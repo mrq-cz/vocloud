@@ -4,3 +4,16 @@
 *.jar
 *.war
 *.ear
+
+target/
+tmp/
+assets/
+build/
+dist/
+.idea/
+.DS_Store
+*.iml
+*~
+Thumbs.db
+.svn/
+nbproject/
