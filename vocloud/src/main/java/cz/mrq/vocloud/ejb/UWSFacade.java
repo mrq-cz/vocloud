@@ -1,0 +1,139 @@
+package cz.mrq.vocloud.ejb;
+
+import cz.mrq.vocloud.entity.UWS;
+import cz.mrq.vocloud.tools.Toolbox;
+
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ *
+ * @author voadmin
+ */
+@Stateless
+public class UWSFacade extends AbstractFacade<UWS> {
+
+    @PersistenceContext(unitName = "vokorelPU")
+    private EntityManager em;
+
+    @Override
+    protected EntityManager getEntityManager() {
+        return em;
+    }
+
+    public UWSFacade() {
+        super(UWS.class);
+    }
+
+    public UWS findOneByType(String type) {
+        UWS uws = null;
+        Query q = getEntityManager().createNamedQuery("UWS.findByType");
+        q.setParameter("jobType", type);
+        try {
+            uws = (UWS) q.getSingleResult();
+        } catch (PersistenceException pe) {
+            Logger.getGlobal().log(Level.WARNING, "query failed: {0}", pe.toString());
+        }
+        return uws;
+    }
+
+    /**
+     * chooses best uws for the job
+     *
+     */
+    public UWS assign(String type) {
+        List<UWS> allUWS = this.findAll();
+        UWS selected = null;
+        float lowestLoad = 100;
+        for (UWS uws : allUWS) {
+            if (uws.getEnabled() && uws.getType().equals(type)) {
+                float load = getLoad(uws);
+                Logger.getGlobal().log(Level.INFO, "quering uws: {0} ({1}), load: {2}", new Object[]{uws.getLabel(), uws.getId(), load});
+                
+                if (load == -1) {
+                    continue;
+                }
+
+                if (load < lowestLoad) {
+                    selected = uws;
+                    lowestLoad = load;
+                }
+
+            }
+        }
+        return selected;
+    }
+
+    /**
+     * check for availability of the uws
+     *
+     * @param uws
+     * @return
+     */
+    public boolean isOnline(UWS uws) {
+        try {
+            int code = Toolbox.getResponseCode(uws.getLocationUrl());
+            if (code == 200) {
+                return true;
+            }
+        } catch (IOException ex) {
+            return false;
+        }
+        return false;
+    }
+
+    /**
+     * counts jobs in phase RUNNING or QUEUED
+     *
+     * @param uws
+     * @return number of jobs, returns -1 if unavailable
+     */
+    public int countRunningJobs(UWS uws) {
+        String ret;
+        try {
+            ret = Toolbox.httpGet(uws.getLocationUrl());
+        } catch (IOException ex) {
+            return -1;
+        }
+        
+
+        Pattern p = Pattern.compile("QUEUED|EXECUTING");
+        Matcher m = p.matcher(ret);
+        int counter = 0;
+        while (m.find()) {
+            counter++;
+        }
+        Logger.getGlobal().log(Level.INFO, "found {0} running jobs at {1}", new Object[]{counter, uws.getLocationUrl()});
+        return counter;
+    }
+
+    public float getLoad(UWS uws) {
+        int running = countRunningJobs(uws);
+        if (running == -1) {
+            return -1;
+        }
+
+        float load = ((float) running / (float) uws.getThreads());
+
+        return load;
+    }
+
+    //TODO rework rating based on priority
+    public float getRating(UWS uws) {
+        float load = getLoad(uws);
+        if (load == -1) {
+            return -1;
+        }
+
+        return load / 100;
+    }
+}

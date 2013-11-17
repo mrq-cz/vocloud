@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:pou="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+    <ui:composition template="./WEB-INF/template.xhtml">
+        <ui:define name="title">Login</ui:define>
+        
+        <ui:define name="messages">
+            <pou:messages globalOnly="true" />
+        </ui:define>
+        
+        <ui:define name="content">
+            <c:choose>
+                <c:when test="#{request.remoteUser != null}">
+                    <p>You are already logged in as #{request.remoteUser}.</p>
+                </c:when>
+                <c:otherwise>
+                    <p>Please log in.</p>
+
+                    <form method="post" action="j_security_check">
+                        <h:panelGrid columns="2">
+                            <h:outputLabel for="j_username" 
+                                           value="User name:"/>
+                            <pou:inputText id="j_username" required="true" value="" />
+
+
+                            <h:outputLabel for="j_password" 
+                                           value="Password:"/>
+                            <pou:password id="j_password" required="true" value="" feedback="false" />
+                            <h:outputLabel for="reset" 
+                                           value=" "/>
+                            <h:link id="reset" outcome="reset-password">Forgot password?</h:link>
+                            <input value="Login" type="submit" ajax="false"/>    
+                        </h:panelGrid>
+                    </form>  
+
+                </c:otherwise>
+            </c:choose>
+        </ui:define>
+    </ui:composition>
+</html>

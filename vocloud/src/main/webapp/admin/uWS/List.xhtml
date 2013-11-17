@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:pou="http://primefaces.org/ui">
+
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.ListUWSTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="content">
+            <h:form styleClass="jsfcrud_list_form">
+                <h:panelGroup id="messagePanel" layout="block">
+                    <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+                </h:panelGroup>
+                <h:outputText escape="false" value="#{bundle.ListUWSEmpty}" rendered="#{uWSController.items.rowCount == 0}"/>
+                <h:panelGroup rendered="#{uWSController.items.rowCount > 0}">
+                    <h:outputText value="#{uWSController.pagination.pageFirstItem + 1}..#{uWSController.pagination.pageLastItem + 1}/#{uWSController.pagination.itemsCount}"/>&nbsp;
+                    <h:commandLink action="#{uWSController.previous}" value="#{bundle.Previous} #{uWSController.pagination.pageSize}" rendered="#{uWSController.pagination.hasPreviousPage}"/>&nbsp;
+                    <h:commandLink action="#{uWSController.next}" value="#{bundle.Next} #{uWSController.pagination.pageSize}" rendered="#{uWSController.pagination.hasNextPage}"/>&nbsp;
+                    <pou:dataTable value="#{uWSController.items}" var="item" >
+
+                        <pou:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListUWSTitle_id}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.id}"/>
+                        </pou:column>
+                        <pou:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListUWSTitle_enabled}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.enabled}"/>
+                        </pou:column>
+                        <pou:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListUWSTitle_locationUrl}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.locationUrl}"/>
+                        </pou:column>
+                        <pou:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListUWSTitle_label}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.label}"/>
+                        </pou:column>
+                        <pou:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListUWSTitle_priority}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.priority}"/>
+                        </pou:column>
+                        <pou:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListUWSTitle_threads}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.threads}"/>
+                        </pou:column>
+                        <pou:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListUWSTitle_type}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.type}"/>
+                        </pou:column>
+                        <pou:column>
+                            <f:facet name="header">
+                                <h:outputText value="&nbsp;"/>
+                            </f:facet>
+                            <h:commandLink action="#{uWSController.prepareView}" value="#{bundle.ListUWSViewLink}"/>
+                            <h:outputText value=" "/>
+                            <h:commandLink action="#{uWSController.prepareEdit}" value="#{bundle.ListUWSEditLink}"/>
+                            <h:outputText value=" "/>
+                            <h:commandLink action="#{uWSController.destroy}" value="#{bundle.ListUWSDestroyLink}"/>
+                        </pou:column>
+                    </pou:dataTable>
+                    
+                </h:panelGroup>
+                <br />
+                <h:commandLink action="#{uWSController.prepareCreate}" value="#{bundle.ListUWSCreateLink}"/>
+
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

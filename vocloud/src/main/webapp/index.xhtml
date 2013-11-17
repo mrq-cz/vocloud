@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:h="http://java.sun.com/jsf/html" xmlns:p="http://primefaces.org/ui">
+    <body>
+
+        <ui:composition template="/WEB-INF/template.xhtml">
+
+            <ui:define name="messages" >
+                <p:messages showDetail="true" />
+            </ui:define>
+
+            <ui:define name="content">
+                <div class="text">
+                <c:if test="#{request.remoteUser != null}">
+                    <p><b>Hi there #{sessionBean.login()}! Your last login was from: #{sessionBean.last}</b></p>
+                </c:if>
+
+                <p>
+                    This service  is the test-bed for embedding Fourier disentangling into the
+                    Virtual Observatory infrastructure. Currently the system allows uploading
+                    of user data, on-the-fly modification of parameters and management of
+                    various user files. The system uses the well-known
+                    interface of electronic shop. The user can see only her/his own files and it
+                    is guaranted that nobody (except the administrator) can access her/his private
+                    files. More information  about the service and its motivation is described in 
+                    <A href="http://arxiv.org/abs/1003.4801">ArXiv:1003.4801</A>. The underlaying  
+                    code  KOREL is presented 
+                    on <A href="http://www.asu.cas.cz/~had/korel.html">KOREL</A> web page of its author P. Hadrava.
+                </p>
+
+                <p>
+                    To achive this the full encryption is used and the user is required to
+                    register (create unique account). Currently up to  five concurrent jobs may run in parallel - the others are queued.
+                    The service is adhering to the IVOA standards for Universal Worker Server (<A href="http://www.ivoa.net/Documents/UWS/20100210/">UWS</A>).
+                </p>
+
+                When using the results achieved by this system, please write the
+                acknowledgment similar to the one stated below:  
+                <p:separator />
+                <b> This research was
+                    accomplished  with the help of  the VO-KOREL web service, developed at the Astronomical Institute
+                    of the Academy of Sciences of the Czech Republic in the framework of the
+                    Czech Virtual Observatory (CZVO) by P. Skoda and  J. Fuchs using the Fourier
+                    disentangling code KOREL deviced by P. Hadrava
+                </b>
+                <p:separator />
+                Current version of KOREL installed on this server is <CODE>KOREL11b - release 9. 9. 2011</CODE>.
+                <p>
+
+                    It can handle up to 2000 spectra with maximal size of 16384 bins, 50 spectral regions and 3 templates.
+                </p>
+                </div>
+            </ui:define>
+        </ui:composition>
+
+    </body>
+
+
+</html>

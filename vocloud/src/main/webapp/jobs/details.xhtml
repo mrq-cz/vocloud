@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <body>
+
+        <ui:composition template="./../WEB-INF/template.xhtml">
+
+            <ui:define name="title">
+                Details of job #{jobs.selected.id}
+            </ui:define>
+
+            <ui:define name="content">
+                
+                <h:form id="details">
+                    <p:poll interval="5" listener="#{jobs.detailsPollListener}" binding="#{jobs.detailsPoll}" autoStart="false" update="details" /> 
+                    <h1>#{jobs.selected.label}</h1>
+                    <p>#{jobs.selected.notes}</p>
+                    <p:dataTable id="atributes" value="#{jobs.selected}" var="job">
+                        <p:column headerText="Type">#{jobs.selected.jobType}</p:column>
+                        <p:column headerText="Id">#{jobs.selected.id}</p:column>
+                        <p:column headerText="Phase">#{jobs.selected.phase}</p:column>
+                        <p:column headerText="Worker">#{jobs.selected.uws.label}</p:column>
+                        <p:column headerText="Created">
+                            <h:outputText value="#{jobs.selected.createdDate}">
+                                <f:convertDateTime type="both"  timeStyle="medium" dateStyle="short" timeZone="CET" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Started">
+                            <h:outputText value="#{jobs.selected.startedDate}">
+                                <f:convertDateTime type="both"  timeStyle="medium" dateStyle="short" timeZone="CET" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Finished">
+                            <h:outputText value="#{jobs.selected.finishedDate}">
+                                <f:convertDateTime type="both"  timeStyle="medium" dateStyle="short" timeZone="CET" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Executing time">#{jobs.selected.executingTime} sec</p:column>
+                    </p:dataTable>
+                    <p:commandButton id="again" actionListener="#{jobs.runAgain}" ajax="false" value="run again" icon="ui-icon-arrowrefresh-1-w" title="create new job with same parameters" />
+                    <p:commandButton id="delete" oncomplete="confirmDelete.show()" value="delete" icon="ui-icon-close" title="delete job and its results" />
+
+                    <p></p>
+                    <h3>Plots</h3>
+                    <c:forEach id="plots" items="#{jobs.images}" var="image" >
+                            <p:panel style="max-width: 800px" >
+                                <f:facet name="header">
+                                    #{image.name} -<p:commandLink ajax="false" actionListener="#{jobs.download}" value="download" title="download this image">
+                                        <f:attribute name="selectedFile" value="#{image}" />
+                                    </p:commandLink>
+                                </f:facet>
+                            <h:graphicImage url="images/#{jobs.selected.stringId}/#{image.name}" />
+                            
+                            </p:panel>
+                            <p></p>
+                    </c:forEach>
+                    <p></p>
+                    <h3>Files</h3>
+                    <p:dataTable  id="files" style="max-width: 800px" value="#{jobs.files}" var="file" 
+                                  rowStyleClass="#{file.name eq 'korel.err' or file.name eq 'korel.ret' ? 'errorrow': null }">
+                        <p:column headerText="Name" >
+                            #{file.name}
+                        </p:column>
+                        <p:column headerText="Size" style="width: 1px">
+                            #{file.length()}
+                        </p:column>
+                        <p:column headerText="Download" style="width: 1px; text-align: center">
+                            <p:commandButton id="download"  ajax="false" actionListener="#{jobs.download}" icon="ui-icon-disk" title="Download #{file.name}">
+                                <f:attribute name="selectedFile" value="#{file}" />
+                            </p:commandButton>
+                        </p:column>
+                        <p:column headerText="View" style="width: 1px; text-align: center" >
+                            <p:commandButton id="view" title="view file"  icon="ui-icon-newwin"
+                                             update=":details:text :details:name" oncomplete="fileView.show()">
+                                <f:setPropertyActionListener value="#{file}" target="#{jobs.selectedFile}" />  
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+
+                    <p:dialog id="fileView" widgetVar="fileView" width="700" maximizable="false" minimizable="true"  height="500"  >
+                        <f:facet name="header">View <h:outputText id="name" value="#{jobs.selectedFile.name}" /></f:facet>
+                        <pre><h:outputText id="text" value="#{jobs.selectedFileContents}" ></h:outputText></pre>
+                    </p:dialog>
+                
+                    <p:confirmDialog id="confirmDeleteDialog" widgetVar="confirmDelete" message="Are you sure to delete this job?" header="Delete #{jobs.selected.id}" severity="alert" >
+                    <p:commandButton id="confirmDel" actionListener="#{jobs.deleteSelected}" ajax="false" value="Delete" title="delete job" onclick="confirmDelete.hide()" />
+                    <p:commandButton id="declineDel" value="Cancel" onclick="confirmDelete.hide()" />
+                </p:confirmDialog>
+                </h:form>
+                
+                
+            </ui:define>
+
+
+        </ui:composition>
+
+    </body>
+</html>

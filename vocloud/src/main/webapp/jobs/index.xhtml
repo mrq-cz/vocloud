@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="title">Jobs</ui:define>
+        <ui:define name="messages">
+            <p:messages id="jobMessages" showDetail="true" />
+        </ui:define>
+        <ui:define name="content">
+            #{jobs.refresh()}
+            <h:form id="formList">
+                <p:poll interval="5" listener="#{jobs.refresh}" update="data, spaceusage" />  
+                <p> </p>
+                <p:dataTable id="data" style="max-width: 1200px" value="#{jobs.jobs}" var="job" rowStyleClass="#{job.phase eq 'ERROR' ? 'errorrow': null}">
+                    <p:column >
+                        <f:facet name="header">Type</f:facet>
+                        #{job.jobType}
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">Id</f:facet>
+                        <p:commandLink actionListener="#{jobs.details}" ajax="false"><f:attribute name="selectedJob" value="#{job}" />#{job.id}</p:commandLink>
+                    </p:column>
+                    <p:column style="width: 100%">
+                        <f:facet name="header">Name</f:facet>
+                        <b>#{job.label}</b>
+                    </p:column>
+                    <p:column  headerText="Created">
+                        <h:outputText value="#{job.createdDate}">
+                            <f:convertDateTime type="date"  dateStyle="short" timeZone="CET" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">Duration</f:facet>
+                        #{job.executingTime} sec
+                    </p:column>
+                    <p:column id="phase" style="text-align: center">
+                        <f:facet name="header">Phase</f:facet>
+                        #{job.phase}
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">Action</f:facet>
+                        <p:commandButton rendered="#{job.phase eq 'PENDING'}" id="start" actionListener="#{jobs.start}" update="data" value="start" title="start">
+                            <f:attribute name="selectedJob" value="#{job}" />
+                        </p:commandButton>
+                        <p:commandButton rendered="#{job.phase eq 'EXECUTING' or job.phase eq 'QUEUED'}" id="abort" actionListener="#{jobs.abort}" update="data" value="abort" title="abort">
+                            <f:attribute name="selectedJob" value="#{job}" />
+                        </p:commandButton>
+                    </p:column>
+                    <p:column headerText="Delete" style="width: 1px; text-align: center">
+                        <p:commandButton id="delete" update=":formList:confirmDeleteDialog" oncomplete="confirmDelete.show()" icon="ui-icon-close" title="delete job">
+                            <f:setPropertyActionListener value="#{job}" target="#{jobs.selected}" />
+                        </p:commandButton>
+                    </p:column>
+                    <p:column headerText="Details" style="width: 1px; text-align: center">
+                        <p:commandButton id="details" actionListener="#{jobs.details}" ajax="false" icon="ui-icon-document" title="details of job">
+                            <f:attribute name="selectedJob" value="#{job}" />
+                        </p:commandButton></p:column>
+                    <p:rowExpansion>
+                        <p>#{job}</p>
+                    </p:rowExpansion>
+                </p:dataTable>
+                <p> </p>
+                <h:outputText id="spaceusage" value="#{jobs.usedPercent}% full (Using #{jobs.spaceUsage})" />                
+            
+                <p:confirmDialog id="confirmDeleteDialog" widgetVar="confirmDelete" message="Are you sure to delete job #{jobs.selected.id}?" header="Delete #{jobs.selected.id}" severity="alert" >
+                    <p:commandButton id="confirmDel" actionListener="#{jobs.delete}" update=":formList" value="Delete" title="delete job" onclick="confirmDelete.hide()" />
+                    <p:commandButton id="declineDel" value="Cancel" onclick="confirmDelete.hide()" />
+                </p:confirmDialog>
+            </h:form>
+
+            
+        </ui:define>
+    </ui:composition>
+
+
+
+</html>
+

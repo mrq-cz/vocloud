@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.EditUWSTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="content">
+            <h:panelGroup id="messagePanel" layout="block">
+                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+            </h:panelGroup>
+            <h:form>
+                <h:panelGrid columns="2">
+                    <h:outputLabel value="#{bundle.EditUWSLabel_id}" for="id" />
+                    <h:inputText id="id" value="#{uWSController.selected.id}" title="#{bundle.EditUWSTitle_id}" />
+                    <h:outputLabel value="#{bundle.EditUWSLabel_enabled}" for="enabled" />
+                    <h:inputText id="enabled" value="#{uWSController.selected.enabled}" title="#{bundle.EditUWSTitle_enabled}" />
+                    <h:outputLabel value="#{bundle.EditUWSLabel_locationUrl}" for="locationUrl" />
+                    <h:inputText id="locationUrl" value="#{uWSController.selected.locationUrl}" title="#{bundle.EditUWSTitle_locationUrl}" />
+                    <h:outputLabel value="#{bundle.EditUWSLabel_label}" for="label" />
+                    <h:inputText id="label" value="#{uWSController.selected.label}" title="#{bundle.EditUWSTitle_label}" required="true" requiredMessage="#{bundle.EditUWSRequiredMessage_label}"/>
+                    <h:outputLabel value="#{bundle.EditUWSLabel_priority}" for="priority" />
+                    <h:inputText id="priority" value="#{uWSController.selected.priority}" title="#{bundle.EditUWSTitle_priority}" />
+                    <h:outputLabel value="#{bundle.EditUWSLabel_threads}" for="threads" />
+                    <h:inputText id="threads" value="#{uWSController.selected.threads}" title="#{bundle.EditUWSTitle_threads}" />
+                    <h:outputLabel value="#{bundle.EditUWSLabel_type}" for="type" />
+                    <h:inputText id="type" value="#{uWSController.selected.type}" title="#{bundle.EditUWSTitle_type}" />
+                </h:panelGrid>
+                <h:commandLink action="#{uWSController.update}" value="#{bundle.EditUWSSaveLink}"/>
+                <br />
+                <br />
+                <h:commandLink action="View" value="#{bundle.EditUWSViewLink}" immediate="true"/>
+                <br />
+                <h:commandLink action="#{uWSController.prepareList}" value="#{bundle.EditUWSShowAllLink}" immediate="true"/>
+
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

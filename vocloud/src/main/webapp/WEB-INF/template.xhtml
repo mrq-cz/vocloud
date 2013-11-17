@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html">
+
+    <h:head>
+        <h:outputStylesheet name="css/default.css" />
+        <h:outputStylesheet name="css/cssLayout.css" />
+        <title>VO-KOREL <ui:insert name="title"/></title>
+    </h:head>
+
+    <h:body>
+        <div id="top">
+            <div id="title"><h2 class="titl"> VO-KOREL <ui:insert name="title" /></h2></div>
+            <div id="navigation">
+                <ui:include src="navigation/navigation.xhtml" />
+            </div>
+            <ui:insert name="top"/>
+        </div>
+
+        <div id="messageBar">
+            <ui:insert name="messages" />
+        </div>
+
+        <div id="content" class="center_content">
+
+            <ui:insert name="content" />
+        </div>
+
+        <div id="bottom">
+            <ui:insert name="bottom" />
+            <h:form><div align="right">(c) mrq 2012 - <h:commandLink value="feedback"  action="/feedback" /></div></h:form>
+        </div>
+
+    </h:body>
+
+</html>

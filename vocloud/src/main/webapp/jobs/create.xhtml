@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <body>
+
+        <ui:composition template="./../WEB-INF/template.xhtml">
+
+            <ui:define name="title">
+                Create new job
+            </ui:define>
+
+            <ui:define name="messages">
+                <p:messages id="createMessages" showDetail="true" />
+            </ui:define>
+
+            <ui:define name="content">
+                <h:form enctype="multipart/form-data">
+                    <h:panelGrid columns="2" style="padding-bottom: 20px">
+                        <h:outputLabel style="font-weight: bold" value="Project label:" for="label" />
+                        <p:inputText size="30" label="Job label" id="label" value="#{createJob.job.label}" 
+                                     required="true"
+                                     requiredMessage="Please enter a label for this job"/>
+
+                        <h:outputLabel value="Description:" for="notes" />
+                        <p:inputTextarea id="notes" cols="60" value="#{createJob.job.notes}" />
+                        <h:panelGrid columns="2">
+                            <p:selectBooleanCheckbox id="email" value="#{createJob.email}" />
+                            <h:outputText value="Email me results" for="email" />
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <p:panel id="korelpar"  binding="#{createJob.editParPanel}" toggleable="true" header="Edit korel.par" >
+                        <p:inputTextarea id="partext" value="#{createJob.parFileContents}" 
+                                         cols="90" rows="10"  autoResize="false" style="font-family: courier"/>
+                        <p:resizable for="partext" minHeight="170" minWidth="750" />
+                    </p:panel>
+                    <p> </p>
+                    <p:panel id="korel" toggleable="true" header="Upload parameters">
+                        <h:panelGrid columns="1">
+                            <p>
+                                Please attach parameter file <em>korel.par</em> and data file <em>korel.dat</em>, 
+                                you can also upload template <em>korel.tmp</em> if needed.
+                            </p>
+                            <p>
+                                All those files can be uploaded in zip archive.
+                            </p>
+                            <h:panelGrid columns="2">
+                                <h:outputText value="korel.par"/>
+                                <p:selectBooleanCheckbox disabled="true" value="#{createJob.par}"/>
+
+                                <h:outputText value="korel.dat"/>
+                                <p:selectBooleanCheckbox disabled="true" value="#{createJob.dat}"/>
+
+                                <h:outputText value="korel.tmp"/>
+                                <p:selectBooleanCheckbox disabled="true" value="#{createJob.tmp}"/>
+                            </h:panelGrid>
+                            <p:fileUpload  id="upload" 
+                                           mode="advanced"
+                                           auto="true"
+                                           multiple="true"
+                                           update="korel korelpar"
+                                           allowTypes="/(\.|\/)(par|dat|tmp|zip)$/"
+                                           fileUploadListener="#{createJob.handleFileUpload}"/>
+
+                        </h:panelGrid>
+                    </p:panel>
+
+                    <p> </p>
+                    <p:splitButton update=":createMessages"  value="Save and run" action="#{createJob.saveRun}">
+                        <p:menuitem update=":createMessages"  value="Save" action="#{createJob.save}" />
+                    </p:splitButton>
+                    <p:commandButton ajax="false" value="Cancel" action="index.xhtml" />
+                </h:form>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>
