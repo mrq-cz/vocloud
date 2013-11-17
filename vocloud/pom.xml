@@ -31,11 +31,6 @@
             <artifactId>primefaces</artifactId>
             <version>4.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.primefaces.themes</groupId>
-            <artifactId>smoothness</artifactId>
-            <version>1.0.7</version>
-        </dependency>
     </dependencies>
 
     <build>
