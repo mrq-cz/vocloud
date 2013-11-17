@@ -39,7 +39,7 @@ public class JobFacade extends AbstractFacade<Job> {
     
     @PersistenceContext(unitName = "vokorelPU")
     private EntityManager em;
-    @Inject
+    @EJB
     private SchedulerBean sb;
     @Resource(name = "vokorel-mail")
     private Session mailSession;
