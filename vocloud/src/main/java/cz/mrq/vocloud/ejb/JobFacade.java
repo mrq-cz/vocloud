@@ -35,7 +35,7 @@ import java.util.logging.Logger;
 @Stateless
 public class JobFacade extends AbstractFacade<Job> {
 
-    public static final Logger logger = Logger.getLogger(JobFacade.class.toString());
+    private static final Logger logger = Logger.getLogger(JobFacade.class.toString());
     
     @PersistenceContext(unitName = "vokorelPU")
     private EntityManager em;
@@ -102,8 +102,7 @@ public class JobFacade extends AbstractFacade<Job> {
         Query q = getEntityManager().createNamedQuery("Job.findByOwnerId");
         q.setParameter("owner", owner);
         try {
-            List<Job> list = q.getResultList();
-            return list;
+            return q.getResultList();
         } catch (PersistenceException pe) {
             Logger.getGlobal().log(Level.WARNING, "query failed: {0}", pe.toString());
         }
@@ -114,8 +113,7 @@ public class JobFacade extends AbstractFacade<Job> {
         Query q = getEntityManager().createNamedQuery("Job.userJobList");
         q.setParameter("owner", owner);
         try {
-            List<Job> list = q.getResultList();
-            return list;
+            return q.getResultList();
         } catch (PersistenceException pe) {
             Logger.getGlobal().log(Level.WARNING, "query failed: {0}", pe.toString());
         }
@@ -132,7 +130,7 @@ public class JobFacade extends AbstractFacade<Job> {
             return false;
         }
         File results = new File(getFileDir(job), "results.zip");
-        Boolean result = false;
+        Boolean result;
         try {
             result = Toolbox.downloadFile(job.getUwsJob().getResults(), results);
             Toolbox.decompress(results, results.getParentFile());
@@ -161,8 +159,7 @@ public class JobFacade extends AbstractFacade<Job> {
         Query q = getEntityManager().createNamedQuery("Job.findByPhase");
         q.setParameter("phase", phase);
         try {
-            List<Job> list = q.getResultList();
-            return list;
+            return q.getResultList();
         } catch (PersistenceException pe) {
             Logger.getGlobal().log(Level.WARNING, "query failed: {0}", pe.toString());
         }
@@ -257,7 +254,7 @@ public class JobFacade extends AbstractFacade<Job> {
      * requires java 7
      * 
      * @since 1.7 
-     * @param job 
+     * @param job
      */
     @Asynchronous
     public void postProcess(Job job) {
@@ -282,7 +279,7 @@ public class JobFacade extends AbstractFacade<Job> {
             logger.log(Level.SEVERE, null, ex);
             return;
         }
-        Process postProcess = null;
+        Process postProcess;
         
         // run parts run any executable (must have permission) scripts *.sh in scripts directory
         ProcessBuilder postPB = new ProcessBuilder("run-parts", "-v", "--regex=", jobScripts);

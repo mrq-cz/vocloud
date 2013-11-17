@@ -33,6 +33,8 @@ import java.util.logging.Logger;
 @ViewScoped
 public class FeedbackBean implements Serializable {
 
+    private static final Logger logger = Logger.getLogger(UserAccountFacade.class.getName());
+
     @EJB
     private UserAccountFacade uaf;
     @Resource(name = "vokorel-mail")
@@ -86,7 +88,7 @@ public class FeedbackBean implements Serializable {
                 emailMessage.setText(sb.toString());
                 emailMessage.setHeader("X-Mailer", "My Mailer");
                 Transport.send(emailMessage);
-                Logger.getLogger(UserAccountFacade.class.getName()).log(Level.INFO, "Feedback email has been sent.");
+                logger.log(Level.INFO, "Feedback email has been sent.");
                 
                 FacesContext currentInstance = FacesContext.getCurrentInstance();
                 currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Thank you for your feedback!" , "Your message has been sent to the administrator."));
@@ -96,9 +98,9 @@ public class FeedbackBean implements Serializable {
                 myNav.handleNavigation(currentInstance, null, "/index");
                 
         } catch (AddressException ex) {
-            Logger.getLogger(UserAccountFacade.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
         } catch (MessagingException ex) {
-                Logger.getLogger(UserAccountFacade.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
         }
     }
 

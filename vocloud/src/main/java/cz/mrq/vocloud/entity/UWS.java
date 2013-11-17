@@ -64,8 +64,7 @@ public class UWS implements Serializable {
     }
     
     public String getJob(String jobId) throws IOException {
-        String out = Toolbox.httpGet(locationUrl + "/" + jobId);
-        return out;
+        return Toolbox.httpGet(locationUrl + "/" + jobId);
     }
     
     //<editor-fold defaultstate="collapsed" desc="getters setters...">
@@ -138,10 +137,7 @@ public class UWS implements Serializable {
             return false;
         }
         UWS other = (UWS) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
+        return !((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id)));
     }
     
     @Override

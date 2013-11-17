@@ -209,7 +209,7 @@ public class UserAccountController implements Serializable {
         }
 
         String getStringKey(java.lang.Long value) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append(value);
             return sb.toString();
         }

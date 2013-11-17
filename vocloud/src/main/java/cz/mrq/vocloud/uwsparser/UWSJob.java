@@ -42,13 +42,10 @@ public class UWSJob {
     
     public void setDestruction(String destruction) {
         try {
-            Date time = dateFormat.parse(destruction);
-            this.destruction = time;
+            this.destruction = dateFormat.parse(destruction);
         } catch (ParseException ex) {
             Logger.getLogger(UWSJob.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
     }
     
     public Date getEndTime() {
@@ -61,13 +58,10 @@ public class UWSJob {
     
     public void setEndTime(String endTime) {
         try {
-            Date time = dateFormat.parse(endTime);
-            this.endTime = time;
+            this.endTime = dateFormat.parse(endTime);
         } catch (ParseException ex) {
             Logger.getLogger(UWSJob.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
     }
     
     public long getExecutionDuration() {
@@ -142,17 +136,12 @@ public class UWSJob {
         this.errorSummary = errorSummary;
     }
     
-    
-    
     public void setStartTime(String startTime) {
         try {
-            Date time = dateFormat.parse(startTime);
-            this.startTime = time;
+            this.startTime = dateFormat.parse(startTime);
         } catch (ParseException ex) {
             Logger.getLogger(UWSJob.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
     }
     //</editor-fold>
 }

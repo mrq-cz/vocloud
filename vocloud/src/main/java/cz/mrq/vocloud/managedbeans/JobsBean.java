@@ -120,7 +120,7 @@ public class JobsBean implements Serializable {
     public void detailsPollListener() {
         selected = jobFacade.find(selected.getId());
         
-        // stop pooling if job isnt in progress
+        // stop pooling if job isn't in progress
         if (selected.getPhase() != UWSJobPhase.EXECUTING & selected.getPhase() != UWSJobPhase.QUEUED)
             detailsPoll.setStop(true);
         else
@@ -138,20 +138,12 @@ public class JobsBean implements Serializable {
         response.setContentType(externalContext.getMimeType(file.getName()));
         response.setHeader("Content-disposition", "attachment; filename=\"" + file.getName() + "\"");
 
-        BufferedInputStream input = null;
-        BufferedOutputStream output = null;
-
-        try {
-            input = new BufferedInputStream(new FileInputStream(file));
-            output = new BufferedOutputStream(response.getOutputStream());
-
+        try (BufferedOutputStream output = new BufferedOutputStream(response.getOutputStream());
+             BufferedInputStream input = new BufferedInputStream(new FileInputStream(file))) {
             byte[] buffer = new byte[10240];
-            for (int length; (length = input.read(buffer)) > 0;) {
+            for (int length; (length = input.read(buffer)) > 0; ) {
                 output.write(buffer, 0, length);
             }
-        } finally {
-            output.close();
-            input.close();
         }
 
         facesContext.responseComplete();
@@ -251,9 +243,7 @@ public class JobsBean implements Serializable {
         if (used == null) {
             return 0;
         }
-        int percent = (int) (((float) used / (float) user.getQuota()) * 100);
-        //if(percent > 100) percent = 100;
-        return percent;
+        return (int) (((float) used / (float) user.getQuota()) * 100);
     }
 
     public String getSpaceUsage() {

@@ -34,7 +34,7 @@ public class SchedulerBean {
     
     @PostConstruct
     public void init() {
-        logger.log(Level.INFO, "schelduler initialized");
+        logger.log(Level.INFO, "scheduler initialized");
         
         // find executing jobs
         watchedJobs.addAll(jf.findByPhase(UWSJobPhase.EXECUTING));
@@ -49,7 +49,7 @@ public class SchedulerBean {
     @Schedule(second="*/5", minute="*", hour="*", persistent=false)
     public void updateExecutingJobs() {
         int prevsize = watchedJobs.size();
-        UWSJobPhase phase = null;
+        UWSJobPhase phase;
         for (Job job : watchedJobs) {
             phase = job.getPhase();
             job.updateFromUWS();

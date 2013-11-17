@@ -47,7 +47,7 @@ public class ImagesServlet extends HttpServlet {
         String jobId = split[1];
         String fileName = split[2];
        
-        //only owner can acces image
+        //only owner can access image
         //TODO fix bugs
         Job job = jf.find(Long.parseLong(jobId));
         String user = request.getRemoteUser();
@@ -57,38 +57,23 @@ public class ImagesServlet extends HttpServlet {
         }
         
         if (!fileName.endsWith("png")) return;
-        
-        //Logger.getLogger(ImagesServlet.class.toString()).log(Level.INFO, "Serving image {0} from job {1}", new Object[]{fileName, jobId});
-        
+
         response.setContentType("text/html;charset=UTF-8");
-        
         File file = new File(jobsDir+path);
-        
-        //Logger.getLogger(JobsBean.class.getName()).info("Generating image "+file.getAbsolutePath());
 
         if (!file.exists()) return;
         
-        response.reset(); // Some JSF component library or some Filter might have set some headers in the buffer beforehand. We want to get rid of them, else it may collide.
-        response.setContentType("image/png"); // Check http://www.w3schools.com/media/media_mimeref.asp for all types. Use if necessary ServletContext#getMimeType() for auto-detection based on filename.
-        response.setHeader("Content-disposition", "inline; filename=\""+file.getName()+"\""); // The Save As popup magic is done here. You can give it any filename you want, this only won't work in MSIE, it will use current request URL as filename instead.
+        response.reset();
+        response.setContentType("image/png");
+        response.setHeader("Content-disposition", "inline; filename=\""+file.getName()+"\"");
 
-        BufferedInputStream input = null;
-        BufferedOutputStream output = null;
-
-        try {
-            input = new BufferedInputStream(new FileInputStream(file));
-            output = new BufferedOutputStream(response.getOutputStream());
-
+        try (BufferedInputStream input = new BufferedInputStream(new FileInputStream(file));
+             BufferedOutputStream output = new BufferedOutputStream(response.getOutputStream())) {
             byte[] buffer = new byte[10240];
-            for (int length; (length = input.read(buffer)) > 0;) {
+            for (int length; (length = input.read(buffer)) > 0; ) {
                 output.write(buffer, 0, length);
             }
-            
-        } finally {
-            output.close();
-            input.close();
         }
-        
     }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

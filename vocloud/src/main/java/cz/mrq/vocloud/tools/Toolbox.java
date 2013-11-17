@@ -128,8 +128,8 @@ public class Toolbox {
     public static void decompress(File file, File outputDirectory) {
         try {
             int buffer = 2048;
-            BufferedOutputStream dest = null;
-            BufferedInputStream is = null;
+            BufferedOutputStream dest;
+            BufferedInputStream is;
             ZipEntry entry;
             ZipFile zipfile = new ZipFile(file);
             Enumeration e = zipfile.entries();
@@ -160,7 +160,7 @@ public class Toolbox {
         StringBuilder sb = new StringBuilder();
         try {
 
-            BufferedInputStream is = null;
+            BufferedInputStream is;
             ZipEntry entry;
             ZipFile zipfile = new ZipFile(file);
             Enumeration e = zipfile.entries();
@@ -185,24 +185,27 @@ public class Toolbox {
     public static void compressFiles(File directory, File archive) {
         int buffer = 2048;
         try {
-            BufferedInputStream origin = null;
+            BufferedInputStream origin;
             ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(archive)));
             byte data[] = new byte[buffer];
             // get a list of files from current directory
 
-            for (File f : directory.listFiles()) {
-                if (archive.getName().equals(f.getName())) {
-                    continue;
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    if (archive.getName().equals(f.getName())) {
+                        continue;
+                    }
+                    origin = new BufferedInputStream(new FileInputStream(f), buffer);
+                    ZipEntry entry = new ZipEntry(f.getName());
+                    out.putNextEntry(entry);
+                    int count;
+                    while ((count = origin.read(data, 0,
+                            buffer)) != -1) {
+                        out.write(data, 0, count);
+                    }
+                    origin.close();
                 }
-                origin = new BufferedInputStream(new FileInputStream(f), buffer);
-                ZipEntry entry = new ZipEntry(f.getName());
-                out.putNextEntry(entry);
-                int count;
-                while ((count = origin.read(data, 0,
-                        buffer)) != -1) {
-                    out.write(data, 0, count);
-                }
-                origin.close();
             }
             out.close();
         } catch (Exception e) {

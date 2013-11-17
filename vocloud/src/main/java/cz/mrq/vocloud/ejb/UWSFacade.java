@@ -57,7 +57,7 @@ public class UWSFacade extends AbstractFacade<UWS> {
         for (UWS uws : allUWS) {
             if (uws.getEnabled() && uws.getType().equals(type)) {
                 float load = getLoad(uws);
-                Logger.getGlobal().log(Level.INFO, "quering uws: {0} ({1}), load: {2}", new Object[]{uws.getLabel(), uws.getId(), load});
+                Logger.getGlobal().log(Level.INFO, "queering uws: {0} ({1}), load: {2}", new Object[]{uws.getLabel(), uws.getId(), load});
                 
                 if (load == -1) {
                     continue;
@@ -122,9 +122,7 @@ public class UWSFacade extends AbstractFacade<UWS> {
             return -1;
         }
 
-        float load = ((float) running / (float) uws.getThreads());
-
-        return load;
+        return ((float) running / (float) uws.getThreads());
     }
 
     //TODO rework rating based on priority

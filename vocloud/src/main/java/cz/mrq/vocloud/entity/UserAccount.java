@@ -35,6 +35,8 @@ import java.util.logging.Logger;
 public class UserAccount implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger logger = Logger.getLogger(UserAccount.class.getName());
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -169,15 +171,12 @@ public class UserAccount implements Serializable {
 
             byte[] digest = md.digest();
             StringBuilder hexString = new StringBuilder();
-            for (int i = 0; i < digest.length; i++) {
-                hexString.append(Integer.toString((digest[i] & 0xff) + 0x100, 16).substring(1));
+            for (byte aDigest : digest) {
+                hexString.append(Integer.toString((aDigest & 0xff) + 0x100, 16).substring(1));
             }
             return hexString.toString();
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, null, ex);
-
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(UserAccount.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
+            logger.log(Level.SEVERE, null, ex);
         }
         return "asdf";
     }
@@ -244,10 +243,7 @@ public class UserAccount implements Serializable {
             return false;
         }
         UserAccount other = (UserAccount) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
+        return !((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id)));
     }
 
     @Override

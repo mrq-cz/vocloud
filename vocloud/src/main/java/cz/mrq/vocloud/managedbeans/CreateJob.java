@@ -89,15 +89,18 @@ public class CreateJob implements Serializable {
             // add parameters
             File dir = jf.getFileDir(parent);
 
-            for (File f : dir.listFiles()) {
-                if (checkFileName(f.getName())) {
-                    uploadedFiles.add(f);
+            File[] files = dir.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    if (checkFileName(f.getName())) {
+                        uploadedFiles.add(f);
+                    }
                 }
             }
 
             // read par file contents
             if (par) {
-                setParFileContents(new File(jf.getFileDir(parent), "korel.par"));
+                setParFileContents(new File(dir, "korel.par"));
             }
 
 
@@ -201,7 +204,7 @@ public class CreateJob implements Serializable {
 
         // check for free space
         if (usb.getUser().getQuota() <= jf.getSize(usb.getUser())) {
-            Logger.getLogger(CreateJob.class.getName()).log(Level.SEVERE, "Job cant be created not enought user space");
+            Logger.getLogger(CreateJob.class.getName()).log(Level.SEVERE, "Job cant be created not enough user space");
             currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Job could been created, you exceeded your disk quota.", "Please free some space first."));
         }
 
@@ -265,7 +268,7 @@ public class CreateJob implements Serializable {
         }
 
         String param = "zip=" + link;
-        String reply = "";
+        String reply;
         try {
             reply = job.getUws().createJob(param);
         } catch (IOException ex) {

@@ -37,9 +37,7 @@ public class UWSParserManager {
     }
 
     public UWSJob getJob(String url) throws IOException {
-        String jobXML = null;
-        jobXML = Toolbox.httpGet(url);
-        UWSJob newJob = this.parseJob(jobXML);
-        return newJob;
+        String jobXML = Toolbox.httpGet(url);
+        return this.parseJob(jobXML);
     }
 }

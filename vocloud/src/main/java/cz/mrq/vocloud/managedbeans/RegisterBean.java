@@ -68,7 +68,7 @@ public class RegisterBean implements Serializable {
             
             uaf.create(user);
             currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Welcome "+user.getFirstName()+"!", null));
-            currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Your account has been sucesfully registered, you can login right away.", null));
+            currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Your account has been successfully registered, you can login right away.", null));
         } catch (Exception e) {
             currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Account registration failed: " + e.toString(), null));
         }

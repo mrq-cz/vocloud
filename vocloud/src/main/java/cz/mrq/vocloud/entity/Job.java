@@ -91,8 +91,7 @@ public class Job implements Serializable {
             Logger.getLogger(Job.class.getName()).log(Level.SEVERE, "cannot update job", ex);
             return;
         }
-        UWSJob newUwsJob = getParser().parseJob(xml);
-        uwsJob = newUwsJob;
+        uwsJob = getParser().parseJob(xml);
         updateFromUWSJob();
     }
 
@@ -265,15 +264,15 @@ public class Job implements Serializable {
             return false;
         }
         Job other = (Job) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
+        return !((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id)));
     }
 
     @Override
     public String toString() {
-        return "Job{" + "id=" + id + ", label=" + label + ", notes=" + notes + ", owner=" + owner + ", jobType=" + jobType + ", uws=" + uws + ", createdDate=" + createdDate + ", finishedDate=" + finishedDate + ", remoteId=" + remoteId + ", phase=" + phase + ", uwsJob=" + uwsJob + '}';
+        return "Job{" + "id=" + id + ", label=" + label + ", notes=" + notes + ", owner=" + owner
+                + ", jobType=" + jobType + ", uws=" + uws + ", createdDate=" + createdDate
+                + ", finishedDate=" + finishedDate + ", remoteId=" + remoteId
+                + ", phase=" + phase + ", uwsJob=" + uwsJob + '}';
     }
     //</editor-fold>
 }
