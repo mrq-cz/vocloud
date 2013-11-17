@@ -46,7 +46,7 @@
                     <p:commandButton id="again" actionListener="#{jobs.runAgain}" ajax="false" value="run again" icon="ui-icon-arrowrefresh-1-w" title="create new job with same parameters" />
                     <p:commandButton id="delete" oncomplete="confirmDelete.show()" value="delete" icon="ui-icon-close" title="delete job and its results" />
 
-                    <p></p>
+                    <p />
                     <h3>Plots</h3>
                     <c:forEach id="plots" items="#{jobs.images}" var="image" >
                             <p:panel style="max-width: 800px" >
@@ -58,9 +58,9 @@
                             <h:graphicImage url="images/#{jobs.selected.stringId}/#{image.name}" />
                             
                             </p:panel>
-                            <p></p>
+                            <p />
                     </c:forEach>
-                    <p></p>
+                    <p />
                     <h3>Files</h3>
                     <p:dataTable  id="files" style="max-width: 800px" value="#{jobs.files}" var="file" 
                                   rowStyleClass="#{file.name eq 'korel.err' or file.name eq 'korel.ret' ? 'errorrow': null }">
@@ -85,7 +85,7 @@
 
                     <p:dialog id="fileView" widgetVar="fileView" width="700" maximizable="false" minimizable="true"  height="500"  >
                         <f:facet name="header">View <h:outputText id="name" value="#{jobs.selectedFile.name}" /></f:facet>
-                        <pre><h:outputText id="text" value="#{jobs.selectedFileContents}" ></h:outputText></pre>
+                        <pre><h:outputText id="text" value="#{jobs.selectedFileContents}" /></pre>
                     </p:dialog>
                 
                     <p:confirmDialog id="confirmDeleteDialog" widgetVar="confirmDelete" message="Are you sure to delete this job?" header="Delete #{jobs.selected.id}" severity="alert" >
