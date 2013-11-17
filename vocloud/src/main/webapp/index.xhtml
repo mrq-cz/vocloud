@@ -17,7 +17,7 @@ and open the template in the editor.
 
             <ui:define name="content">
                 <div class="text">
-                <c:if test="#{request.remoteUser != null}">
+                <c:if test="${request.remoteUser != null}">
                     <p><b>Hi there #{sessionBean.login()}! Your last login was from: #{sessionBean.last}</b></p>
                 </c:if>
 

@@ -19,7 +19,7 @@ and open the template in the editor.
         
         <ui:define name="content">
             <c:choose>
-                <c:when test="#{request.remoteUser != null}">
+                <c:when test="${request.remoteUser != null}">
                     <p>You are already logged in as #{request.remoteUser}.</p>
                 </c:when>
                 <c:otherwise>

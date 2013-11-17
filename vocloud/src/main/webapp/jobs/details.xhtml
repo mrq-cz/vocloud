@@ -48,7 +48,7 @@
 
                     <p />
                     <h3>Plots</h3>
-                    <c:forEach id="plots" items="#{jobs.images}" var="image" >
+                    <c:forEach id="plots" items="${jobs.images}" var="image" >
                             <p:panel style="max-width: 800px" >
                                 <f:facet name="header">
                                     #{image.name} -<p:commandLink ajax="false" actionListener="#{jobs.download}" value="download" title="download this image">

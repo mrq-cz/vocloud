@@ -14,11 +14,11 @@ and open the template in the editor.
             <p:menuitem value="Home" action="/index.xhtml" />
             
             <c:choose>
-            <c:when test="#{request.remoteUser !=  null}">
+            <c:when test="${request.remoteUser !=  null}">
                 <p:menuitem ajax="false" action="/jobs/index" value="Jobs" icon="ui-icon-document" />
                 <p:menuitem ajax="false" action="/jobs/create" value="Create" icon="ui-icon-disk" />
                 <p:menuitem ajax="false" action="/settings" value="Settings" icon="ui-icon-gear" />
-                <c:if test="#{sessionBean.user.groupName == 'ADMIN'}">
+                <c:if test="${sessionBean.user.groupName == 'ADMIN'}">
                     <p:submenu label="Admin">
                         <p:menuitem ajax="false" action="admin-users" value="Users" />
                         <p:menuitem ajax="false" action="admin-uws" value="UWS" />
