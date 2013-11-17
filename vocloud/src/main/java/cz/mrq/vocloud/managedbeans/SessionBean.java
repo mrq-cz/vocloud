@@ -22,18 +22,13 @@ import java.util.Date;
 @SessionScoped
 public class SessionBean implements Serializable {
 
-    @EJB
-    private UserSessionBean usb;
-    
-    @EJB
-    private JobFacade jf;
+    @EJB private UserSessionBean usb;
+    @EJB private JobFacade jf;
     
     private UserAccount user;
     private boolean loggedIn = false;
     private String last = "";
-    /**
-     * Creates a new instance of Session
-     */
+
     public SessionBean() {
     }
 

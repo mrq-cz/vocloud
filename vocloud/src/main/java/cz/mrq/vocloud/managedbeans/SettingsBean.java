@@ -12,7 +12,6 @@ import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
 
-
 /**
  *
  * @author voadmin
@@ -21,23 +20,17 @@ import java.io.Serializable;
 @RequestScoped
 public class SettingsBean implements Serializable {
 
-    @EJB
-    private UserSessionBean usb;
-    @EJB
-    private UserAccountFacade uaf;
+    @EJB private UserSessionBean usb;
+    @EJB private UserAccountFacade uaf;
     
     private String oldpass;
     private String newpass;
-    
-    
-    
     
     public SettingsBean() {
     }
     
      public void changePassword() {
         FacesContext currentInstance = FacesContext.getCurrentInstance();
-        
         
         if(usb.getUser().isPassword(oldpass)) {
             //change password
@@ -46,12 +39,12 @@ public class SettingsBean implements Serializable {
         } else {
             currentInstance.addMessage("#oldpass", new FacesMessage("Wrong password!"));
         }
-        
     }
      
      public void validatePassword(FacesContext context,
-            UIComponent toValidate,
-            Object value) {
+                                  UIComponent toValidate,
+                                  Object value) {
+
         String password = (String) value;
         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Wrong password.", null);
 

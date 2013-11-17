@@ -19,11 +19,9 @@ import java.io.Serializable;
 @RequestScoped
 public class ResetPass implements Serializable {
 
+    @EJB private UserAccountFacade ejbFacade;
+
     private UserAccount user = new UserAccount();
-    
-    @EJB
-    private UserAccountFacade ejbFacade;
-    
     private Boolean disabled = false;
     
     /**

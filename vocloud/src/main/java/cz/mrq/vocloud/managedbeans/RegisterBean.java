@@ -25,23 +25,14 @@ import java.io.Serializable;
 @RequestScoped
 public class RegisterBean implements Serializable {
 
-    @EJB
-    private UserAccountFacade uaf;
+    @EJB private UserAccountFacade uaf;
+
+    @Inject @Config
+    private String defaultQuota;
     private UserAccount user;
 
-    
-    @Inject
-    @Config
-    private String defaultQuota;
-    /**
-     * Creates a new instance of RegisterBean
-     */
     public RegisterBean() {
         user = new UserAccount();
-    }
-
-    public UserAccount getUser() {
-        return user;
     }
 
     public void register(ActionEvent actionEvent) {
@@ -102,6 +93,10 @@ public class RegisterBean implements Serializable {
             context.addMessage(toValidate.getClientId(context), message);
             ((UIInput) toValidate).setValid(false);
         }
+    }
+
+    public UserAccount getUser() {
+        return user;
     }
 
     private UserAccountFacade getUaf() {

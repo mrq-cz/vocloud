@@ -34,10 +34,11 @@ import java.util.logging.Logger;
 @SessionScoped
 public class JobsBean implements Serializable {
 
-    @EJB
-    private JobFacade jobFacade;
-    @EJB
-    private UserSessionBean usb;
+    private static final Logger logger = Logger.getLogger(JobsBean.class.getName());
+
+    @EJB private JobFacade jobFacade;
+    @EJB private UserSessionBean usb;
+
     private List<Job> jobs;
     private UserAccount user;
     private Job selected;
@@ -45,7 +46,7 @@ public class JobsBean implements Serializable {
     private Poll detailsPoll = new Poll();
 
     public JobsBean() {
-        Logger.getLogger(JobsBean.class.getName()).info("Creating JobsBean");
+        logger.info("Creating JobsBean");
     }
 
     @PostConstruct
@@ -77,7 +78,7 @@ public class JobsBean implements Serializable {
             jobFacade.start(selected);
         } catch (Exception ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Cant start a job!", ex.toString()));
-            Logger.getLogger(JobsBean.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         this.refresh();
     }
@@ -88,7 +89,7 @@ public class JobsBean implements Serializable {
             jobFacade.abort(selected);
         } catch (Exception ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Cant abort a job!", ex.toString()));
-            Logger.getLogger(JobsBean.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         this.refresh();
     }
@@ -110,9 +111,8 @@ public class JobsBean implements Serializable {
         }
         jobFacade.delete(selected);
 
-
         this.refresh();
-        // navigate back to joblist
+        // navigate back to the joblist
         NavigationHandler myNav = FacesContext.getCurrentInstance().getApplication().getNavigationHandler();
         myNav.handleNavigation(FacesContext.getCurrentInstance(), "details", "index");
     }
@@ -129,7 +129,7 @@ public class JobsBean implements Serializable {
 
     public void download(ActionEvent e) throws IOException {
         File file = (File) e.getComponent().getAttributes().get("selectedFile");
-        Logger.getLogger(JobsBean.class.getName()).info("Downloading " + file.getAbsolutePath());
+        logger.info("Downloading " + file.getAbsolutePath());
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
         HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
@@ -158,7 +158,7 @@ public class JobsBean implements Serializable {
     }
 
     /**
-     * get files of slected job (without 0 length files)
+     * get files of selected job (without 0 length files)
      *
      * @return
      */
@@ -219,7 +219,7 @@ public class JobsBean implements Serializable {
         try {
             content = FileUtils.readFileToString(selectedFile);
         } catch (IOException ex) {
-            Logger.getLogger(JobsBean.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         return content;
     }

@@ -38,21 +38,19 @@ import java.util.zip.ZipFile;
 @ViewScoped
 public class CreateJob implements Serializable {
 
-    @EJB
-    private JobFacade jf;
-    @EJB
-    private UWSFacade uws;
-    @EJB
-    private UserSessionBean usb;
-    @Inject
-    @Config
+    private static final Logger logger = Logger.getLogger(CreateJob.class.getName());
+
+    @EJB private JobFacade jf;
+    @EJB private UWSFacade uws;
+    @EJB private UserSessionBean usb;
+
+    @Inject @Config
     private String applicationAddress;
-    @Inject
-    @Config
+    @Inject @Config
     private String tempDir;
-    @Inject
-    @Config
+    @Inject @Config
     private String jobsDir;
+
     private Job parent;
     private String parFileContents;
     private Job job;
@@ -144,10 +142,10 @@ public class CreateJob implements Serializable {
                     }
                 }
             } catch (ZipException ex) {
-                Logger.getLogger(CreateJob.class.getName()).log(Level.SEVERE, "zip exception");
+                logger.log(Level.SEVERE, "zip exception");
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Not a valid zip file.", null));
             } catch (IOException ex) {
-                Logger.getLogger(CreateJob.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         } else {
             uploadedFiles.add(outFile);
@@ -158,7 +156,7 @@ public class CreateJob implements Serializable {
             setParFileContents(new File(uploadDir, "korel.par"));
         }
 
-        Logger.getLogger(CreateJob.class.toString()).info("File uploaded: " + event.getFile().getFileName());
+        logger.info("File uploaded: " + event.getFile().getFileName());
     }
 
     private Boolean checkFileName(String fileName) {
@@ -182,7 +180,7 @@ public class CreateJob implements Serializable {
             copyFile(out, uf.getInputstream());
         } catch (IOException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "File copy failed.", ex.toString()));
-            Logger.getLogger(CreateJob.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -192,7 +190,7 @@ public class CreateJob implements Serializable {
             FileUtils.copyInputStreamToFile(bis, out);
         } catch (IOException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "File copy failed.", ex.toString()));
-            Logger.getLogger(CreateJob.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -204,7 +202,7 @@ public class CreateJob implements Serializable {
 
         // check for free space
         if (usb.getUser().getQuota() <= jf.getSize(usb.getUser())) {
-            Logger.getLogger(CreateJob.class.getName()).log(Level.SEVERE, "Job cant be created not enough user space");
+            logger.log(Level.SEVERE, "Job cant be created not enough user space");
             currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Job could been created, you exceeded your disk quota.", "Please free some space first."));
         }
 
@@ -228,7 +226,7 @@ public class CreateJob implements Serializable {
                     FileUtils.copyFileToDirectory(f, jobFolder);
                 }
             } catch (IOException ex) {
-                Logger.getLogger(CreateJob.class.getName()).log(Level.SEVERE, "cannot copy file", ex);
+                logger.log(Level.SEVERE, "cannot copy file", ex);
                 //currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Job could been created (IO error)", ex.toString()));
             }
         }
@@ -237,7 +235,7 @@ public class CreateJob implements Serializable {
         try {
             FileUtils.writeStringToFile(new File(jobFolder, "korel.par"), getParFileContents());
         } catch (IOException ex) {
-            Logger.getLogger(CreateJob.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         deleteTempFiles();
@@ -253,7 +251,7 @@ public class CreateJob implements Serializable {
         try {
             FileUtils.copyFileToDirectory(parameters, expose);
         } catch (IOException ex) {
-            Logger.getLogger(CreateJob.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
 
         String link = applicationAddress + "/download/" + tid + "/" + parameters.getName();
@@ -273,7 +271,7 @@ public class CreateJob implements Serializable {
             reply = job.getUws().createJob(param);
         } catch (IOException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Can't create job!", "Korel worker is unavailable."));
-            Logger.getLogger(CreateJob.class.getName()).log(Level.SEVERE, "cant create a job", ex);
+            logger.log(Level.SEVERE, "cant create a job", ex);
             jf.delete(job);
             return;
         }
@@ -293,7 +291,7 @@ public class CreateJob implements Serializable {
                 jf.start(job);
             } catch (IOException ex) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to start a job!", ex.toString()));
-                Logger.getLogger(CreateJob.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
 
@@ -400,7 +398,7 @@ public class CreateJob implements Serializable {
         try {
             parFileContents = FileUtils.readFileToString(file);
         } catch (IOException ex) {
-            Logger.getLogger(CreateJob.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             return;
         }
         editParPanel.setCollapsed(false);

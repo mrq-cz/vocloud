@@ -35,12 +35,11 @@ public class FeedbackBean implements Serializable {
 
     private static final Logger logger = Logger.getLogger(UserAccountFacade.class.getName());
 
-    @EJB
-    private UserAccountFacade uaf;
+    @EJB private UserAccountFacade uaf;
+
     @Resource(name = "vokorel-mail")
     private Session mailSession;
-    @Inject
-    @Config
+    @Inject @Config
     private String feedbackEmail;
     
     private String name;
