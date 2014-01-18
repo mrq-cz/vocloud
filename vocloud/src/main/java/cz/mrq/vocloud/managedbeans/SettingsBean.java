@@ -35,7 +35,7 @@ public class SettingsBean implements Serializable {
         if(usb.getUser().isPassword(oldpass)) {
             //change password
             uaf.changePassword(usb.getUser(), newpass);
-            currentInstance.addMessage(null, new FacesMessage("Your password has been sucessfully changed."));
+            currentInstance.addMessage(null, new FacesMessage("Your password has been successfully changed."));
         } else {
             currentInstance.addMessage("#oldpass", new FacesMessage("Wrong password!"));
         }
