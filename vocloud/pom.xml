@@ -70,5 +70,47 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>vocloud-dev</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.glassfish.maven.plugin</groupId>
+                        <artifactId>maven-glassfish-plugin</artifactId>
+                        <version>2.1</version>
+                        <configuration>
+                            <glassfishDirectory>C:\dev\glassfish3</glassfishDirectory>
+                            <echo>true</echo>
+                            <debug>true</debug>
+                            <autoCreate>true</autoCreate>
+                            <user>admin</user>
+                            <adminPassword>${vocloud.pass}</adminPassword>
+                            <domain>
+                                <host>vocloud.ts.mrq.cz</host>
+                                <name>domain1</name>
+                                <httpPort>80</httpPort>
+                                <adminPort>4848</adminPort>
+                            </domain>
+                            <components>
+                                <component>
+                                    <name>${project.artifactId}</name>
+                                    <artifact>${project.build.directory}/${project.build.finalName}.war</artifact>
+                                </component>
+                            </components>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>deploy</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     
 </project>
