@@ -69,6 +69,7 @@ for Debian 'squeeze' amd64 with glassfish 3.1.2 server, JDK 7 and postgresql 8.4
            user: vokorel
            password: vokorel
            driverClass: org.postgresql.Driver
+           
    ping should be successful
 
    create new JDBC Resource (Resources > JDBC > JDBC Resources)
@@ -107,7 +108,7 @@ for Debian 'squeeze' amd64 with glassfish 3.1.2 server, JDK 7 and postgresql 8.4
 8. define vokorel.properties file
 
    create file /etc/vokorel.properties with this content
-   applicationAddress=http://localhost/vokorel
+   	applicationAddress=http://localhost/vokorel
         tempDir=/tmp/upload
         jobsDir=/var/local/korel/jobs
         feedbackEmail=vokorel@example.com
