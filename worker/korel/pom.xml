@@ -14,17 +14,12 @@
     <packaging>war</packaging>
     <name>korel-worker</name>
 
-    <dependencies>
-        <dependency>
-            <groupId>uws</groupId>
-            <artifactId>uws</artifactId>
-            <version>2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>6.0</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
+    <repositories>
+        <repository>
+            <id>local-project-libraries</id>
+            <name>Local project libraries</name>
+            <url>file://${project.basedir}/../../lib</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
 </project>
