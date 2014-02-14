@@ -7,7 +7,6 @@
     <groupId>cz.mrq</groupId>
     <artifactId>vocloud</artifactId>
     <version>1.0</version>
-    <packaging>war</packaging>
 
     <dependencies>
         <dependency>

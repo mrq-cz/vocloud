@@ -5,22 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cz.mrq</groupId>
-    <artifactId>vocloud-parent</artifactId>
+    <artifactId>worker</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>vocloud</module>
-        <module>worker</module>
+        <module>korel</module>
     </modules>
-
-    <repositories>
-        <repository>
-            <id>local-project-libraries</id>
-            <name>Local project libraries</name>
-            <url>file://${project.basedir}/../lib</url>
-            <layout>default</layout>
-        </repository>
-    </repositories>
 
 </project>
