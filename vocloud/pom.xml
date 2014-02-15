@@ -103,7 +103,7 @@
                         <executions>
                             <execution>
                                 <goals>
-                                    <goal>deploy</goal>
+                                    <goal>redeploy</goal>
                                 </goals>
                             </execution>
                         </executions>
