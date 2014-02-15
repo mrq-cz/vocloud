@@ -80,16 +80,16 @@
                         <artifactId>maven-glassfish-plugin</artifactId>
                         <version>2.1</version>
                         <configuration>
-                            <glassfishDirectory>C:\dev\glassfish3</glassfishDirectory>
+                            <glassfishDirectory>/usr/local/glassfish3</glassfishDirectory>
                             <echo>true</echo>
                             <debug>true</debug>
                             <autoCreate>true</autoCreate>
                             <user>admin</user>
                             <adminPassword>${vocloud.pass}</adminPassword>
                             <domain>
-                                <host>vocloud.ts.mrq.cz</host>
+                                <host>vocloud-dev</host>
                                 <name>domain1</name>
-                                <httpPort>80</httpPort>
+                                <httpPort>8001</httpPort>
                                 <adminPort>4848</adminPort>
                             </domain>
                             <components>
