@@ -1,10 +1,13 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html">
 
     <h:head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="initial-scale=1.0" />
+        <link rel="shortcut icon" href="resources/css/favicon.ico"/>
         <h:outputStylesheet name="css/default.css" />
         <h:outputStylesheet name="css/cssLayout.css" />
         <title>vo-cloud <ui:insert name="title"/></title>
@@ -30,7 +33,12 @@
 
         <div id="bottom">
             <ui:insert name="bottom" />
-            <h:form><div align="right">(c) mrq 2013 - <h:commandLink value="feedback"  action="/feedback" /></div></h:form>
+            <h:form>
+                <div align="right">
+                    (c) mrq 2014 - <h:commandLink value="feedback"  action="/feedback" /> -
+                    <a target="_blank" href="https://github.com/mrq-cz/vocloud">github</a>
+                </div>
+            </h:form>
         </div>
 
     </h:body>
