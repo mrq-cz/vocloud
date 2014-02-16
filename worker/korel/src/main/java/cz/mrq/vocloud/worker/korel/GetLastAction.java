@@ -1,17 +1,16 @@
 package cz.mrq.vocloud.worker.korel;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import uws.UWSException;
 import uws.job.AbstractJob;
 import uws.job.JobList;
 import uws.service.AbstractUWS;
 import uws.service.UWSUrl;
 import uws.service.actions.UWSAction;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 
 public class GetLastAction<JL extends JobList<J>, J extends AbstractJob> extends UWSAction<JL, J> {

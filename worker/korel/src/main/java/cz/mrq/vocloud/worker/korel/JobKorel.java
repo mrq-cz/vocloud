@@ -1,5 +1,9 @@
 package cz.mrq.vocloud.worker.korel;
 
+import uws.UWSException;
+import uws.job.AbstractJob;
+import uws.job.Result;
+
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,9 +16,6 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
-import uws.UWSException;
-import uws.job.AbstractJob;
-import uws.job.Result;
 
 /*
  * To change this template, choose Tools | Templates and open the template in
