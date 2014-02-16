@@ -102,6 +102,8 @@
                         </configuration>
                         <executions>
                             <execution>
+                                <id>install</id>
+                                <phase>install</phase>
                                 <goals>
                                     <goal>redeploy</goal>
                                 </goals>
