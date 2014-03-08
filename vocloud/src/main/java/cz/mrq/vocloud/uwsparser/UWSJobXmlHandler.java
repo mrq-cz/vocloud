@@ -1,13 +1,21 @@
 package cz.mrq.vocloud.uwsparser;
 
+import cz.mrq.vocloud.entity.Phase;
+import cz.mrq.vocloud.uwsparser.model.UWSJob;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author voadmin
  */
+@Deprecated
 public class UWSJobXmlHandler extends DefaultHandler {
 
     private UWSJob job = new UWSJob();
@@ -16,7 +24,8 @@ public class UWSJobXmlHandler extends DefaultHandler {
         return job;
     }
     private Elements current = Elements.UNKNOWN;
-    
+
+    private List<String> results = new ArrayList<>();
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
@@ -31,8 +40,10 @@ public class UWSJobXmlHandler extends DefaultHandler {
             if (result == null) {
                 // needed if job finishes with error
                 result = attributes.getValue(0);
+                results.add(result);
             }
-            job.setResults(result);
+            // not updated since UWSJob object refactor
+            //job.setResults(results);
             
             current = Elements.UNKNOWN;
         }
@@ -43,7 +54,8 @@ public class UWSJobXmlHandler extends DefaultHandler {
         if(current == Elements.UNKNOWN) return;
         
         String string = new String(ch, start, length);
-        //Logger.getLogger(UWSParser.class.getName()).log(Level.WARNING, current.toString()+": "+string);
+
+        Logger.getLogger(UWSParser.class.getName()).log(Level.WARNING, current.toString()+": "+string);
         switch (current) {
             case jobId:
                 job.setJobId(string);
@@ -55,7 +67,7 @@ public class UWSJobXmlHandler extends DefaultHandler {
                 job.setOwner(string);
                 break;
             case phase:
-                job.setPhase(UWSJobPhase.getPhase(string));
+                job.setPhase(Phase.getPhase(string));
                 break;
             case startTime:
                 job.setStartTime(string);

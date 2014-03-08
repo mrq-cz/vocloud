@@ -1,10 +1,10 @@
-package cz.mrq.vocloud.uwsparser;
+package cz.mrq.vocloud.entity;
 
 /**
  *
  * @author voadmin
  */
-public enum UWSJobPhase {
+public enum Phase {
 
     PENDING,
     QUEUED,
@@ -17,15 +17,15 @@ public enum UWSJobPhase {
     SUSPENDED,
     PROCESSING; // not standard phase, used for manager needs
 
-    public static String getStr(UWSJobPhase ph) {
-        return (ph == null) ? UWSJobPhase.UNKNOWN.name() : ph.name();
+    public static String getStr(Phase ph) {
+        return (ph == null) ? Phase.UNKNOWN.name() : ph.name();
     }
 
-    public static UWSJobPhase getPhase(String phStr) {
+    public static Phase getPhase(String phStr) {
         try {
             return valueOf(phStr);
         } catch (Exception ex) {
-            return UWSJobPhase.UNKNOWN;
+            return Phase.UNKNOWN;
         }
 
     }

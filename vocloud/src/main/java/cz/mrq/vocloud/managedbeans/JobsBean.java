@@ -3,9 +3,9 @@ package cz.mrq.vocloud.managedbeans;
 import cz.mrq.vocloud.ejb.JobFacade;
 import cz.mrq.vocloud.ejb.UserSessionBean;
 import cz.mrq.vocloud.entity.Job;
+import cz.mrq.vocloud.entity.Phase;
 import cz.mrq.vocloud.entity.UserAccount;
 import cz.mrq.vocloud.tools.Toolbox;
-import cz.mrq.vocloud.uwsparser.UWSJobPhase;
 import org.apache.commons.io.FileUtils;
 import org.primefaces.component.poll.Poll;
 
@@ -121,7 +121,7 @@ public class JobsBean implements Serializable {
         selected = jobFacade.find(selected.getId());
         
         // stop pooling if job isn't in progress
-        if (selected.getPhase() != UWSJobPhase.EXECUTING & selected.getPhase() != UWSJobPhase.QUEUED)
+        if (selected.getPhase() != Phase.EXECUTING & selected.getPhase() != Phase.QUEUED)
             detailsPoll.setStop(true);
         else
             detailsPoll.setStop(false);

@@ -4,9 +4,10 @@ import cz.mrq.vocloud.ejb.JobFacade;
 import cz.mrq.vocloud.ejb.UWSFacade;
 import cz.mrq.vocloud.ejb.UserSessionBean;
 import cz.mrq.vocloud.entity.Job;
+import cz.mrq.vocloud.entity.Phase;
 import cz.mrq.vocloud.tools.Config;
 import cz.mrq.vocloud.tools.Toolbox;
-import cz.mrq.vocloud.uwsparser.UWSJob;
+import cz.mrq.vocloud.uwsparser.model.UWSJob;
 import cz.mrq.vocloud.uwsparser.UWSParserManager;
 import org.apache.commons.io.FileUtils;
 import org.primefaces.component.panel.Panel;
@@ -68,7 +69,7 @@ public class CreateJob implements Serializable {
         job = new Job();
         tid = UUID.randomUUID();
         job.setJobType("Korel");
-        uploadedFiles = new ArrayList<File>();
+        uploadedFiles = new ArrayList<>();
         uploadDir = new File(tempDir, tid.toString());
     }
 
@@ -260,7 +261,8 @@ public class CreateJob implements Serializable {
         job.setUws(uws.assign("Korel"));
         
         if (job.getUws() == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Can't create job!", "No worker is available."));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Can't create job!", "No worker is available."));
             jf.delete(job);
             return;
         }
@@ -270,7 +272,8 @@ public class CreateJob implements Serializable {
         try {
             reply = job.getUws().createJob(param);
         } catch (IOException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Can't create job!", "Korel worker is unavailable."));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Can't create job!", "Korel worker is unavailable."));
             logger.log(Level.SEVERE, "cant create a job", ex);
             jf.delete(job);
             return;
@@ -278,20 +281,27 @@ public class CreateJob implements Serializable {
 
         // link up Job with UWSjob
         UWSJob uwsJob = UWSParserManager.getInstance().parseJob(reply);
+        if (uwsJob == null || uwsJob.getJobId() == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Failed to create a job on worker '" + job.getUws().getLabel() + "' !",
+                    "Worker is probably not configured properly."));
+            logger.log(Level.SEVERE, "can't create job");
+            job.setPhase(Phase.ERROR);
+            return;
+        }
         job.setUwsJob(uwsJob);
-
         job.updateFromUWSJob();
-        jf.edit(job);
 
-        jf.flush();
+        jf.edit(job);
 
         // execute if wanted
         if (run) {
             try {
                 jf.start(job);
             } catch (IOException ex) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed to start a job!", ex.toString()));
-                logger.log(Level.SEVERE, null, ex);
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Failed to start a job on worker '" + job.getUws().getLabel() + "' !", ex.getMessage()));
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
 

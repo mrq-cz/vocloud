@@ -1,7 +1,6 @@
 package cz.mrq.vocloud.entity;
 
-import cz.mrq.vocloud.uwsparser.UWSJob;
-import cz.mrq.vocloud.uwsparser.UWSJobPhase;
+import cz.mrq.vocloud.uwsparser.model.UWSJob;
 import cz.mrq.vocloud.uwsparser.UWSParserManager;
 
 import javax.persistence.*;
@@ -55,7 +54,7 @@ public class Job implements Serializable {
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date finishedDate;
     private String remoteId;
-    private UWSJobPhase phase;
+    private Phase phase;
     private String resultsEmail;
     @Transient
     private UWSJob uwsJob;
@@ -74,6 +73,8 @@ public class Job implements Serializable {
             this.finishedDate = uwsJob.getEndTime();
             this.remoteId = uwsJob.getJobId();
             this.phase = uwsJob.getPhase();
+        } else {
+            Logger.getLogger(Job.class.getName()).warning("trying to update from non-existent uwsJob");
         }
     }
 
@@ -125,7 +126,7 @@ public class Job implements Serializable {
     
 
     public Boolean isCompleted() {
-        return (this.phase == UWSJobPhase.COMPLETED);
+        return (this.phase == Phase.COMPLETED);
     }
 
     //<editor-fold defaultstate="collapsed" desc="getters & setters">
@@ -189,11 +190,11 @@ public class Job implements Serializable {
         this.owner = owner;
     }
 
-    public UWSJobPhase getPhase() {
+    public Phase getPhase() {
         return phase;
     }
 
-    public void setPhase(UWSJobPhase phase) {
+    public void setPhase(Phase phase) {
         this.phase = phase;
     }
 

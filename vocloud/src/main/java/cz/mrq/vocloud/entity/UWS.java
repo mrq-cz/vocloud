@@ -54,7 +54,7 @@ public class UWS implements Serializable {
     }
     
     public void destroyJob(String jobId) throws IOException {
-        Toolbox.httpPost(locationUrl + "/" + jobId + "/?ACTION=DELETE" );
+        //TODO enable Toolbox.httpPost(locationUrl + "/" + jobId + "/?ACTION=DELETE" );
     }
     
     public String createJob(String parameters) throws IOException {

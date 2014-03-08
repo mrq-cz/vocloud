@@ -1,8 +1,6 @@
 package cz.mrq.vocloud.uwsparser;
 
-import cz.mrq.vocloud.tools.Toolbox;
-
-import java.io.IOException;
+import cz.mrq.vocloud.uwsparser.model.UWSJob;
 
 /**
  * Singleton with UWSParser instance
@@ -34,10 +32,5 @@ public class UWSParserManager {
 
     public UWSJob parseJob(String xml) {
         return this.getParser().parseJob(xml);
-    }
-
-    public UWSJob getJob(String url) throws IOException {
-        String jobXML = Toolbox.httpGet(url);
-        return this.parseJob(jobXML);
     }
 }

@@ -1,11 +1,11 @@
 package cz.mrq.vocloud.ejb;
 
 import cz.mrq.vocloud.entity.Job;
+import cz.mrq.vocloud.entity.Phase;
 import cz.mrq.vocloud.entity.UserAccount;
 import cz.mrq.vocloud.managedbeans.RegisterBean;
 import cz.mrq.vocloud.tools.Config;
 import cz.mrq.vocloud.tools.Toolbox;
-import cz.mrq.vocloud.uwsparser.UWSJobPhase;
 import org.apache.commons.io.FileUtils;
 
 import javax.annotation.Resource;
@@ -132,7 +132,7 @@ public class JobFacade extends AbstractFacade<Job> {
         File results = new File(getFileDir(job), "results.zip");
         Boolean result;
         try {
-            result = Toolbox.downloadFile(job.getUwsJob().getResults(), results);
+            result = Toolbox.downloadFile(job.getUwsJob().getResultUrl(), results);
             Toolbox.decompress(results, results.getParentFile());
             logger.info("results for job " + job.getId() + " downloaded");
         } catch (Exception ex) {
@@ -155,7 +155,7 @@ public class JobFacade extends AbstractFacade<Job> {
         return sum;
     }
 
-    public List<Job> findByPhase(UWSJobPhase phase) {
+    public List<Job> findByPhase(Phase phase) {
         Query q = getEntityManager().createNamedQuery("Job.findByPhase");
         q.setParameter("phase", phase);
         try {
@@ -180,7 +180,6 @@ public class JobFacade extends AbstractFacade<Job> {
 
         // remove job from database
         remove(job);
-        flush();
     }
 
     /**
@@ -206,13 +205,13 @@ public class JobFacade extends AbstractFacade<Job> {
             // message body
             StringBuilder sb = new StringBuilder();
             sb.append("Your job '").append(job.getLabel()).append("' ");
-            if (job.getPhase() == UWSJobPhase.COMPLETED) {
+            if (job.getPhase() == Phase.COMPLETED) {
                 sb.append("finished successfully.");
             }
-            if (job.getPhase() == UWSJobPhase.ERROR) {
+            if (job.getPhase() == Phase.ERROR) {
                 sb.append("finished with error.");
             }
-            if (job.getPhase() == UWSJobPhase.ABORTED) {
+            if (job.getPhase() == Phase.ABORTED) {
                 sb.append("has been aborted,");
             }
             sb.append("\n");
@@ -266,7 +265,7 @@ public class JobFacade extends AbstractFacade<Job> {
             return;
         }
         
-        job.setPhase(UWSJobPhase.PROCESSING);
+        job.setPhase(Phase.PROCESSING);
         
         File workingDir = getFileDir(job);
         
@@ -295,7 +294,7 @@ public class JobFacade extends AbstractFacade<Job> {
             logger.log(Level.SEVERE, null, e);
         }
         
-        job.setPhase(UWSJobPhase.COMPLETED);
+        job.setPhase(Phase.COMPLETED);
         
         
         File results = new File(workingDir,"results.zip");
@@ -349,7 +348,7 @@ public class JobFacade extends AbstractFacade<Job> {
                 exampleJob.setFinishedDate(now);
                 exampleJob.setStartedDate(now);
                 exampleJob.setOwner(user);
-                exampleJob.setPhase(UWSJobPhase.COMPLETED);
+                exampleJob.setPhase(Phase.COMPLETED);
 
                 this.create(exampleJob);
 

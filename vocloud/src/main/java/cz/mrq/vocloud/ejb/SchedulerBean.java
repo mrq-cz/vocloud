@@ -1,7 +1,7 @@
 package cz.mrq.vocloud.ejb;
 
 import cz.mrq.vocloud.entity.Job;
-import cz.mrq.vocloud.uwsparser.UWSJobPhase;
+import cz.mrq.vocloud.entity.Phase;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -37,7 +37,7 @@ public class SchedulerBean {
         logger.log(Level.INFO, "scheduler initialized");
         
         // find executing jobs
-        watchedJobs.addAll(jf.findByPhase(UWSJobPhase.EXECUTING));
+        watchedJobs.addAll(jf.findByPhase(Phase.EXECUTING));
         updateExecutingJobs();
     }
     
@@ -49,21 +49,19 @@ public class SchedulerBean {
     @Schedule(second="*/5", minute="*", hour="*", persistent=false)
     public void updateExecutingJobs() {
         int prevsize = watchedJobs.size();
-        UWSJobPhase phase;
+        Phase phase;
         for (Job job : watchedJobs) {
             phase = job.getPhase();
             job.updateFromUWS();
             if (phase != job.getPhase())
                 jf.edit(job);
-            if (job.getPhase() == UWSJobPhase.COMPLETED || job.getPhase() == UWSJobPhase.ERROR || job.getPhase() == UWSJobPhase.ABORTED) {
+            if (job.getPhase() == Phase.COMPLETED || job.getPhase() == Phase.ERROR || job.getPhase() == Phase.ABORTED) {
                 jf.downloadResults(job);
                 jf.postProcess(job);
                 job.destroyOnUWS();
                 watchedJobs.remove(job);
             }
         }
-        jf.flush();
-        
         lastUpdate = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat();
         if(prevsize != watchedJobs.size()) {

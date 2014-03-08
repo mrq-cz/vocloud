@@ -19,14 +19,17 @@ public abstract class AbstractFacade<T> {
 
     public void create(T entity) {
         getEntityManager().persist(entity);
+        this.flush();
     }
 
     public void edit(T entity) {
         getEntityManager().merge(entity);
+        this.flush();
     }
 
     public void remove(T entity) {
         getEntityManager().remove(getEntityManager().merge(entity));
+        this.flush();
     }
 
     public T find(Object id) {
