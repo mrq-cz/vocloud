@@ -287,7 +287,6 @@ public class CreateJob implements Serializable {
                     "Worker is probably not configured properly."));
             logger.log(Level.SEVERE, "can't create job");
             job.setPhase(Phase.ERROR);
-            return;
         }
         job.setUwsJob(uwsJob);
         job.updateFromUWSJob();

@@ -41,7 +41,7 @@ public class UWSJob {
     @XmlElement(name = "parameter")
     private List<Parameter> parameters;
     @XmlElement(nillable = true)
-    private String errorSummary;
+    private ErrorSummary errorSummary;
     
     //<editor-fold defaultstate="collapsed" desc="getters and setters">
     public Date getDestruction() {
@@ -142,11 +142,11 @@ public class UWSJob {
         this.startTime = startTime;
     }
 
-    public String getErrorSummary() {
+    public ErrorSummary getErrorSummary() {
         return errorSummary;
     }
 
-    public void setErrorSummary(String errorSummary) {
+    public void setErrorSummary(ErrorSummary errorSummary) {
         this.errorSummary = errorSummary;
     }
     

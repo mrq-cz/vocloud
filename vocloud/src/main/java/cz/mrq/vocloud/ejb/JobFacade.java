@@ -369,4 +369,13 @@ public class JobFacade extends AbstractFacade<Job> {
             }
         }
     }
+
+    public void exportUWSJob(Job job) {
+        File uwsFile = new File(getFileDir(job), "uws-job.xml");
+        try {
+            FileUtils.writeStringToFile(uwsFile, job.getUwsJobXml());
+        } catch (IOException e) {
+            logger.warning("failed to save uws-job.xml");
+        }
+    }
 }

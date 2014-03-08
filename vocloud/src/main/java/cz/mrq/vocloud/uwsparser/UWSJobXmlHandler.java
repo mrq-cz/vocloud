@@ -1,6 +1,7 @@
 package cz.mrq.vocloud.uwsparser;
 
 import cz.mrq.vocloud.entity.Phase;
+import cz.mrq.vocloud.uwsparser.model.ErrorSummary;
 import cz.mrq.vocloud.uwsparser.model.UWSJob;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -82,7 +83,9 @@ public class UWSJobXmlHandler extends DefaultHandler {
                 job.setDestruction(string);
                 break;
             case message:
-                job.setErrorSummary(string);
+                ErrorSummary error = new ErrorSummary();
+                error.setMessage(string);
+                job.setErrorSummary(error);
                 break;
             default:
                 break;

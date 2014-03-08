@@ -27,7 +27,11 @@ public class Parameter {
     }
 
     public void setValue(String value) {
-        this.value = value;
+        this.value = value.trim();
+    }
+
+    public String getValueTrimmed() {
+        return value != null ? value.trim() : null;
     }
 
     @Override

@@ -36,6 +36,10 @@ public class Result {
         return href;
     }
 
+    public String getHrefTrimmed() {
+        return href != null ? href.trim() : null;
+    }
+
     public void setHref(String href) {
         this.href = href;
     }

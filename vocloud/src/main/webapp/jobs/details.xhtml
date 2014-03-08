@@ -8,7 +8,6 @@
       xmlns:f="http://java.sun.com/jsf/core">
 
     <body>
-
         <ui:composition template="./../WEB-INF/template.xhtml">
 
             <ui:define name="title">
@@ -63,7 +62,7 @@
                     <p />
                     <h3>Files</h3>
                     <p:dataTable  id="files" style="max-width: 800px" value="#{jobs.files}" var="file" 
-                                  rowStyleClass="#{file.name eq 'korel.err' or file.name eq 'korel.ret' ? 'errorrow': null }">
+                                  rowStyleClass="#{file.name == 'korel.err' or file.name == 'korel.ret' or (jobs.selected.phase == 'ERROR' and file.name == 'uws-job.xml') ? 'errorrow': null }">
                         <p:column headerText="Name" >
                             #{file.name}
                         </p:column>

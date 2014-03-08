@@ -56,10 +56,14 @@ public class Job implements Serializable {
     private String remoteId;
     private Phase phase;
     private String resultsEmail;
+
     @Transient
     private UWSJob uwsJob;
     @Transient
+    private String uwsJobXml;
+    @Transient
     private UWSParserManager parser;
+
 
     
 
@@ -93,6 +97,7 @@ public class Job implements Serializable {
             return;
         }
         uwsJob = getParser().parseJob(xml);
+        uwsJobXml = xml;
         updateFromUWSJob();
     }
 
@@ -122,8 +127,6 @@ public class Job implements Serializable {
         }
         return parser;
     }
-
-    
 
     public Boolean isCompleted() {
         return (this.phase == Phase.COMPLETED);
@@ -250,6 +253,10 @@ public class Job implements Serializable {
             fd = new Date();
         }
         return (fd.getTime() - sd.getTime())/1000;
+    }
+
+    public String getUwsJobXml() {
+        return uwsJobXml;
     }
 
     @Override

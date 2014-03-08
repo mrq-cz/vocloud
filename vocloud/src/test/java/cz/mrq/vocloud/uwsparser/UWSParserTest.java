@@ -30,7 +30,6 @@ public class UWSParserTest {
 
     public UWSJob parseJob(String xml) throws Exception {
         UWSJob job = parser.parseJob(xml);
-        System.out.println(job);
         Assert.assertNotNull(job);
         Assert.assertNotNull(job.getJobId());
         return job;
@@ -47,9 +46,10 @@ public class UWSParserTest {
         xmls.add(xml);
         xmls.add(readResource("executing.xml"));
         xmls.add(readResource("completed.xml"));
+        xmls.add(readResource("error.xml"));
 
         for (String xml : xmls) {
-            parseJob(xml);
+            System.out.println(parseJob(xml));
         }
     }
 
@@ -70,6 +70,18 @@ public class UWSParserTest {
 
         Assert.assertEquals("different number of results", 1, job.getResults().size());
         Assert.assertEquals("not expected result url", "http://192.168.192.118/uws-korel/results/korel/1394313702207A/results.zip", job.getResultUrl());
+    }
+
+    @Test
+    public void testParserErrorSummary() throws Exception {
+        UWSJob job = parseJob(readResource("error.xml"));
+
+        Assert.assertNotNull("error not parsed", job.getErrorSummary());
+        Assert.assertEquals("different type", "FATAL", job.getErrorSummary().getType());
+        Assert.assertEquals("different message", "Cannot download ZIP file.", job.getErrorSummary().getMessage());
+
+        job = parseJob(readResource("completed.xml"));
+        Assert.assertNull("error should be null", job.getErrorSummary());
     }
 
     static String readResource(String resource)
