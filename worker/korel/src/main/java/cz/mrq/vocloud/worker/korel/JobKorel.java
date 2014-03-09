@@ -70,7 +70,6 @@ public class JobKorel extends AbstractJob {
             FileOutputStream fos = new FileOutputStream(zipFile);
             fos.getChannel().transferFrom(rbc, 0, 1 << 24);
         } catch (Exception e) {
-            addResult(new Result("Error Downloading ZIP file."));
             throw new UWSException(UWSException.BAD_REQUEST, "Cannot download ZIP file.");
         }
 
@@ -111,9 +110,8 @@ public class JobKorel extends AbstractJob {
             korelProcess.destroy();
             aborted = true;
         } catch (Exception e) {
-            Logger.getLogger(JobKorel.class.getName()).log(Level.SEVERE, null, e);
-            addResult(new Result("Error", "Message", e.getMessage().toString()));
-            addResult(new Result("Error", "Stack", e.getStackTrace().toString()));
+            Logger.getLogger(JobKorel.class.getName()).log(Level.SEVERE, "error when executing binary", e);
+            throw new UWSException(UWSException.INTERNAL_SERVER_ERROR, e, "error when executing binary");
         }
 
         // write return code to the file
@@ -125,6 +123,7 @@ public class JobKorel extends AbstractJob {
             out.close();
         } catch (IOException ex) {
             Logger.getLogger(JobKorel.class.getName()).log(Level.SEVERE, null, ex);
+            throw new UWSException(ex);
         }
 
         // postprocessing scripts only if job is not aborted
@@ -159,15 +158,14 @@ public class JobKorel extends AbstractJob {
                 postProcess.destroy();
             } catch (Exception e) {
                 Logger.getLogger(JobKorel.class.getName()).log(Level.SEVERE, null, e);
+                throw new UWSException(e);
             }
         }
-
-
 
         // submit results, send error if korel failed
         prepareResults();
         if (korelProcess.exitValue() != 0) {
-            throw new UWSException("Korel returns " + korelProcess.exitValue());
+            throw new UWSException("Korel exit value:" + korelProcess.exitValue());
         }
 
         if (thread.isInterrupted() || aborted) {

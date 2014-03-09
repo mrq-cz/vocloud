@@ -28,8 +28,8 @@ public class UWSKorel extends HttpServlet {
 	
 	protected QueuedBasicUWS<JobKorel> uws = null;
 	protected File restoreFile = null;
-        protected String serverAddress = "http://localhost:8080";
-        protected int jobsMax = 4;
+    protected String serverAddress = "http://localhost:8080";
+    protected int jobsMax = 4;
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -38,26 +38,26 @@ public class UWSKorel extends HttpServlet {
 		
 		ServletContext context = config.getServletContext();
 		
-                // load config file
-                Properties configFile = new Properties();
-                try {
-                    configFile.load(new FileInputStream(context.getRealPath("/WEB-INF/")+ "/uws-korel.conf"));
-                } catch (IOException ex) {
-                    Logger.getLogger(UWSKorel.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
-                // set configured values
-                // server address
-                serverAddress = configFile.getProperty("server_address","http://localhost:8080");
-                // jobs max, default: 4
-                jobsMax = Integer.parseInt(configFile.getProperty("jobs_max","4"));
-                
-                // korel bin, default: /bin/korel
-                JobKorel.setKorelExecutable(configFile.getProperty("korel_bin", "/bin/korel"));
-                
-                
-                //set scripts dir
-                JobKorel.setScriptsDir(context.getRealPath("/WEB-INF/scripts/"));
+        // load config file
+        Properties configFile = new Properties();
+        try {
+            configFile.load(new FileInputStream(context.getRealPath("/WEB-INF/")+ "/uws-korel.conf"));
+        } catch (IOException ex) {
+            Logger.getLogger(UWSKorel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        // set configured values
+        // server address
+        serverAddress = configFile.getProperty("server_address","http://localhost:8080");
+        // jobs max, default: 4
+        jobsMax = Integer.parseInt(configFile.getProperty("jobs_max","4"));
+
+        // korel bin, default: /bin/korel
+        JobKorel.setKorelExecutable(configFile.getProperty("korel_bin", "/bin/korel"));
+
+
+        //set scripts dir
+        JobKorel.setScriptsDir(context.getRealPath("/WEB-INF/scripts/"));
                 
                 
 		// Fetch the results directory path:
@@ -118,18 +118,15 @@ public class UWSKorel extends HttpServlet {
 	@Override
 	public void destroy() {
 		// Save the current state of this UWS:
-                UWSToolBox.saveUWS(uws, restoreFile, true);
+        UWSToolBox.saveUWS(uws, restoreFile, true);
 		super.destroy();
 	}
 
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		try{
-			// FORWARD THE REQUEST TO THE UWS:
+		try {
 			uws.executeRequest(req, resp);
-			
-		}catch(UWSException uwsEx){
-			// Display properly the caught UWSException:
+		} catch(UWSException uwsEx) {
 			resp.sendError(uwsEx.getHttpErrorCode(), uwsEx.getMessage());
 		}
 	}
