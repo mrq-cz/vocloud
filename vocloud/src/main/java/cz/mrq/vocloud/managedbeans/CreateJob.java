@@ -256,7 +256,7 @@ public class CreateJob implements Serializable {
             logger.log(Level.SEVERE, null, ex);
         }
 
-        String link = getExposeAddress() + "/download/" + tid + "/" + parameters.getName();
+        String link = applicationAddress + "/download/" + tid + "/" + parameters.getName();
 
         // find uws and create job there
         job.setUws(uws.assign("Korel"));
@@ -338,12 +338,6 @@ public class CreateJob implements Serializable {
             }
         }
         return parFileContents;
-    }
-
-    protected String getExposeAddress() {
-        ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-        return ec.getRequestScheme() + "://" + ec.getRequestServerName() +
-                (ec.getRequestServerPort() != 80 ? ":" + ec.getRequestServerPort() : "" ) + ec.getRequestContextPath();
     }
 
     public Job getJob() {

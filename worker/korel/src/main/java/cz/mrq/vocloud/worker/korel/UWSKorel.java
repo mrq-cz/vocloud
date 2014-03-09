@@ -48,9 +48,9 @@ public class UWSKorel extends HttpServlet {
 
         // set configured values
         // server address
-        serverAddress = configFile.getProperty("server_address","http://localhost:8080");
+        serverAddress = configFile.getProperty("server_address", "http://localhost:8080");
         // jobs max, default: 4
-        jobsMax = Integer.parseInt(configFile.getProperty("jobs_max","4"));
+        jobsMax = Integer.parseInt(configFile.getProperty("jobs_max", "4"));
 
         // korel bin, default: /bin/korel
         JobKorel.setKorelExecutable(configFile.getProperty("korel_bin", "/bin/korel"));
@@ -62,7 +62,7 @@ public class UWSKorel extends HttpServlet {
                 
 		// Fetch the results directory path:
 		String resultsDirectoryPath = context.getRealPath("/results/korel");
-                new File(resultsDirectoryPath).mkdirs();
+        new File(resultsDirectoryPath).mkdirs();
                 
                 // set result directory for korel job
 		JobKorel.setResultDirectory(resultsDirectoryPath);
@@ -72,7 +72,12 @@ public class UWSKorel extends HttpServlet {
                 
 		// Restore the last saved UWS, if any:
 		restoreFile = new File(context.getRealPath("/WEB-INF/"), "uwsRestoreKorel");
-		uws = (QueuedBasicUWS<JobKorel>) UWSToolBox.restoreUWS(restoreFile, true);
+        try {
+		    uws = (QueuedBasicUWS<JobKorel>) UWSToolBox.restoreUWS(restoreFile, true);
+        } catch (Exception e) {
+            Logger.getLogger(UWSKorel.class.getName()).log(Level.WARNING, "loading saved uws failed, creating new");
+            uws = null;
+        }
 		
 		// If no saved UWS has been found, initialize the UWS:
 		if (uws == null){
@@ -81,7 +86,7 @@ public class UWSKorel extends HttpServlet {
 			
 			try{
 				// Create the UWS:
-				uws = new QueuedBasicUWS<JobKorel>(JobKorel.class,jobsMax);
+				uws = new QueuedBasicUWS<>(JobKorel.class,jobsMax);
 				
 				// Set the destruction time for all jobs:
 				uws.getDestructionTimeController().setDefaultDestructionInterval(1, DateField.MONTH);

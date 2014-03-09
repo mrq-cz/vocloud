@@ -17,15 +17,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-/*
- * To change this template, choose Tools | Templates and open the template in
- * the editor.
- */
 /**
  *
  * @author mrq
  */
 public class JobKorel extends AbstractJob {
+
+    private static final Logger logger = Logger.getLogger(JobKorel.class.getName());
 
     private static String resultsDir;
     private static String resultsLink;
@@ -65,10 +63,11 @@ public class JobKorel extends AbstractJob {
 
         // download args (dat and par file)
         File zipFile = new File(resultsDir + "/" + getJobId() + "/parameters.zip");
+
         try {
-            ReadableByteChannel rbc = Channels.newChannel(zip.openStream());
-            FileOutputStream fos = new FileOutputStream(zipFile);
-            fos.getChannel().transferFrom(rbc, 0, 1 << 24);
+            if (!downloadFile(zip, zipFile))
+            if (!downloadFile(new URL(zip.getProtocol(), owner, zip.getPort(), zip.getPath()), zipFile))
+                throw new Exception();
         } catch (Exception e) {
             throw new UWSException(UWSException.BAD_REQUEST, "Cannot download ZIP file.");
         }
@@ -84,7 +83,7 @@ public class JobKorel extends AbstractJob {
             errorFile.createNewFile();
             returnFile.createNewFile();
         } catch (IOException ex) {
-            Logger.getLogger(JobKorel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new UWSException(UWSException.INTERNAL_SERVER_ERROR, "IO Exception when creating output files.");
         }
 
@@ -110,7 +109,7 @@ public class JobKorel extends AbstractJob {
             korelProcess.destroy();
             aborted = true;
         } catch (Exception e) {
-            Logger.getLogger(JobKorel.class.getName()).log(Level.SEVERE, "error when executing binary", e);
+            logger.log(Level.SEVERE, "error when executing binary", e);
             throw new UWSException(UWSException.INTERNAL_SERVER_ERROR, e, "error when executing binary");
         }
 
@@ -118,11 +117,11 @@ public class JobKorel extends AbstractJob {
         BufferedWriter out;
         try {
             out = new BufferedWriter(new FileWriter(returnFile));
-            Logger.getLogger(JobKorel.class.getName()).info("korel exit value: " + korelProcess.exitValue());
+            logger.info("korel exit value: " + korelProcess.exitValue());
             out.write("" + korelProcess.exitValue());
             out.close();
         } catch (IOException ex) {
-            Logger.getLogger(JobKorel.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
             throw new UWSException(ex);
         }
 
@@ -134,7 +133,7 @@ public class JobKorel extends AbstractJob {
             try {
                 postOutput.createNewFile();
             } catch (IOException ex) {
-                Logger.getLogger(JobKorel.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
                 throw new UWSException(UWSException.INTERNAL_SERVER_ERROR, "IO Exception when creating post process output file.");
             }
             Process postProcess = null;
@@ -157,7 +156,7 @@ public class JobKorel extends AbstractJob {
                 aborted = true;
                 postProcess.destroy();
             } catch (Exception e) {
-                Logger.getLogger(JobKorel.class.getName()).log(Level.SEVERE, null, e);
+                logger.log(Level.SEVERE, null, e);
                 throw new UWSException(e);
             }
         }
@@ -170,6 +169,17 @@ public class JobKorel extends AbstractJob {
 
         if (thread.isInterrupted() || aborted) {
             throw new InterruptedException();
+        }
+    }
+
+    private boolean downloadFile(URL url, File file) {
+        try (ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+             FileOutputStream fos = new FileOutputStream(file)) {
+            fos.getChannel().transferFrom(rbc, 0, 1 << 24);
+            return true;
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "failed to download file", e);
+            return false;
         }
     }
 
@@ -192,7 +202,7 @@ public class JobKorel extends AbstractJob {
             }
             boolean res = workingDir.delete();
             if (!res) {
-                Logger.getLogger(JobKorel.class.getName()).log(Level.WARNING, "Cannot delete working dir {0}", workingDir.toString());
+                logger.log(Level.WARNING, "Cannot delete working dir {0}", workingDir.toString());
             }
         }
         super.clearResources();
@@ -202,7 +212,7 @@ public class JobKorel extends AbstractJob {
         try {
             // check if there are some result files
             String[] list = workingDir.list();
-            if (list != null & list.length != 0) {
+            if (list != null && list.length != 0) {
 
                 // compress files in the working dir
                 compress();
@@ -211,43 +221,39 @@ public class JobKorel extends AbstractJob {
                 addResult(new Result("Results", "zip", getResultLink() + this.getJobId() + "/results.zip"));
             }
         } catch (Exception e) {
-            Logger.getLogger(JobKorel.class.getName()).log(Level.SEVERE, null, e);
+            logger.log(Level.SEVERE, null, e);
         }
     }
 
-    public static final String getResultDirectory() {
+    public static String getResultDirectory() {
 
         return resultsDir;
     }
 
-    public static final void setResultDirectory(String directoryPath) {
+    public static void setResultDirectory(String directoryPath) {
         if (resultsDir == null) {
-
             resultsDir = directoryPath;
         }
     }
 
-    public static final String getResultLink() {
+    public static String getResultLink() {
         return resultsLink;
     }
 
-    public static final void setResultLink(String directoryPath) {
+    public static void setResultLink(String directoryPath) {
         if (resultsLink == null) {
-
             resultsLink = directoryPath;
         }
     }
 
-    public static final void setKorelExecutable(String directoryPath) {
+    public static void setKorelExecutable(String directoryPath) {
         if (korelExecutable == null) {
-
             korelExecutable = directoryPath;
         }
     }
 
-    public static final void setScriptsDir(String directoryPath) {
+    public static void setScriptsDir(String directoryPath) {
         if (scriptsDir == null) {
-
             scriptsDir = directoryPath;
         }
     }
@@ -263,7 +269,7 @@ public class JobKorel extends AbstractJob {
             Enumeration e = zipfile.entries();
             while (e.hasMoreElements()) {
                 entry = (ZipEntry) e.nextElement();
-                //Logger.getLogger(JobKorel.class.getName()).log(Level.INFO, "Extracting: {0}", entry);
+                //logger.log(Level.INFO, "Extracting: {0}", entry);
                 is = new BufferedInputStream(zipfile.getInputStream(entry));
                 int count;
                 byte data[] = new byte[buffer];
@@ -279,7 +285,7 @@ public class JobKorel extends AbstractJob {
                 is.close();
             }
         } catch (Exception e) {
-            Logger.getLogger(JobKorel.class.getName()).log(Level.SEVERE, "Cannot compress files {0}", e.toString());
+            logger.log(Level.SEVERE, "Cannot compress files {0}", e.toString());
         }
 
     }
@@ -295,19 +301,19 @@ public class JobKorel extends AbstractJob {
             // get a list of files from current directory
             String files[] = workingDir.list();
 
-            for (int i = 0; i < files.length; i++) {
-                if ("results.zip".equals(files[i])
-                        || "korel.par".equals(files[i])
-                        || "korel.dat".equals(files[i])
-                        || "korel.tmp".equals(files[i])
-                        || "parameters.zip".equals(files[i])) {
+            for (String file : files) {
+                if ("results.zip".equals(file)
+                        || "korel.par".equals(file)
+                        || "korel.dat".equals(file)
+                        || "korel.tmp".equals(file)
+                        || "parameters.zip".equals(file)) {
                     continue;
                 }
-                //Logger.getLogger(JobKorel.class.getName()).log(Level.INFO, "Adding: {0}", files[i]);
-                File f = new File(workingDir, files[i]);
+                //logger.log(Level.INFO, "Adding: {0}", files[i]);
+                File f = new File(workingDir, file);
                 FileInputStream fi = new FileInputStream(f);
                 origin = new BufferedInputStream(fi, buffer);
-                ZipEntry entry = new ZipEntry(files[i]);
+                ZipEntry entry = new ZipEntry(file);
                 out.putNextEntry(entry);
                 int count;
                 while ((count = origin.read(data, 0,
@@ -318,7 +324,7 @@ public class JobKorel extends AbstractJob {
             }
             out.close();
         } catch (Exception e) {
-            Logger.getLogger(JobKorel.class.getName()).log(Level.SEVERE, "Cannot compress files {0}", e.toString());
+            logger.log(Level.SEVERE, "Cannot compress files {0}", e.toString());
         }
 
     }
