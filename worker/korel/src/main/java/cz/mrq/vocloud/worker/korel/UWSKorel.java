@@ -66,7 +66,7 @@ public class UWSKorel extends HttpServlet {
                 
                 // set result directory for korel job
 		JobKorel.setResultDirectory(resultsDirectoryPath);
-		JobKorel.setResultLink(serverAddress + context.getContextPath()+"/results/korel/");
+		JobKorel.setResultLink(serverAddress + context.getContextPath() + "/results/korel/");
                 
                 
                 

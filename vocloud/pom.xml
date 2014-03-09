@@ -9,6 +9,10 @@
     <version>1.0</version>
     <packaging>war</packaging>
 
+    <properties>
+        <vocloud.appUrl>http://vocloud:8080/vocloud</vocloud.appUrl>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>javax</groupId>
@@ -57,6 +61,12 @@
 
     <build>
         <finalName>vocloud</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
 	    	<plugin>
 	        	<groupId>org.apache.maven.plugins</groupId>
@@ -96,6 +106,9 @@
     <profiles>
         <profile>
             <id>vocloud-dev</id>
+            <properties>
+                <vocloud.appUrl>http://vocloud-dev:8001/vocloud</vocloud.appUrl>
+            </properties>
             <build>
                 <plugins>
                     <plugin>

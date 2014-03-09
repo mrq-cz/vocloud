@@ -14,9 +14,26 @@
     <packaging>war</packaging>
     <name>korel-worker</name>
 
+    <properties>
+        <korel.serverUrl>http://localhost:8080</korel.serverUrl>
+    </properties>
+
+    <build>
+        <finalName>korel-worker</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
     <profiles>
         <profile>
             <id>vocloud-dev</id>
+            <properties>
+                <korel.serverUrl>http://vocloud-dev:8001</korel.serverUrl>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
