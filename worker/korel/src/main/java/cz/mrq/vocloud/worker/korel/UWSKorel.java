@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -24,9 +23,11 @@ import java.util.logging.Logger;
 
 @WebServlet(name = "uws-korel",urlPatterns = {"/uws/*"})
 public class UWSKorel extends HttpServlet {
-	private static final long serialVersionUID = 2L;
-	
-	protected QueuedBasicUWS<JobKorel> uws = null;
+
+    private static final long serialVersionUID = 2L;
+    private static final Logger logger = Logger.getLogger(UWSKorel.class.getName());
+
+    protected QueuedBasicUWS<JobKorel> uws = null;
 	protected File restoreFile = null;
     protected String serverAddress = "http://localhost:8080";
     protected int jobsMax = 4;
@@ -38,51 +39,21 @@ public class UWSKorel extends HttpServlet {
 		
 		ServletContext context = config.getServletContext();
 		
-        // load config file
-        Properties configFile = new Properties();
-        try {
-            configFile.load(new FileInputStream(context.getRealPath("/WEB-INF/")+ "/uws-korel.conf"));
-        } catch (IOException ex) {
-            Logger.getLogger(UWSKorel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        // set configured values
-        // server address
-        serverAddress = configFile.getProperty("server_address", "http://localhost:8080");
-        // jobs max, default: 4
-        jobsMax = Integer.parseInt(configFile.getProperty("jobs_max", "4"));
-
-        // korel bin, default: /bin/korel
-        JobKorel.setKorelExecutable(configFile.getProperty("korel_bin", "/bin/korel"));
-
-
-        //set scripts dir
-        JobKorel.setScriptsDir(context.getRealPath("/WEB-INF/scripts/"));
-                
-                
-		// Fetch the results directory path:
-		String resultsDirectoryPath = context.getRealPath("/results/korel");
-        new File(resultsDirectoryPath).mkdirs();
-                
-                // set result directory for korel job
-		JobKorel.setResultDirectory(resultsDirectoryPath);
-		JobKorel.setResultLink(serverAddress + context.getContextPath() + "/results/korel/");
-                
-                
+        loadProperties(context);
                 
 		// Restore the last saved UWS, if any:
 		restoreFile = new File(context.getRealPath("/WEB-INF/"), "uwsRestoreKorel");
         try {
 		    uws = (QueuedBasicUWS<JobKorel>) UWSToolBox.restoreUWS(restoreFile, true);
         } catch (Exception e) {
-            Logger.getLogger(UWSKorel.class.getName()).log(Level.WARNING, "loading saved uws failed, creating new");
+            logger.log(Level.WARNING, "loading saved uws failed, creating new");
             uws = null;
         }
 		
 		// If no saved UWS has been found, initialize the UWS:
 		if (uws == null){
 			// Ensure the results directory is empty (this wont delete directories)
-			UWSToolBox.clearDirectory(resultsDirectoryPath);
+			UWSToolBox.clearDirectory(JobKorel.getResultDirectory());
 			
 			try{
 				// Create the UWS:
@@ -119,6 +90,43 @@ public class UWSKorel extends HttpServlet {
 			}
 		}
 	}
+
+    private void loadProperties(ServletContext context) {
+        Properties configFile = new Properties();
+        try {
+            configFile.load(UWSKorel.class.getResourceAsStream("/uws-korel.conf"));
+            logger.log(Level.INFO, "successfully loaded config from uws-korel.conf");
+        } catch (IOException ex) {
+            logger.log(Level.WARNING, "failed to load config file uws-korel.conf", ex);
+        }
+
+        // set configured values
+        // server address
+        serverAddress = configFile.getProperty("server_address", "http://localhost:8080");
+        // jobs max, default: 4
+        jobsMax = Integer.parseInt(configFile.getProperty("jobs_max", "4"));
+
+        // korel bin, default: /bin/korel
+        JobKorel.setKorelExecutable(configFile.getProperty("korel_bin", "/bin/korel"));
+
+
+        //set scripts dir
+        JobKorel.setScriptsDir(context.getRealPath("/WEB-INF/scripts/"));
+
+
+        // Fetch the results directory path:
+        String resultsDirectoryPath = context.getRealPath("/results/korel");
+        try {
+            new File(resultsDirectoryPath).mkdirs();
+        } catch (SecurityException e) {
+            logger.log(Level.SEVERE, "failed to create result directory " + resultsDirectoryPath, e);
+        }
+
+
+        // set result directory for korel job
+        JobKorel.setResultDirectory(resultsDirectoryPath);
+        JobKorel.setResultLink(serverAddress + context.getContextPath() + "/results/korel/");
+    }
 
 	@Override
 	public void destroy() {
