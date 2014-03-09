@@ -96,8 +96,17 @@ public class Job implements Serializable {
             Logger.getLogger(Job.class.getName()).log(Level.SEVERE, "cannot update job", ex);
             return;
         }
-        uwsJob = getParser().parseJob(xml);
         uwsJobXml = xml;
+        uwsJob = getParser().parseJob(xml);
+        if (uwsJob == null) {
+            try {
+                Phase uwsPhase = getUws().getJobPhase(remoteId);
+                if (uwsPhase != null) this.phase = uwsPhase;
+            } catch (IOException e) {
+                Logger.getLogger(Job.class.getName()).log(Level.SEVERE, "failed retrieving job phase", e);
+            }
+            return;
+        }
         updateFromUWSJob();
     }
 

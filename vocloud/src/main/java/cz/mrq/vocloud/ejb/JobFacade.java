@@ -126,7 +126,7 @@ public class JobFacade extends AbstractFacade<Job> {
      * @return success
      */
     public Boolean downloadResults(Job job) {
-        if (job.getUwsJob().getResults() == null) {
+        if (job.getUwsJob() == null || job.getUwsJob().getResults() == null) {
             return false;
         }
         File results = new File(getFileDir(job), "results.zip");

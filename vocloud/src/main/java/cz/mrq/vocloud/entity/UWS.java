@@ -66,6 +66,10 @@ public class UWS implements Serializable {
     public String getJob(String jobId) throws IOException {
         return Toolbox.httpGet(locationUrl + "/" + jobId);
     }
+
+    public Phase getJobPhase(String jobId) throws IOException {
+        return Phase.getPhase(Toolbox.httpGet(locationUrl + "/" + jobId + "/phase").trim());
+    }
     
     //<editor-fold defaultstate="collapsed" desc="getters setters...">
     public Integer getId() {

@@ -57,8 +57,9 @@ public class SchedulerBean {
                 jf.edit(job);
             if (job.getPhase() == Phase.COMPLETED || job.getPhase() == Phase.ERROR || job.getPhase() == Phase.ABORTED) {
                 jf.exportUWSJob(job);
-                jf.downloadResults(job);
-                jf.postProcess(job);
+                if (jf.downloadResults(job)) {
+                    jf.postProcess(job);
+                }
                 job.destroyOnUWS();
                 watchedJobs.remove(job);
             }

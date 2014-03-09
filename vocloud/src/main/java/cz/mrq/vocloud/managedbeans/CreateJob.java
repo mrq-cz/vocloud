@@ -21,6 +21,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.application.NavigationHandler;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import java.io.*;
@@ -160,7 +161,7 @@ public class CreateJob implements Serializable {
         logger.info("File uploaded: " + event.getFile().getFileName());
     }
 
-    private Boolean checkFileName(String fileName) {
+    protected Boolean checkFileName(String fileName) {
         if ("korel.par".equals(fileName)) {
             par = true;
             return true;
@@ -176,7 +177,7 @@ public class CreateJob implements Serializable {
         return false;
     }
 
-    private void copyUploadedFile(File out, UploadedFile uf) {
+    protected void copyUploadedFile(File out, UploadedFile uf) {
         try {
             copyFile(out, uf.getInputstream());
         } catch (IOException ex) {
@@ -185,7 +186,7 @@ public class CreateJob implements Serializable {
         }
     }
 
-    private void copyFile(File out, InputStream is) {
+    protected void copyFile(File out, InputStream is) {
         try {
             BufferedInputStream bis = new BufferedInputStream(is);
             FileUtils.copyInputStreamToFile(bis, out);
@@ -255,7 +256,7 @@ public class CreateJob implements Serializable {
             logger.log(Level.SEVERE, null, ex);
         }
 
-        String link = applicationAddress + "/download/" + tid + "/" + parameters.getName();
+        String link = getExposeAddress() + "/download/" + tid + "/" + parameters.getName();
 
         // find uws and create job there
         job.setUws(uws.assign("Korel"));
@@ -317,8 +318,6 @@ public class CreateJob implements Serializable {
 
         NavigationHandler myNav = currentInstance.getApplication().getNavigationHandler();
         myNav.handleNavigation(currentInstance, "create", "index");
-
-
     }
 
     public void saveRun() {
@@ -339,6 +338,12 @@ public class CreateJob implements Serializable {
             }
         }
         return parFileContents;
+    }
+
+    protected String getExposeAddress() {
+        ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+        return ec.getRequestScheme() + "://" + ec.getRequestServerName() +
+                (ec.getRequestServerPort() != 80 ? ":" + ec.getRequestServerPort() : "" ) + ec.getRequestContextPath();
     }
 
     public Job getJob() {
