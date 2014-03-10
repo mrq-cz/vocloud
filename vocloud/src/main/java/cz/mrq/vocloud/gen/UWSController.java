@@ -22,7 +22,7 @@ import java.util.ResourceBundle;
 @SessionScoped
 public class UWSController implements Serializable {
 
-    public static final ResourceBundle bundle = ResourceBundle.getBundle("/cz/mrq/vocloud/Bundle");
+    private static final ResourceBundle bundle = ResourceBundle.getBundle("/cz/mrq/vocloud/Bundle");
 
     private UWS current;
     private DataModel items = null;

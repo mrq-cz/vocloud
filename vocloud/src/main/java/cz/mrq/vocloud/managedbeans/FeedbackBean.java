@@ -14,10 +14,8 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.Serializable;
@@ -96,10 +94,8 @@ public class FeedbackBean implements Serializable {
         
                 myNav.handleNavigation(currentInstance, null, "/index");
                 
-        } catch (AddressException ex) {
-                logger.log(Level.SEVERE, null, ex);
-        } catch (MessagingException ex) {
-                logger.log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+                logger.log(Level.SEVERE, "error when sending feedback email", ex);
         }
     }
 

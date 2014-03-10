@@ -157,37 +157,38 @@ public class UserAccount implements Serializable {
     
     
     /**
-     * 
-     * Password is encrypted by sha256
+     * Password is hashed using sha256
      * 
      * http://www.mkyong.com/java/java-sha-hashing-example/
      *
-     * @param pass
+     * @param password
+     * @return hashed password
      */
-    private String encryptPassword(String pass) {
+    private String hashPassword(String password) {
+        String encPass = null;
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.update(pass.getBytes("UTF-8"));
+            md.update(password.getBytes("UTF-8"));
 
             byte[] digest = md.digest();
             StringBuilder hexString = new StringBuilder();
             for (byte aDigest : digest) {
                 hexString.append(Integer.toString((aDigest & 0xff) + 0x100, 16).substring(1));
             }
-            return hexString.toString();
+            encPass = hexString.toString();
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
-        return "asdf";
+        return encPass;
     }
     
     
     public void setPass(String pass) {
-        this.pass = encryptPassword(pass);
+        this.pass = hashPassword(pass);
     }
     
     public boolean isPassword(String pass) {
-        return (this.pass == null ? encryptPassword(pass) == null : this.pass.equals(encryptPassword(pass)));
+        return (this.pass == null ? hashPassword(pass) == null : this.pass.equals(hashPassword(pass)));
     }
 
     public String getRegisteredIp() {

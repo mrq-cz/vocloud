@@ -23,10 +23,9 @@ import java.util.logging.Logger;
 @LocalBean
 public class SchedulerBean {
     
-    @EJB
-    JobFacade jf;
+    @EJB JobFacade jf;
     
-    private List<Job> watchedJobs = new CopyOnWriteArrayList<Job>();
+    private List<Job> watchedJobs = new CopyOnWriteArrayList<>();
     
     private Date lastUpdate;
 
@@ -85,12 +84,9 @@ public class SchedulerBean {
             logger.log(Level.INFO, "watched jobs: {0}", watchedJobs.size());
         }
     }
-    
 
     public Date getLastUpdate() {
         return lastUpdate;
     }
-
-    
 }
 

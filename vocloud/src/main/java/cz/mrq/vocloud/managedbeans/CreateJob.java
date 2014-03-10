@@ -7,8 +7,8 @@ import cz.mrq.vocloud.entity.Job;
 import cz.mrq.vocloud.entity.Phase;
 import cz.mrq.vocloud.tools.Config;
 import cz.mrq.vocloud.tools.Toolbox;
-import cz.mrq.vocloud.uwsparser.model.UWSJob;
 import cz.mrq.vocloud.uwsparser.UWSParserManager;
+import cz.mrq.vocloud.uwsparser.model.UWSJob;
 import org.apache.commons.io.FileUtils;
 import org.primefaces.component.panel.Panel;
 import org.primefaces.event.FileUploadEvent;
@@ -21,7 +21,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.application.NavigationHandler;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import java.io.*;
@@ -145,7 +144,8 @@ public class CreateJob implements Serializable {
                 }
             } catch (ZipException ex) {
                 logger.log(Level.SEVERE, "zip exception");
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Not a valid zip file.", null));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Not a valid zip file.", null));
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
@@ -161,7 +161,7 @@ public class CreateJob implements Serializable {
         logger.info("File uploaded: " + event.getFile().getFileName());
     }
 
-    protected Boolean checkFileName(String fileName) {
+    Boolean checkFileName(String fileName) {
         if ("korel.par".equals(fileName)) {
             par = true;
             return true;
@@ -177,21 +177,23 @@ public class CreateJob implements Serializable {
         return false;
     }
 
-    protected void copyUploadedFile(File out, UploadedFile uf) {
+    void copyUploadedFile(File out, UploadedFile uf) {
         try {
             copyFile(out, uf.getInputstream());
         } catch (IOException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "File copy failed.", ex.toString()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "File copy failed.", ex.toString()));
             logger.log(Level.SEVERE, null, ex);
         }
     }
 
-    protected void copyFile(File out, InputStream is) {
+    void copyFile(File out, InputStream is) {
         try {
             BufferedInputStream bis = new BufferedInputStream(is);
             FileUtils.copyInputStreamToFile(bis, out);
         } catch (IOException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "File copy failed.", ex.toString()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "File copy failed.", ex.toString()));
             logger.log(Level.SEVERE, null, ex);
         }
     }
@@ -205,7 +207,8 @@ public class CreateJob implements Serializable {
         // check for free space
         if (usb.getUser().getQuota() <= jf.getSize(usb.getUser())) {
             logger.log(Level.SEVERE, "Job cant be created not enough user space");
-            currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Job could been created, you exceeded your disk quota.", "Please free some space first."));
+            currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Job could been created, you exceeded your disk quota.", "Please free some space first."));
         }
 
         // set owner and save to the database to get id
@@ -229,7 +232,6 @@ public class CreateJob implements Serializable {
                 }
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, "cannot copy file", ex);
-                //currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Job could been created (IO error)", ex.toString()));
             }
         }
 

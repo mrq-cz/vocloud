@@ -22,6 +22,8 @@ import java.util.regex.Pattern;
 @Stateless
 public class UWSFacade extends AbstractFacade<UWS> {
 
+    private static final Logger logger = Logger.getLogger(UWSFacade.class.getName());
+
     @PersistenceContext(unitName = "vokorelPU")
     private EntityManager em;
 
@@ -41,7 +43,7 @@ public class UWSFacade extends AbstractFacade<UWS> {
         try {
             uws = (UWS) q.getSingleResult();
         } catch (PersistenceException pe) {
-            Logger.getGlobal().log(Level.WARNING, "query failed: {0}", pe.toString());
+            logger.log(Level.WARNING, "query failed: {0}", pe.toString());
         }
         return uws;
     }
@@ -57,7 +59,7 @@ public class UWSFacade extends AbstractFacade<UWS> {
         for (UWS uws : allUWS) {
             if (uws.getEnabled() && uws.getType().equals(type)) {
                 float load = getLoad(uws);
-                Logger.getGlobal().log(Level.INFO, "queering uws: {0} ({1}), load: {2}", new Object[]{uws.getLabel(), uws.getId(), load});
+                logger.log(Level.INFO, "queering uws: {0} ({1}), load: {2}", new Object[]{uws.getLabel(), uws.getId(), load});
                 
                 if (load == -1) {
                     continue;
@@ -112,7 +114,7 @@ public class UWSFacade extends AbstractFacade<UWS> {
         while (m.find()) {
             counter++;
         }
-        Logger.getGlobal().log(Level.INFO, "found {0} running jobs at {1}", new Object[]{counter, uws.getLocationUrl()});
+        logger.log(Level.INFO, "found {0} running jobs at {1}", new Object[]{counter, uws.getLocationUrl()});
         return counter;
     }
 

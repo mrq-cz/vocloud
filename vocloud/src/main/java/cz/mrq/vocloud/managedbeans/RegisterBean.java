@@ -35,7 +35,7 @@ public class RegisterBean implements Serializable {
         user = new UserAccount();
     }
 
-    public void register(ActionEvent actionEvent) {
+    public void register() {
         FacesContext currentInstance = FacesContext.getCurrentInstance();
 
         user.setEnabled(Boolean.TRUE);
@@ -58,10 +58,13 @@ public class RegisterBean implements Serializable {
             user.setRegisteredIp(request.getRemoteAddr());
             
             uaf.create(user);
-            currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Welcome "+user.getFirstName()+"!", null));
-            currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Your account has been successfully registered, you can login right away.", null));
+            currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Welcome "+user.getFirstName()+"!", null));
+            currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Your account has been successfully registered, you can login right away.", null));
         } catch (Exception e) {
-            currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Account registration failed: " + e.toString(), null));
+            currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Account registration failed: " + e.toString(), null));
         }
         
         String redirect = "login";
@@ -75,7 +78,8 @@ public class RegisterBean implements Serializable {
             UIComponent toValidate,
             Object value) {
         String username = (String) value;
-        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Username is already registered.", null);
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                "Username is already registered.", null);
 
         if (uaf.findByUsername(username) != null) {
             context.addMessage(toValidate.getClientId(context), message);
@@ -87,7 +91,8 @@ public class RegisterBean implements Serializable {
             UIComponent toValidate,
             Object value) {
         String email = (String) value;
-        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "E-mail is already registered.", null);
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                "E-mail is already registered.", null);
 
         if (uaf.findByEmail(email) != null) {
             context.addMessage(toValidate.getClientId(context), message);

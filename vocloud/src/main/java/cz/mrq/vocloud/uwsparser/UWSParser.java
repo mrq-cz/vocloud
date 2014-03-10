@@ -35,7 +35,7 @@ public class UWSParser {
         }
     }
 
-    protected UWSJob parseJobUsingJAXB(String xml) throws JAXBException {
+    UWSJob parseJobUsingJAXB(String xml) throws JAXBException {
         JAXBContext jc = JAXBContext.newInstance(UWSJob.class);
 
         Unmarshaller unmarshaller = jc.createUnmarshaller();
@@ -48,7 +48,7 @@ public class UWSParser {
     }
 
     @Deprecated
-    protected UWSJob parseJobUsingSax(String xml) {
+    UWSJob parseJobUsingSax(String xml) {
         UWSJobXmlHandler handler = new UWSJobXmlHandler();
         try {
             XMLReader saxParser = XMLReaderFactory.createXMLReader();

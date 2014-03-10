@@ -55,7 +55,7 @@ public class JobsBean implements Serializable {
         jobs = jobFacade.userJobList(user);
     }
 
-    public void runAgain(ActionEvent e) {
+    public void runAgain() {
         NavigationHandler myNav = FacesContext.getCurrentInstance().getApplication().getNavigationHandler();
         FacesContext.getCurrentInstance().getAttributes().put("parent", selected);
 
@@ -77,7 +77,8 @@ public class JobsBean implements Serializable {
         try {
             jobFacade.start(selected);
         } catch (Exception ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Cant start a job!", ex.toString()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Cant start a job!", ex.toString()));
             logger.log(Level.SEVERE, null, ex);
         }
         this.refresh();
@@ -88,7 +89,8 @@ public class JobsBean implements Serializable {
         try {
             jobFacade.abort(selected);
         } catch (Exception ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Cant abort a job!", ex.toString()));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Cant abort a job!", ex.toString()));
             logger.log(Level.SEVERE, null, ex);
         }
         this.refresh();
@@ -102,10 +104,11 @@ public class JobsBean implements Serializable {
         jobFacade.delete(selected);
 
         this.refresh();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Job \""+name+"\" has been deleted."," "));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "Job \""+name+"\" has been deleted."," "));
     }
 
-    public void deleteSelected(ActionEvent e) {
+    public void deleteSelected() {
         if (selected == null) {
             return;
         }
@@ -164,7 +167,7 @@ public class JobsBean implements Serializable {
      */
     public List<File> getFiles() {
         File[] listFiles = jobFacade.getFileDir(selected).listFiles();
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         if (listFiles != null) {
             for (File f : listFiles) {
                 if (f.length() > 1 & !f.getName().endsWith("png")) {
@@ -177,7 +180,7 @@ public class JobsBean implements Serializable {
 
     public List<File> getImages() {
         File[] listFiles = jobFacade.getFileDir(selected).listFiles();
-        List<File> images = new ArrayList<File>();
+        List<File> images = new ArrayList<>();
         if (listFiles != null) {
             for (File file : listFiles) {
                 if (file.getName().endsWith("png") & file.length() != 0) {

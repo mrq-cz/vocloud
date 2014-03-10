@@ -262,8 +262,8 @@ public class JobKorel extends AbstractJob {
     private void decompress(File file, File outputDirectory) {
         try {
             int buffer = 2048;
-            BufferedOutputStream dest = null;
-            BufferedInputStream is = null;
+            BufferedOutputStream dest;
+            BufferedInputStream is;
             ZipEntry entry;
             ZipFile zipfile = new ZipFile(file);
             Enumeration e = zipfile.entries();
@@ -294,7 +294,7 @@ public class JobKorel extends AbstractJob {
         int buffer = 2048;
         try {
             String output = workingDir.getAbsolutePath() + "/results.zip";
-            BufferedInputStream origin = null;
+            BufferedInputStream origin;
             FileOutputStream dest = new FileOutputStream(output);
             ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
             byte data[] = new byte[2048];

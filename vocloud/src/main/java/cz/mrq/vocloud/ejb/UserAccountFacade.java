@@ -6,10 +6,8 @@ import javax.annotation.Resource;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityManager;
@@ -28,6 +26,9 @@ import java.util.logging.Logger;
 @Stateless
 @LocalBean
 public class UserAccountFacade extends AbstractFacade<UserAccount> {
+
+    private static final Logger logger = Logger.getLogger(UserAccountFacade.class.getName());
+
     @PersistenceContext(unitName = "vokorelPU")
     private EntityManager em;
     
@@ -50,33 +51,23 @@ public class UserAccountFacade extends AbstractFacade<UserAccount> {
     }
     
     public void resetPassword(UserAccount entity) {
-        Random rng = new Random();
-        int length = 6;
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        char[] text = new char[length];
-        for (int i = 0; i < length; i++)
-        {
-            text[i] = characters.charAt(rng.nextInt(characters.length()));
-        }
-        String newPass = new String(text);
+
+        String newPass = generatePassword();
         
         // sent email with pass
         Message message = new MimeMessage(mailSession);
         try {
-                message.addRecipient(Message.RecipientType.TO, new InternetAddress(entity.getEmail()));
-                message.setFrom();
-                message.setSubject("vo-korel: Password reset");
-                message.setText("Your password for account "+entity.getUsername()+" was changed to: "+newPass);
-                message.setHeader("X-Mailer", "My Mailer");
-                Transport.send(message);
-                Logger.getLogger(UserAccountFacade.class.getName()).log(Level.INFO, "Email with password has been sent to the user.");
-        } catch (AddressException ex) {
-            Logger.getLogger(UserAccountFacade.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (MessagingException ex) {
-                Logger.getLogger(UserAccountFacade.class.getName()).log(Level.SEVERE, null, ex);
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(entity.getEmail()));
+            message.setFrom();
+            message.setSubject("vo-korel: Password reset");
+            message.setText("Your password for account "+entity.getUsername()+" was changed to: "+newPass);
+            message.setHeader("X-Mailer", "My Mailer");
+            Transport.send(message);
+            logger.log(Level.INFO, "Email with password has been sent to the user.");
+            changePassword(entity, newPass);
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, "failed to reset pass", ex);
         }
-        
-        changePassword(entity, newPass);
     }
     
     public void changePassword(UserAccount user, String password) {
@@ -95,11 +86,10 @@ public class UserAccountFacade extends AbstractFacade<UserAccount> {
         UserAccount user = null;
         Query q = getEntityManager().createNamedQuery("UserAccount.findByEmail");
         q.setParameter("email",email);
-        //Logger.getGlobal().log(Level.INFO, "query for {0} is {1}", new Object[]{email, q.toString()});
         try {
             user = (UserAccount) q.getSingleResult();
         } catch (PersistenceException pe) {
-            Logger.getGlobal().log(Level.WARNING, "query failed: {0}",pe.toString());
+            logger.log(Level.WARNING, "query failed: {0}", pe.toString());
         }
         return user;
     }
@@ -108,13 +98,23 @@ public class UserAccountFacade extends AbstractFacade<UserAccount> {
         UserAccount user = null;
         Query q = getEntityManager().createNamedQuery("UserAccount.findByUsername");
         q.setParameter("username",username);
-        //Logger.getGlobal().log(Level.INFO, "query for {0} is {1}", new Object[]{username, q.toString()});
         try {
             user = (UserAccount) q.getSingleResult();
         } catch (PersistenceException pe) {
-            Logger.getGlobal().log(Level.WARNING, "query failed: {0}",pe.toString());
+            logger.log(Level.WARNING, "query failed: {0}", pe.toString());
         }
         return user;
+    }
+
+    private String generatePassword() {
+        Random rng = new Random();
+        int length = 6;
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        char[] text = new char[length];
+        for (int i = 0; i < length; i++) {
+            text[i] = characters.charAt(rng.nextInt(characters.length()));
+        }
+        return new String(text);
     }
     
     

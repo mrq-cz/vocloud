@@ -22,7 +22,7 @@ import java.util.ResourceBundle;
 @SessionScoped
 public class UserAccountController implements Serializable {
 
-    public static final ResourceBundle bundle = ResourceBundle.getBundle("/cz/mrq/vocloud/Bundle");
+    private static final ResourceBundle bundle = ResourceBundle.getBundle("/cz/mrq/vocloud/Bundle");
     
     private UserAccount current;
     private DataModel items = null;

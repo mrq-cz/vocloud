@@ -3,7 +3,6 @@ package cz.mrq.vocloud.ejb;
 import cz.mrq.vocloud.entity.Job;
 import cz.mrq.vocloud.entity.Phase;
 import cz.mrq.vocloud.entity.UserAccount;
-import cz.mrq.vocloud.managedbeans.RegisterBean;
 import cz.mrq.vocloud.tools.Config;
 import cz.mrq.vocloud.tools.Toolbox;
 import org.apache.commons.io.FileUtils;
@@ -13,8 +12,14 @@ import javax.ejb.Asynchronous;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.mail.*;
-import javax.mail.internet.*;
+import javax.mail.Message;
+import javax.mail.Multipart;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
@@ -104,7 +109,7 @@ public class JobFacade extends AbstractFacade<Job> {
         try {
             return q.getResultList();
         } catch (PersistenceException pe) {
-            Logger.getGlobal().log(Level.WARNING, "query failed: {0}", pe.toString());
+            logger.log(Level.WARNING, "query failed: {0}", pe.toString());
         }
         return null;
     }
@@ -115,7 +120,7 @@ public class JobFacade extends AbstractFacade<Job> {
         try {
             return q.getResultList();
         } catch (PersistenceException pe) {
-            Logger.getGlobal().log(Level.WARNING, "query failed: {0}", pe.toString());
+            logger.log(Level.WARNING, "query failed: {0}", pe.toString());
         }
         return null;
     }
@@ -161,7 +166,7 @@ public class JobFacade extends AbstractFacade<Job> {
         try {
             return q.getResultList();
         } catch (PersistenceException pe) {
-            Logger.getGlobal().log(Level.WARNING, "query failed: {0}", pe.toString());
+            logger.log(Level.WARNING, "query failed: {0}", pe.toString());
         }
         return null;
     }
@@ -240,10 +245,8 @@ public class JobFacade extends AbstractFacade<Job> {
             message.setHeader("X-Mailer", "My Mailer");
             Transport.send(message);
             logger.log(Level.INFO, "Result were sent to {0}", job.getResultsEmail());
-        } catch (AddressException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        } catch (MessagingException ex) {
-            logger.log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, "failed to send email with job results", ex);
         }
     }
 
@@ -360,7 +363,7 @@ public class JobFacade extends AbstractFacade<Job> {
                 try {
                     FileUtils.copyDirectory(example, jobFolder);
                 } catch (IOException ex) {
-                    Logger.getLogger(RegisterBean.class.getName()).log(Level.SEVERE, "cannot copy example files for the job", ex);
+                    logger.log(Level.SEVERE, "cannot copy example files for the job", ex);
                     this.delete(exampleJob);
                 }
 

@@ -16,7 +16,7 @@ public class Configuration {
     private static final Logger logger = Logger.getLogger(Configuration.class.getName());
 
     private volatile static Properties properties;
-    public static final String propertiesFile = "/cz/mrq/vocloud/vokorel.properties";
+    private static final String propertiesFile = "/cz/mrq/vocloud/vokorel.properties";
 
     public synchronized static Properties getProperties() {
         if (properties == null) {

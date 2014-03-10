@@ -44,16 +44,15 @@ public class SessionBean implements Serializable {
             }
             user = u;
             DateFormat df = new SimpleDateFormat();
-            Date lastlogin = u.getLastLogin();
-            if (lastlogin == null) {
+            Date lastLogin = u.getLastLogin();
+            if (lastLogin == null) {
                 last = "this is your first login";
                 // if first and no jobs, copy examples
                 if (jf.findByOwnerId(user).isEmpty()) {
                     jf.prepareKorelJobExamples(user);
                 }
-                
             } else {
-                last = u.getLastIp()+" ("+df.format(lastlogin)+")";
+                last = u.getLastIp() + " (" + df.format(lastLogin) + ")";
             }
             loggedIn = true;
             FacesContext currentInstance = FacesContext.getCurrentInstance();

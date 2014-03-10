@@ -1,7 +1,7 @@
 package cz.mrq.vocloud.entity;
 
-import cz.mrq.vocloud.uwsparser.model.UWSJob;
 import cz.mrq.vocloud.uwsparser.UWSParserManager;
+import cz.mrq.vocloud.uwsparser.model.UWSJob;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
