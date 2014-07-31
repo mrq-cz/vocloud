@@ -16,7 +16,10 @@ and open the template in the editor.
             <c:choose>
             <c:when test="${request.remoteUser !=  null}">
                 <p:menuitem ajax="false" action="/jobs/index" value="Jobs" icon="ui-icon-document" />
-                <p:menuitem ajax="false" action="/jobs/create" value="Create" icon="ui-icon-disk" />
+                <p:submenu label="Create" icon="ui-icon-disk">
+                    <p:menuitem ajax="false" action="/jobs/create" value="Korel" />
+                    <p:menuitem ajax="false" action="/jobs/create-som" value="SOM" />
+                </p:submenu>
                 <p:menuitem ajax="false" action="/settings" value="Settings" icon="ui-icon-gear" />
                 <c:if test="${sessionBean.user.groupName == 'ADMIN'}">
                     <p:submenu label="Admin">

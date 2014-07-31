@@ -35,47 +35,41 @@ import java.util.zip.ZipFile;
  *
  * @author voadmin
  */
-@ManagedBean(name = "createJob")
-@ViewScoped
-public class CreateJob implements Serializable {
+public abstract class CreateJob implements Serializable {
 
     private static final Logger logger = Logger.getLogger(CreateJob.class.getName());
 
-    @EJB private JobFacade jf;
-    @EJB private UWSFacade uws;
-    @EJB private UserSessionBean usb;
+    @EJB protected JobFacade jf;
+    @EJB protected UWSFacade uws;
+    @EJB protected UserSessionBean usb;
 
     @Inject @Config
-    private String applicationAddress;
+    protected String applicationAddress;
     @Inject @Config
-    private String tempDir;
+    protected String tempDir;
     @Inject @Config
-    private String jobsDir;
+    protected String jobsDir;
 
-    private Job parent;
-    private String parFileContents;
-    private Job job;
-    private UUID tid;
-    private Boolean run = false;
-    private Boolean email = false;
-    private Boolean par = false;
-    private Boolean dat = false;
-    private Boolean tmp = false;
-    private File uploadDir;
-    private List<File> uploadedFiles;
-    private Panel editParPanel = new Panel();
+    protected Job parent;
+    protected Job job;
+    protected UUID tid;
+    protected Boolean run = false;
+    protected Boolean email = false;
+    protected File uploadDir;
+    protected List<File> uploadedFiles;
+
+    protected abstract String getJobType();
 
     public CreateJob() {
         job = new Job();
         tid = UUID.randomUUID();
-        job.setJobType("Korel");
+        job.setJobType(getJobType());
         uploadedFiles = new ArrayList<>();
         uploadDir = new File(tempDir, tid.toString());
     }
 
     @PostConstruct
     public void init() {
-        editParPanel.setCollapsed(true);
 
         // if we are creating from other job, get parent
         parent = (Job) FacesContext.getCurrentInstance().getAttributes().get("parent");
@@ -91,90 +85,20 @@ public class CreateJob implements Serializable {
             File[] files = dir.listFiles();
             if (files != null) {
                 for (File f : files) {
-                    if (checkFileName(f.getName())) {
-                        uploadedFiles.add(f);
-                    }
+                    uploadedFiles.add(f);
                 }
             }
-
-            // read par file contents
-            if (par) {
-                setParFileContents(new File(dir, "korel.par"));
-            }
-
-
+            postInit();
         }
     }
+
+    protected abstract void postInit();
 
     @PreDestroy
     public void deleteTempFiles() {
         if (uploadDir.exists()) {
             Toolbox.delete(uploadDir);
         }
-    }
-
-    public void handleFileUpload(FileUploadEvent event) {
-        UploadedFile uploaded = event.getFile();
-        String fileName = uploaded.getFileName();
-        checkFileName(fileName);
-
-        uploadDir.mkdirs();
-        File outFile = new File(uploadDir, uploaded.getFileName());
-
-        copyUploadedFile(outFile, uploaded);
-
-        //extract uploaded zip file
-        if (fileName.endsWith(".zip")) {
-            try {
-                ZipEntry entry;
-                ZipFile zf = new ZipFile(outFile);
-                Enumeration e = zf.entries();
-                while (e.hasMoreElements()) {
-                    entry = (ZipEntry) e.nextElement();
-
-                    // flatten directories
-                    String filename = entry.getName().substring(entry.getName().lastIndexOf('/') + 1);
-
-                    if (checkFileName(filename)) {
-
-                        File exFile = new File(uploadDir, filename);
-                        copyFile(exFile, zf.getInputStream(entry));
-                        uploadedFiles.add(exFile);
-                    }
-                }
-            } catch (ZipException ex) {
-                logger.log(Level.SEVERE, "zip exception");
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Not a valid zip file.", null));
-            } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
-            }
-        } else {
-            uploadedFiles.add(outFile);
-        }
-
-        // read par file contents
-        if (par) {
-            setParFileContents(new File(uploadDir, "korel.par"));
-        }
-
-        logger.info("File uploaded: " + event.getFile().getFileName());
-    }
-
-    Boolean checkFileName(String fileName) {
-        if ("korel.par".equals(fileName)) {
-            par = true;
-            return true;
-        }
-        if ("korel.dat".equals(fileName)) {
-            dat = true;
-            return true;
-        }
-        if ("korel.tmp".equals(fileName)) {
-            tmp = true;
-            return true;
-        }
-        return false;
     }
 
     void copyUploadedFile(File out, UploadedFile uf) {
@@ -222,31 +146,24 @@ public class CreateJob implements Serializable {
             job.setResultsEmail(usb.getUser().getEmail());
         }
 
-        // create job folder and copy uploaded files there 
-        File jobFolder = new File(jobsDir, job.getId().toString());
-        jobFolder.mkdirs();
+        // create job folder and copy uploaded files there
+        getJobFolder().mkdirs();
         for (File f : uploadedFiles) {
             try {
                 if (f.exists()) {
-                    FileUtils.copyFileToDirectory(f, jobFolder);
+                    FileUtils.copyFileToDirectory(f, getJobFolder());
                 }
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, "cannot copy file", ex);
             }
         }
 
-        //replace korel.par by data from textfield
-        try {
-            FileUtils.writeStringToFile(new File(jobFolder, "korel.par"), getParFileContents());
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
+        handleSave();
 
         deleteTempFiles();
 
         // pack files to param file
-        File parameters = new File(jobFolder, "parameters.zip");
-        Toolbox.compressFiles(jobFolder, parameters);
+        File parameters = prepareParameters();
 
         // expose for download
         String exposeLocal = currentInstance.getExternalContext().getRealPath("/download/" + tid);
@@ -261,7 +178,7 @@ public class CreateJob implements Serializable {
         String link = applicationAddress + "/download/" + tid + "/" + parameters.getName();
 
         // find uws and create job there
-        job.setUws(uws.assign("Korel"));
+        job.setUws(uws.assign(job.getJobType()));
         
         if (job.getUws() == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -276,7 +193,7 @@ public class CreateJob implements Serializable {
             reply = job.getUws().createJob(param);
         } catch (IOException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Can't create job!", "Korel worker is unavailable."));
+                    "Can't create job!", "Job worker is unavailable."));
             logger.log(Level.SEVERE, "cant create a job", ex);
             jf.delete(job);
             return;
@@ -315,12 +232,17 @@ public class CreateJob implements Serializable {
 
         //navigate away
 
-
         //currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Job created.", "New job '" + job.getLabel() + "' created."));
 
         NavigationHandler myNav = currentInstance.getApplication().getNavigationHandler();
         myNav.handleNavigation(currentInstance, "create", "index");
     }
+
+    protected abstract File prepareParameters();
+
+    protected abstract void handleFileUpload(FileUploadEvent event);
+
+    protected abstract void handleSave();
 
     public void saveRun() {
         run = true;
@@ -331,15 +253,6 @@ public class CreateJob implements Serializable {
         FacesContext currentInstance = FacesContext.getCurrentInstance();
         NavigationHandler myNav = currentInstance.getApplication().getNavigationHandler();
         myNav.handleNavigation(currentInstance, "create", "index");
-    }
-
-    public String getParFileContents() {
-        if (parFileContents == null) {
-            if (parent != null) {
-                setParFileContents(new File(jf.getFileDir(parent), "korel.par"));
-            }
-        }
-        return parFileContents;
     }
 
     public Job getJob() {
@@ -370,55 +283,12 @@ public class CreateJob implements Serializable {
         return uploadedFiles;
     }
 
-    public Boolean getDat() {
-        return dat;
-    }
-
-    public void setDat(Boolean dat) {
-        this.dat = dat;
-    }
-
-    public Boolean getPar() {
-        return par;
-    }
-
-    public void setPar(Boolean par) {
-        this.par = par;
-    }
-
-    public Boolean getTmp() {
-        return tmp;
-    }
-
-    public void setTmp(Boolean tmp) {
-        this.tmp = tmp;
-    }
-
     @Override
     public String toString() {
         return "CreateJob{" + "tid=" + tid.toString() + "job=" + job + ", run=" + run + ", email=" + email + ", uploadedFiles(" + uploadedFiles.size() + ")=" + uploadedFiles + '}';
     }
 
-    public void setParFileContents(String contents) {
-        editParPanel.setCollapsed(false);
-        parFileContents = contents;
-    }
-
-    private void setParFileContents(File file) {
-        try {
-            parFileContents = FileUtils.readFileToString(file);
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
-            return;
-        }
-        editParPanel.setCollapsed(false);
-    }
-
-    public Panel getEditParPanel() {
-        return editParPanel;
-    }
-
-    public void setEditParPanel(Panel editParPanel) {
-        this.editParPanel = editParPanel;
+    public File getJobFolder() {
+        return new File(jobsDir, job.getId().toString());
     }
 }

@@ -11,7 +11,7 @@
         <ui:composition template="./../WEB-INF/template.xhtml">
 
             <ui:define name="title">
-                Create new job
+                Create new Korel job
             </ui:define>
 
             <ui:define name="messages">
@@ -22,19 +22,19 @@
                 <h:form enctype="multipart/form-data">
                     <h:panelGrid columns="2" style="padding-bottom: 20px">
                         <h:outputLabel style="font-weight: bold" value="Project label:" for="label" />
-                        <p:inputText size="30" label="Job label" id="label" value="#{createJob.job.label}" 
+                        <p:inputText size="30" label="Job label" id="label" value="#{createKorelJob.job.label}"
                                      required="true"
                                      requiredMessage="Please enter a label for this job"/>
 
                         <h:outputLabel value="Description:" for="notes" />
-                        <p:inputTextarea id="notes" cols="60" value="#{createJob.job.notes}" />
+                        <p:inputTextarea id="notes" cols="60" value="#{createKorelJob.job.notes}" />
                         <h:panelGrid columns="2">
-                            <p:selectBooleanCheckbox id="email" value="#{createJob.email}" />
+                            <p:selectBooleanCheckbox id="email" value="#{createKorelJob.email}" />
                             <h:outputText value="Email me results" for="email" />
                         </h:panelGrid>
                     </h:panelGrid>
-                    <p:panel id="korelpar"  binding="#{createJob.editParPanel}" toggleable="true" header="Edit korel.par" >
-                        <p:inputTextarea id="partext" value="#{createJob.parFileContents}" 
+                    <p:panel id="korelpar"  binding="#{createKorelJob.editParPanel}" toggleable="true" header="Edit korel.par" >
+                        <p:inputTextarea id="partext" value="#{createKorelJob.parFileContents}"
                                          cols="90" rows="10"  autoResize="false" style="font-family: courier"/>
                         <p:resizable for="partext" minHeight="170" minWidth="750" />
                     </p:panel>
@@ -50,13 +50,13 @@
                             </p>
                             <h:panelGrid columns="2">
                                 <h:outputText value="korel.par"/>
-                                <p:selectBooleanCheckbox disabled="true" value="#{createJob.par}"/>
+                                <p:selectBooleanCheckbox disabled="true" value="#{createKorelJob.par}"/>
 
                                 <h:outputText value="korel.dat"/>
-                                <p:selectBooleanCheckbox disabled="true" value="#{createJob.dat}"/>
+                                <p:selectBooleanCheckbox disabled="true" value="#{createKorelJob.dat}"/>
 
                                 <h:outputText value="korel.tmp"/>
-                                <p:selectBooleanCheckbox disabled="true" value="#{createJob.tmp}"/>
+                                <p:selectBooleanCheckbox disabled="true" value="#{createKorelJob.tmp}"/>
                             </h:panelGrid>
                             <p:fileUpload  id="upload" 
                                            mode="advanced"
@@ -64,14 +64,14 @@
                                            multiple="true"
                                            update="korel korelpar"
                                            allowTypes="/(\.|\/)(par|dat|tmp|zip)$/"
-                                           fileUploadListener="#{createJob.handleFileUpload}"/>
+                                           fileUploadListener="#{createKorelJob.handleFileUpload}"/>
 
                         </h:panelGrid>
                     </p:panel>
 
                     <p> </p>
-                    <p:splitButton update=":createMessages"  value="Save and run" action="#{createJob.saveRun}">
-                        <p:menuitem update=":createMessages"  value="Save" action="#{createJob.save}" />
+                    <p:splitButton update=":createMessages"  value="Save and run" action="#{createKorelJob.saveRun}">
+                        <p:menuitem update=":createMessages"  value="Save" action="#{createKorelJob.save}" />
                     </p:splitButton>
                     <p:commandButton ajax="false" value="Cancel" action="index.xhtml" />
                 </h:form>
