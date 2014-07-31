@@ -46,7 +46,23 @@
                     <p:commandButton id="delete" oncomplete="confirmDelete.show()" value="delete" icon="ui-icon-close" title="delete job and its results" />
 
                     <p />
-                    <h3>Plots</h3>
+                    <c:if test="#{not empty jobs.pages}">
+                        <h3>Preview</h3>
+                    </c:if>
+                    <c:forEach id="pages" items="${jobs.pages}" var="page" >
+                        <p:panel style="max-width: 1200px" >
+                            <f:facet name="header">
+                                #{page.name}
+                                <f:attribute name="selectedFile" value="#{page}" />
+                            </p:commandLink>
+                            </f:facet>
+                            <iframe src="job/#{jobs.selected.stringId}/#{page}" style="width: 98%; height: 700px; border: 0px; margin-left: 5px;" ></iframe>
+                        </p:panel>
+                        <p />
+                    </c:forEach>
+                    <c:if test="#{not empty jobs.images}">
+                        <h3>Plots</h3>
+                    </c:if>
                     <c:forEach id="plots" items="${jobs.images}" var="image" >
                             <p:panel style="max-width: 800px" >
                                 <f:facet name="header">
@@ -61,8 +77,9 @@
                     </c:forEach>
                     <p />
                     <h3>Files</h3>
-                    <p:dataTable  id="files" style="max-width: 800px" value="#{jobs.files}" var="file" 
-                                  rowStyleClass="#{file.name == 'korel.err' or file.name == 'korel.ret' or (jobs.selected.phase == 'ERROR' and file.name == 'uws-job.xml') ? 'errorrow': null }">
+                    <p:dataTable  id="files" style="max-width: 800px" value="#{jobs.files}" var="file"
+                                  rowStyleClass="#{file.name == 'korel.err' or file.name == 'korel.ret' or
+                                  (jobs.selected.phase == 'ERROR' and file.name == 'uws-job.xml') ? 'errorrow': null }">
                         <p:column headerText="Name" >
                             #{file.name}
                         </p:column>

@@ -170,7 +170,7 @@ public class JobsBean implements Serializable {
         List<File> files = new ArrayList<>();
         if (listFiles != null) {
             for (File f : listFiles) {
-                if (f.length() > 1 & !f.getName().endsWith("png")) {
+                if (f.length() > 1 & !(f.getName().endsWith("png") || f.getName().endsWith("html") || f.isDirectory())) {
                     files.add(f);
                 }
             }
@@ -190,6 +190,20 @@ public class JobsBean implements Serializable {
         }
         Collections.sort(images);
         return images;
+    }
+
+    public List<File> getPages() {
+        File[] listFiles = jobFacade.getFileDir(selected).listFiles();
+        List<File> pages = new ArrayList<>();
+        if (listFiles != null) {
+            for (File file : listFiles) {
+                if ((file.getName().endsWith("html") || file.getName().endsWith("htm")) & file.length() != 0) {
+                    pages.add(file);
+                }
+            }
+        }
+        Collections.sort(pages);
+        return pages;
     }
 
     public List<Job> getJobs() {
