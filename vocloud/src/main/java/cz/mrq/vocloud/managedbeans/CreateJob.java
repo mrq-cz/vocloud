@@ -160,9 +160,7 @@ public abstract class CreateJob implements Serializable {
 
         handleSave();
 
-        deleteTempFiles();
-
-        // pack files to param file
+        // prepare params
         File parameters = prepareParameters();
 
         // expose for download
@@ -172,6 +170,8 @@ public abstract class CreateJob implements Serializable {
         try {
             FileUtils.copyFileToDirectory(parameters, expose);
         } catch (IOException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Can't create job!", "Parameters file can't be exposed."));
             logger.log(Level.SEVERE, null, ex);
         }
 
@@ -236,6 +236,8 @@ public abstract class CreateJob implements Serializable {
 
         NavigationHandler myNav = currentInstance.getApplication().getNavigationHandler();
         myNav.handleNavigation(currentInstance, "create", "index");
+
+        deleteTempFiles();
     }
 
     protected abstract File prepareParameters();
