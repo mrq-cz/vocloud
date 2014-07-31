@@ -53,10 +53,8 @@
                         <p:panel style="max-width: 1200px" >
                             <f:facet name="header">
                                 #{page.name}
-                                <f:attribute name="selectedFile" value="#{page}" />
-                            </p:commandLink>
                             </f:facet>
-                            <iframe src="job/#{jobs.selected.stringId}/#{page}" style="width: 98%; height: 700px; border: 0px; margin-left: 5px;" ></iframe>
+                            <iframe src="preview/#{jobs.selected.stringId}/#{page}" style="width: 98%; height: 700px; border: 0px; margin-left: 5px;" ></iframe>
                         </p:panel>
                         <p />
                     </c:forEach>
