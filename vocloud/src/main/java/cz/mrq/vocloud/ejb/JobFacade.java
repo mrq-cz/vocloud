@@ -6,6 +6,7 @@ import cz.mrq.vocloud.entity.UserAccount;
 import cz.mrq.vocloud.tools.Config;
 import cz.mrq.vocloud.tools.Toolbox;
 import org.apache.commons.io.FileUtils;
+import org.zeroturnaround.zip.ZipUtil;
 
 import javax.annotation.Resource;
 import javax.ejb.Asynchronous;
@@ -138,7 +139,7 @@ public class JobFacade extends AbstractFacade<Job> {
         Boolean result;
         try {
             result = Toolbox.downloadFile(job.getUwsJob().getResultUrl(), results);
-            Toolbox.decompress(results, results.getParentFile());
+            ZipUtil.unpack(results, results.getParentFile());
             logger.info("results for job " + job.getId() + " downloaded");
         } catch (Exception ex) {
             result = false;
