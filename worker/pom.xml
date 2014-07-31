@@ -11,6 +11,7 @@
 
     <modules>
         <module>korel</module>
+        <module>som</module>
     </modules>
 
     <dependencies>

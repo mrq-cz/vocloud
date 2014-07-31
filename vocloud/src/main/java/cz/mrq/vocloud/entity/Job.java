@@ -43,7 +43,7 @@ public class Job implements Serializable {
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
     @ManyToOne
     private UserAccount owner;
-    private String jobType;   // possibly enum
+    private String jobType;
     @JoinColumn(name = "uws_id", referencedColumnName = "id", nullable=true)
     @ManyToOne
     private UWS uws;
