@@ -171,13 +171,15 @@ public class Job extends AbstractJob {
         File zip = new File(workingDir, "results.zip");
         File results = new File(workingDir, "result");
 
-        ZipEntrySource[] entries = new ZipEntrySource[] {
-                new FileSource(".", results),
-                new FileSource("run.out", outputFile),
-                new FileSource("run.err", errorFile),
-                new FileSource("run.ret", returnFile),
-        };
-        ZipUtil.pack(entries, zip);
+        try {
+            FileUtils.copyFileToDirectory(outputFile, results);
+            FileUtils.copyFileToDirectory(errorFile, results);
+            FileUtils.copyFileToDirectory(returnFile, results);
+        } catch (IOException e) {
+            throw new UWSException("failed to copy log files to the results");
+        }
+
+        ZipUtil.pack(results, zip);
 
         addResult(new Result("Results", "zip", Config.resultsLink + "/" + this.getJobId() + "/results.zip"));
     }
