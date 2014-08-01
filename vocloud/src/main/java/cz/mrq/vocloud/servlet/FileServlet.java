@@ -19,7 +19,7 @@ import java.net.URLDecoder;
  *
  * @author Lumir Mrkva (lumir.mrkva@topmonks.com)
  */
-@WebServlet(name = "ImagesServlet", urlPatterns = {"/jobs/preview/*"})
+@WebServlet(name = "FilesServlet", urlPatterns = {"/jobs/preview/*"})
 public class FileServlet extends HttpServlet {
 
     @EJB
