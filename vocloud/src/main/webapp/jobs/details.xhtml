@@ -52,7 +52,7 @@
                     <c:forEach id="pages" items="${jobs.pages}" var="page" >
                         <p:panel style="max-width: 1200px" >
                             <f:facet name="header">
-                                #{page.name}
+                                #{page.name} - <a href="preview/#{jobs.selected.stringId}/#{page.name}" target="_blank">fullscreen</a>
                             </f:facet>
                             <iframe src="preview/#{jobs.selected.stringId}/#{page.name}" style="width: 98%; height: 700px; border: 0px; margin-left: 5px;" ></iframe>
                         </p:panel>
