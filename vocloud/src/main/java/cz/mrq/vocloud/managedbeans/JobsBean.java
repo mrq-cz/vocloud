@@ -59,7 +59,12 @@ public class JobsBean implements Serializable {
         NavigationHandler myNav = FacesContext.getCurrentInstance().getApplication().getNavigationHandler();
         FacesContext.getCurrentInstance().getAttributes().put("parent", selected);
 
-        myNav.handleNavigation(FacesContext.getCurrentInstance(), "details", "create");
+        String create = "create";
+        if (selected.getJobType().equals("SOM")) {
+            create = "create-som";
+        }
+
+        myNav.handleNavigation(FacesContext.getCurrentInstance(), "details", create);
     }
 
     public void details(ActionEvent e) {
