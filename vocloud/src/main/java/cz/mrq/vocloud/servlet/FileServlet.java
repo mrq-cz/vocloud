@@ -57,7 +57,7 @@ public class FileServlet extends HttpServlet {
         File file = new File(jobsDir, URLDecoder.decode(path, "UTF-8"));
 
         if (!file.exists()) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404.
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, path); // 404.
             return;
         }
 
