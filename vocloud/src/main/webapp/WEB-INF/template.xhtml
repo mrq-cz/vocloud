@@ -39,8 +39,8 @@
                     (c) mrq 2014 - <h:commandLink value="feedback"  action="/feedback" /> -
                     <a target="_blank" href="https://github.com/mrq-cz/vocloud">github</a>
                      - build: #{sessionBean.buildNumber}
-                    <h:outputText value="#{sessionBean.buildTimestamp}">
-                        <f:convertDateTime type="date"  dateStyle="long" timeZone="CET" />
+                    <h:outputText value="#{sessionBean.buildDate}">
+                        <f:convertDateTime type="both"  dateStyle="long" timeZone="CET" />
                     </h:outputText>
                 </div>
             </h:form>

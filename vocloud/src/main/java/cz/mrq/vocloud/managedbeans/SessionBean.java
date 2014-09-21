@@ -92,7 +92,7 @@ public class SessionBean implements Serializable {
         return buildNumber;
     }
 
-    public String getBuildTimestamp() {
-        return buildTimestamp;
+    public Date getBuildDate() {
+        return new Date(Long.parseLong(buildTimestamp));
     }
 }
