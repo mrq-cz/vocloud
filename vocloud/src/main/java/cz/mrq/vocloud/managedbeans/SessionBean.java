@@ -3,6 +3,7 @@ package cz.mrq.vocloud.managedbeans;
 import cz.mrq.vocloud.ejb.JobFacade;
 import cz.mrq.vocloud.ejb.UserSessionBean;
 import cz.mrq.vocloud.entity.UserAccount;
+import cz.mrq.vocloud.tools.Config;
 
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
@@ -28,6 +29,9 @@ public class SessionBean implements Serializable {
     private UserAccount user;
     private boolean loggedIn = false;
     private String last = "";
+
+    @Config
+    private String buildNumber;
 
     public SessionBean() {
     }
@@ -81,5 +85,8 @@ public class SessionBean implements Serializable {
     public String getLast() {
         return last;
     }
-    
+
+    public String getBuildNumber() {
+        return buildNumber;
+    }
 }
