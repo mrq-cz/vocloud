@@ -2,7 +2,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:h="http://java.sun.com/jsf/html">
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
 
     <h:head>
         <meta charset="utf-8" />
@@ -37,7 +38,10 @@
                 <div align="right">
                     (c) mrq 2014 - <h:commandLink value="feedback"  action="/feedback" /> -
                     <a target="_blank" href="https://github.com/mrq-cz/vocloud">github</a>
-                     - build:#{sessionBean.buildNumber}
+                     - build: #{sessionBean.buildNumber}
+                    <h:outputText value="#{sessionBean.buildTimestamp}">
+                        <f:convertDateTime type="date"  dateStyle="long" timeZone="CET" />
+                    </h:outputText>
                 </div>
             </h:form>
         </div>

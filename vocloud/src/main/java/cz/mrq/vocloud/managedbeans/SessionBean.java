@@ -32,6 +32,8 @@ public class SessionBean implements Serializable {
 
     @Config
     private String buildNumber;
+    @Config
+    private String buildTimestamp;
 
     public SessionBean() {
     }
@@ -88,5 +90,9 @@ public class SessionBean implements Serializable {
 
     public String getBuildNumber() {
         return buildNumber;
+    }
+
+    public String getBuildTimestamp() {
+        return buildTimestamp;
     }
 }
