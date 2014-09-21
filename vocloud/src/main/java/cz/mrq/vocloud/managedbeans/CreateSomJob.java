@@ -6,6 +6,8 @@ import org.primefaces.model.UploadedFile;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -28,12 +30,15 @@ public class CreateSomJob extends CreateJob {
 
     @Override
     public void postInit() {
+        List<File> files = new ArrayList<>();
         for (File f : uploadedFiles) {
-            if (f.getName().endsWith(".zip")) {
+            if (f.getName().endsWith(".zip") && !f.getName().equals("results.zip")) {
                 zip = true;
                 parameters = f;
+                files.add(f);
             }
         }
+        uploadedFiles = files;
     }
 
     @Override
