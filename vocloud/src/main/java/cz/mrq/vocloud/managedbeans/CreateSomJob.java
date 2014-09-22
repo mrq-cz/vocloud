@@ -57,6 +57,7 @@ public class CreateSomJob extends CreateJob {
 
     @Override
     protected File prepareParameters() {
+        ZipUtil.replaceEntry(parameters, CONFIG_FILE, editPanel.getFileContents().getBytes());
         return parameters;
     }
 

@@ -33,6 +33,11 @@
                             <h:outputText value="Email me results" for="email" />
                         </h:panelGrid>
                     </h:panelGrid>
+                    <p:panel id="edit" binding="#{createSomJob.editPanel.panel}" toggleable="true" header="Edit config.json" >
+                        <p:inputTextarea id="editPanel" value="#{createSomJob.editPanel.fileContents}"
+                                         cols="90" rows="10"  autoResize="false" style="font-family: courier"/>
+                        <p:resizable for="editPanel" minHeight="170" minWidth="750" />
+                    </p:panel>
                     <p> </p>
                     <p:panel id="som" toggleable="true" header="Upload parameters">
                         <h:panelGrid columns="1">
@@ -43,17 +48,11 @@
                                 <h:outputText value="parameters.zip"/>
                                 <p:selectBooleanCheckbox disabled="true" value="#{createSomJob.zip}"/>
                             </h:panelGrid>
-                            <p:panel binding="#{createSomJob.editPanel.panel}" toggleable="true" header="Edit config.json" >
-                                <p:inputTextarea id="editPanel" value="#{createSomJob.editPanel.fileContents}"
-                                                 cols="90" rows="10"  autoResize="false" style="font-family: courier"/>
-                                <p:resizable for="editPanel" minHeight="170" minWidth="750" />
-                            </p:panel>
-                            <p> </p>
                             <p:fileUpload  id="upload" 
                                            mode="advanced"
                                            auto="true"
                                            multiple="false"
-                                           update="som"
+                                           update="som edit"
                                            allowTypes="/(\.|\/)(zip)$/"
                                            fileUploadListener="#{createSomJob.handleFileUpload}"/>
 
