@@ -43,7 +43,7 @@
                                 <h:outputText value="parameters.zip"/>
                                 <p:selectBooleanCheckbox disabled="true" value="#{createSomJob.zip}"/>
                             </h:panelGrid>
-                            <p:panel binding="#{createSomJob.editPanel}" toggleable="true" header="Edit korel.par" >
+                            <p:panel binding="#{createSomJob.editPanel.panel}" toggleable="true" header="Edit korel.par" >
                                 <p:inputTextarea id="partext" value="#{createSomJob.editPanel.fileContents}"
                                                  cols="90" rows="10"  autoResize="false" style="font-family: courier"/>
                                 <p:resizable for="partext" minHeight="170" minWidth="750" />
