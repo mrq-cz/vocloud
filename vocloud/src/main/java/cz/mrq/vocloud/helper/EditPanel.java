@@ -45,4 +45,8 @@ public class EditPanel {
     public Panel getPanel() {
         return panel;
     }
+
+    public void setPanel(Panel panel) {
+        this.panel = panel;
+    }
 }
