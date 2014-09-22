@@ -41,15 +41,14 @@ public class CreateSomJob extends CreateJob {
     @Override
     public void postInit() {
         List<File> files = new ArrayList<>();
+        editPanel.getPanel().setCollapsed(true);
         for (File file : uploadedFiles) {
             if (file.getName().endsWith(".zip") && !file.getName().equals("results.zip")) {
                 if (zip = ZipUtil.containsEntry(file, CONFIG_FILE)) {
                     parameters = file;
+                    editPanel.setFileContents(new String(ZipUtil.unpackEntry(file, CONFIG_FILE)));
                     files.add(file);
                 }
-            }
-            if (config = file.getName().equals(CONFIG_FILE)) {
-                editPanel.setFileContents(file);
             }
         }
         uploadedFiles = files;
@@ -57,7 +56,8 @@ public class CreateSomJob extends CreateJob {
 
     @Override
     protected File prepareParameters() {
-        ZipUtil.replaceEntry(parameters, CONFIG_FILE, editPanel.getFileContents().getBytes());
+        File params = new File(getJobFolder(), parameters.getName());
+        ZipUtil.replaceEntry(params, CONFIG_FILE, editPanel.getFileContents().getBytes());
         return parameters;
     }
 
@@ -68,10 +68,9 @@ public class CreateSomJob extends CreateJob {
             File file = new File(uploadDir, uploaded.getFileName());
             copyUploadedFile(file, uploaded);
             if (zip = ZipUtil.containsEntry(file, CONFIG_FILE)) {
-                uploadedFiles.add(file);
                 parameters = file;
-                String config = new String(ZipUtil.unpackEntry(file, CONFIG_FILE));
-                editPanel.setFileContents(config);
+                uploadedFiles.add(parameters);
+                editPanel.setFileContents(new String(ZipUtil.unpackEntry(file, CONFIG_FILE)));
             }
         }
     }
