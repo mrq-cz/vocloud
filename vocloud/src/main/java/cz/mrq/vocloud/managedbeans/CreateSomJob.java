@@ -7,8 +7,10 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
 import org.zeroturnaround.zip.ZipUtil;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,10 +69,14 @@ public class CreateSomJob extends CreateJob {
         if (uploaded.getFileName().endsWith(".zip")) {
             File file = new File(uploadDir, uploaded.getFileName());
             copyUploadedFile(file, uploaded);
-            if (zip = ZipUtil.containsEntry(file, CONFIG_FILE)) {
+            if (ZipUtil.containsEntry(file, CONFIG_FILE)) {
+                zip = true;
                 parameters = file;
                 uploadedFiles.add(parameters);
                 editPanel.setFileContents(new String(ZipUtil.unpackEntry(file, CONFIG_FILE)));
+            } else {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "config.json not found in uploaded zip file", null));
             }
         }
     }

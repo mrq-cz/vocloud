@@ -41,12 +41,9 @@
                     <p> </p>
                     <p:panel id="som" toggleable="true" header="Upload parameters">
                         <h:panelGrid columns="1">
-                            <p>
-                                Please attach config zip file.
-                            </p>
                             <h:panelGrid columns="2">
-                                <h:outputText value="parameters.zip"/>
                                 <p:selectBooleanCheckbox disabled="true" value="#{createSomJob.zip}"/>
+                                <h:outputText value="Please attach data with config.json file."/>
                             </h:panelGrid>
                             <p:fileUpload  id="upload" 
                                            mode="advanced"
