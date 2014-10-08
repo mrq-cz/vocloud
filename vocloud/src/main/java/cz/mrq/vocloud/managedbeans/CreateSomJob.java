@@ -59,7 +59,14 @@ public class CreateSomJob extends CreateJob {
     @Override
     protected File prepareParameters() {
         File params = new File(getJobFolder(), parameters.getName());
-        ZipUtil.replaceEntry(params, CONFIG_FILE, editPanel.getFileContents().getBytes());
+        String config = editPanel.getFileContents();
+        try {
+            FileUtils.writeStringToFile(new File(getJobFolder(), CONFIG_FILE), config);
+        } catch (IOException e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "failed to save config.json to job directory", null));
+        }
+        ZipUtil.replaceEntry(params, CONFIG_FILE, config.getBytes());
         return params;
     }
 
