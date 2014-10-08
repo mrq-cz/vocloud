@@ -60,7 +60,7 @@ public class CreateSomJob extends CreateJob {
     protected File prepareParameters() {
         File params = new File(getJobFolder(), parameters.getName());
         ZipUtil.replaceEntry(params, CONFIG_FILE, editPanel.getFileContents().getBytes());
-        return parameters;
+        return params;
     }
 
     @Override
