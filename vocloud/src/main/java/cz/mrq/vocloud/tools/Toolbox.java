@@ -52,13 +52,12 @@ public class Toolbox {
     public static String httpPost(String urlStr) throws IOException {
         StringBuilder sb = new StringBuilder();
         URL url = new URL(urlStr);
-        HttpURLConnection conn =
-                (HttpURLConnection) url.openConnection();
+        HttpURLConnection conn
+                = (HttpURLConnection) url.openConnection();
         // request json instead of xml
         //conn.setRequestProperty("Accept", "application/json");
         conn.setRequestMethod("POST");
         conn.connect();
-
 
         if (conn.getResponseCode() != 200) {
             throw new IOException(conn.getResponseMessage());
@@ -79,7 +78,7 @@ public class Toolbox {
 
         return sb.toString();
     }
-    
+
     public static int getResponseCode(String urlStr) throws IOException {
         URL url = new URL(urlStr);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -91,11 +90,14 @@ public class Toolbox {
 
     public static Boolean downloadFile(String address, File out) throws MalformedURLException {
         URL url = new URL(address);
-        ReadableByteChannel rbc;
-        try {
-            rbc = Channels.newChannel(url.openStream());
-            FileOutputStream fos = new FileOutputStream(out);
-            fos.getChannel().transferFrom(rbc, 0, 1 << 24);
+        try (ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+                FileOutputStream fos = new FileOutputStream(out)) {
+            long stepToDownload = 1 << 24;
+            long offset = 0;
+            long downloaded;
+            while ((downloaded = fos.getChannel().transferFrom(rbc, offset, stepToDownload)) != 0){
+                offset += downloaded;
+            }
         } catch (IOException ex) {
             Logger.getLogger(Toolbox.class.getName()).log(Level.SEVERE, null, ex);
             return false;
