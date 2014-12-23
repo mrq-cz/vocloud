@@ -10,5 +10,10 @@ package cz.mrq.vocloud.worker.rf;
  * @author palicka
  */
 public class Config {
-    
+    public static String binariesLocation = "/app/rdf";
+
+    public static String resultsDir;
+    public static String resultsLink;
+    public static String serverAddress = "http://localhost:8080";
+    public static int maxJobs = 4;
 }

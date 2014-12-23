@@ -6,7 +6,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>rf-worker</servlet-name>
-        <url-pattern>/uws/*</url-pattern>
+        <url-pattern>/uws-rf/*</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
