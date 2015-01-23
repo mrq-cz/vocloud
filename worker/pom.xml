@@ -10,8 +10,8 @@
     <modules>
         <module>korel</module>
         <module>som</module>
-    <module>rf-worker</module>
-  </modules>
+        <module>rdf</module>
+    </modules>
 
     <dependencies>
         <dependency>
