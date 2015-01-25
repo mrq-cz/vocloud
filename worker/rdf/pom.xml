@@ -42,7 +42,7 @@
         <profile>
             <id>vocloud-dev</id>
             <properties>
-                <korel.serverUrl>http://localhost:8080</korel.serverUrl>
+                <korel.serverUrl>http://vocloud-dev:8001</korel.serverUrl>
             </properties>
             <build>
                 <plugins>

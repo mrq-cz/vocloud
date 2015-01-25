@@ -18,7 +18,7 @@ function changeAction(){
 	else if (action == 'jobList')
 		load('GET', '');
 	else if (action == 'createJob')
-		load('POST', 'zip=http://localhost/som.zip&PHASE=RUN');
+		load('POST', 'zip=http://localhost/rdf.zip&PHASE=RUN');
 	else if (action == 'jobSummary')
 		load('GET', '');
 	else if (action == 'getJobParam')
@@ -110,7 +110,7 @@ function updateUri(){
 		return;
 	
 	if (action != 'homePage'){
-		uri = uri+'som';
+		uri = uri+'rdf';
 	
 		if (action != 'jobList' && action != 'createJob'){
 			uri = uri+'/'+$('jobId').value;
