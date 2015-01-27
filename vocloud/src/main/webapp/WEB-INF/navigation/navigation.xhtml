@@ -19,6 +19,7 @@ and open the template in the editor.
                 <p:submenu label="Create" icon="ui-icon-disk">
                     <p:menuitem ajax="false" action="/jobs/create" value="Korel" />
                     <p:menuitem ajax="false" action="/jobs/create-som" value="SOM" />
+                    <p:menuitem ajax="false" action="/jobs/create-rdf" value="RDF" />
                 </p:submenu>
                 <p:menuitem ajax="false" action="/settings" value="Settings" icon="ui-icon-gear" />
                 <c:if test="${sessionBean.user.groupName == 'ADMIN'}">

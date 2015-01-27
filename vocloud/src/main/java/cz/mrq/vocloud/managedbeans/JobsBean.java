@@ -63,6 +63,9 @@ public class JobsBean implements Serializable {
         if (selected.getJobType().equals("SOM")) {
             create = "create-som";
         }
+        else if(selected.getJobType().equals("RDF")) {
+            create = "create-rdf";
+        }
 
         myNav.handleNavigation(FacesContext.getCurrentInstance(), "details", create);
     }

@@ -17,6 +17,7 @@ import org.primefaces.model.UploadedFile;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.EJB;
+import javax.ejb.Local;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.NavigationHandler;
 import javax.faces.bean.ManagedBean;
@@ -164,7 +165,7 @@ public abstract class CreateJob implements Serializable {
         File parameters = prepareParameters();
 
         // expose for download
-        String exposeLocal = currentInstance.getExternalContext().getRealPath("/download/" + tid);
+        String exposeLocal = currentInstance.getExternalContext().getRealPath("/") + "/download/" + tid;
         File expose = new File(exposeLocal);
         expose.mkdirs();
         try {
