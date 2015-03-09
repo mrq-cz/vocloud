@@ -29,7 +29,7 @@
 }
 
 .center_content {
-    
+
     background-color: #dddddd;
     padding: 10px;
     text-align: left;
@@ -48,15 +48,15 @@
 }
 
 #top a:link, #top a:visited {
-  color: #3a4f54;
-  font-weight : normal;
-  text-decoration: none;
+    color: #3a4f54;
+    font-weight : normal;
+    text-decoration: none;
 }
 
 #top a:link:hover, #top a:visited:hover  {
-  color: #3a4f54;
-  font-weight : normal;
-  text-decoration : none;
+    color: #3a4f54;
+    font-weight : normal;
+    text-decoration : none;
 }
 
 

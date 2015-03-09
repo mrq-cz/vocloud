@@ -23,7 +23,6 @@ public class UserSessionBean {
     @Resource
     private SessionContext sessionContext;
 
-
     public UserAccount getUser() {
         if (user == null) {
             Principal principal = sessionContext.getCallerPrincipal();
@@ -33,7 +32,6 @@ public class UserSessionBean {
         }
         return user;
     }
-    
 
     private UserAccountFacade getUaf() {
         return uaf;
@@ -42,5 +40,5 @@ public class UserSessionBean {
     public void login() {
         uaf.edit(user);
     }
-    
+
 }

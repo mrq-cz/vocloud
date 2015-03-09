@@ -31,7 +31,7 @@ public class UserAccountFacade extends AbstractFacade<UserAccount> {
 
     @PersistenceContext(unitName = "vokorelPU")
     private EntityManager em;
-    
+
     @Resource(name = "vokorel-mail")
     private Session mailSession;
 
@@ -43,24 +43,24 @@ public class UserAccountFacade extends AbstractFacade<UserAccount> {
     public UserAccountFacade() {
         super(UserAccount.class);
     }
-    
+
     @Override
     public void create(UserAccount entity) {
         entity.setSince(new Date());
         super.create(entity);
     }
-    
+
     public void resetPassword(UserAccount entity) {
 
         String newPass = generatePassword();
-        
+
         // sent email with pass
         Message message = new MimeMessage(mailSession);
         try {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(entity.getEmail()));
             message.setFrom();
             message.setSubject("vo-korel: Password reset");
-            message.setText("Your password for account "+entity.getUsername()+" was changed to: "+newPass);
+            message.setText("Your password for account " + entity.getUsername() + " was changed to: " + newPass);
             message.setHeader("X-Mailer", "My Mailer");
             Transport.send(message);
             logger.log(Level.INFO, "Email with password has been sent to the user.");
@@ -69,23 +69,25 @@ public class UserAccountFacade extends AbstractFacade<UserAccount> {
             logger.log(Level.SEVERE, "failed to reset pass", ex);
         }
     }
-    
+
     public void changePassword(UserAccount user, String password) {
         user.setPass(password);
         edit(user);
     }
-    
+
     public Boolean resetPassword(String email) {
         UserAccount user = findByEmail(email);
-        if (user == null) return false;
-        resetPassword(user);   
+        if (user == null) {
+            return false;
+        }
+        resetPassword(user);
         return true;
     }
-     
+
     public UserAccount findByEmail(String email) {
         UserAccount user = null;
         Query q = getEntityManager().createNamedQuery("UserAccount.findByEmail");
-        q.setParameter("email",email);
+        q.setParameter("email", email);
         try {
             user = (UserAccount) q.getSingleResult();
         } catch (PersistenceException pe) {
@@ -93,11 +95,11 @@ public class UserAccountFacade extends AbstractFacade<UserAccount> {
         }
         return user;
     }
-    
+
     public UserAccount findByUsername(String username) {
         UserAccount user = null;
         Query q = getEntityManager().createNamedQuery("UserAccount.findByUsername");
-        q.setParameter("username",username);
+        q.setParameter("username", username);
         try {
             user = (UserAccount) q.getSingleResult();
         } catch (PersistenceException pe) {
@@ -116,7 +118,5 @@ public class UserAccountFacade extends AbstractFacade<UserAccount> {
         }
         return new String(text);
     }
-    
-    
-    
+
 }

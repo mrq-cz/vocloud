@@ -15,7 +15,7 @@
             </ui:define>
 
             <ui:define name="content">
-                
+
                 <h:form id="details">
                     <p:poll interval="5" listener="#{jobs.detailsPollListener}" binding="#{jobs.detailsPoll}" autoStart="false" update="details" /> 
                     <h1>#{jobs.selected.label}</h1>
@@ -62,22 +62,22 @@
                         <h3>Plots</h3>
                     </c:if>
                     <c:forEach id="plots" items="${jobs.images}" var="image" >
-                            <p:panel style="max-width: 800px" >
-                                <f:facet name="header">
-                                    #{image.name} -<p:commandLink ajax="false" actionListener="#{jobs.download}" value="download" title="download this image">
-                                        <f:attribute name="selectedFile" value="#{image}" />
-                                    </p:commandLink>
-                                </f:facet>
+                        <p:panel style="max-width: 800px" >
+                            <f:facet name="header">
+                                #{image.name} -<p:commandLink ajax="false" actionListener="#{jobs.download}" value="download" title="download this image">
+                                    <f:attribute name="selectedFile" value="#{image}" />
+                                </p:commandLink>
+                            </f:facet>
                             <h:graphicImage url="images/#{jobs.selected.stringId}/#{image.name}" />
-                            
-                            </p:panel>
-                            <p />
+
+                        </p:panel>
+                        <p />
                     </c:forEach>
                     <p />
                     <h3>Files</h3>
                     <p:dataTable  id="files" style="max-width: 800px" value="#{jobs.files}" var="file"
                                   rowStyleClass="#{file.name == 'korel.err' or file.name == 'korel.ret' or
-                                  (jobs.selected.phase == 'ERROR' and file.name == 'uws-job.xml') ? 'errorrow': null }">
+                                                   (jobs.selected.phase == 'ERROR' and file.name == 'uws-job.xml') ? 'errorrow': null }">
                         <p:column headerText="Name" >
                             #{file.name}
                         </p:column>
@@ -101,14 +101,14 @@
                         <f:facet name="header">View <h:outputText id="name" value="#{jobs.selectedFile.name}" /></f:facet>
                         <pre><h:outputText id="text" value="#{jobs.selectedFileContents}" /></pre>
                     </p:dialog>
-                
+
                     <p:confirmDialog id="confirmDeleteDialog" widgetVar="confirmDelete" message="Are you sure to delete this job?" header="Delete #{jobs.selected.id}" severity="alert" >
-                    <p:commandButton id="confirmDel" actionListener="#{jobs.deleteSelected}" ajax="false" value="Delete" title="delete job" onclick="confirmDelete.hide()" />
-                    <p:commandButton id="declineDel" value="Cancel" onclick="confirmDelete.hide()" />
-                </p:confirmDialog>
+                        <p:commandButton id="confirmDel" actionListener="#{jobs.deleteSelected}" ajax="false" value="Delete" title="delete job" onclick="confirmDelete.hide()" />
+                        <p:commandButton id="declineDel" value="Cancel" onclick="confirmDelete.hide()" />
+                    </p:confirmDialog>
                 </h:form>
-                
-                
+
+
             </ui:define>
 
 

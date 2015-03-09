@@ -20,19 +20,21 @@ import java.io.Serializable;
 @RequestScoped
 public class SettingsBean implements Serializable {
 
-    @EJB private UserSessionBean usb;
-    @EJB private UserAccountFacade uaf;
-    
+    @EJB
+    private UserSessionBean usb;
+    @EJB
+    private UserAccountFacade uaf;
+
     private String oldpass;
     private String newpass;
-    
+
     public SettingsBean() {
     }
-    
-     public void changePassword() {
+
+    public void changePassword() {
         FacesContext currentInstance = FacesContext.getCurrentInstance();
-        
-        if(usb.getUser().isPassword(oldpass)) {
+
+        if (usb.getUser().isPassword(oldpass)) {
             //change password
             uaf.changePassword(usb.getUser(), newpass);
             currentInstance.addMessage(null, new FacesMessage("Your password has been successfully changed."));
@@ -40,10 +42,10 @@ public class SettingsBean implements Serializable {
             currentInstance.addMessage("#oldpass", new FacesMessage("Wrong password!"));
         }
     }
-     
-     public void validatePassword(FacesContext context,
-                                  UIComponent toValidate,
-                                  Object value) {
+
+    public void validatePassword(FacesContext context,
+            UIComponent toValidate,
+            Object value) {
 
         String password = (String) value;
         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Wrong password.", null);
@@ -69,6 +71,5 @@ public class SettingsBean implements Serializable {
     public void setOldpass(String oldpass) {
         this.oldpass = oldpass;
     }
-    
-    
+
 }

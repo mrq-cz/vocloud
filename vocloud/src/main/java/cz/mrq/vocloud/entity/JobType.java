@@ -13,8 +13,8 @@ import java.io.Serializable;
  */
 @Entity
 @NamedQueries({
-        @NamedQuery(name = "JobType.findAll", query = "SELECT jt FROM JobType jt"),
-        @NamedQuery(name = "JobType.findByName", query = "SELECT jt FROM JobType jt WHERE jt.name = :name")
+    @NamedQuery(name = "JobType.findAll", query = "SELECT jt FROM JobType jt"),
+    @NamedQuery(name = "JobType.findByName", query = "SELECT jt FROM JobType jt WHERE jt.name = :name")
 })
 public class JobType implements Serializable {
 

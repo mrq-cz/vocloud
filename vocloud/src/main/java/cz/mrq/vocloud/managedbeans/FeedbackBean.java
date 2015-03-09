@@ -33,22 +33,24 @@ public class FeedbackBean implements Serializable {
 
     private static final Logger logger = Logger.getLogger(UserAccountFacade.class.getName());
 
-    @EJB private UserAccountFacade uaf;
+    @EJB
+    private UserAccountFacade uaf;
 
     @Resource(name = "vokorel-mail")
     private Session mailSession;
-    @Inject @Config
+    @Inject
+    @Config
     private String feedbackEmail;
-    
+
     private String name;
     private String email;
     private String topic;
     private String message;
     private UserAccount user;
-    
+
     public FeedbackBean() {
     }
-    
+
     @PostConstruct
     public void init() {
         String username = FacesContext.getCurrentInstance().getExternalContext().getRemoteUser();
@@ -58,44 +60,44 @@ public class FeedbackBean implements Serializable {
             this.email = user.getEmail();
         }
     }
-    
-    public void send() {        
+
+    public void send() {
         Message emailMessage = new MimeMessage(mailSession);
         try {
-                emailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(feedbackEmail));
-                emailMessage.setFrom();
-                emailMessage.setSubject("vo-korel: Feedback: "+topic);
-                StringBuilder sb = new StringBuilder();
-                sb.append("MESSAGE\n");
-                sb.append(message);
-                sb.append("\n");
-                sb.append("\nINFO\n");
-                sb.append("Time: ").append(new Date()).append('\n');
-                sb.append("Name: ").append(name).append('\n');
-                sb.append("Email: ").append(email).append('\n');
-                sb.append("Topic: ").append(topic).append('\n');
-                
-                if (user != null) {
-                    sb.append("\nUSER INFO\n");
-                    sb.append("Id: ").append(user.getId()).append('\n');
-                    sb.append("Username: ").append(user.getUsername()).append('\n');
-                    sb.append("Email: ").append(user.getEmail()).append('\n');
-                }
-                        
-                emailMessage.setText(sb.toString());
-                emailMessage.setHeader("X-Mailer", "My Mailer");
-                Transport.send(emailMessage);
-                logger.log(Level.INFO, "Feedback email has been sent.");
-                
-                FacesContext currentInstance = FacesContext.getCurrentInstance();
-                currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Thank you for your feedback!" , "Your message has been sent to the administrator."));
-                
-                NavigationHandler myNav = currentInstance.getApplication().getNavigationHandler();
-        
-                myNav.handleNavigation(currentInstance, null, "/index");
-                
+            emailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(feedbackEmail));
+            emailMessage.setFrom();
+            emailMessage.setSubject("vo-korel: Feedback: " + topic);
+            StringBuilder sb = new StringBuilder();
+            sb.append("MESSAGE\n");
+            sb.append(message);
+            sb.append("\n");
+            sb.append("\nINFO\n");
+            sb.append("Time: ").append(new Date()).append('\n');
+            sb.append("Name: ").append(name).append('\n');
+            sb.append("Email: ").append(email).append('\n');
+            sb.append("Topic: ").append(topic).append('\n');
+
+            if (user != null) {
+                sb.append("\nUSER INFO\n");
+                sb.append("Id: ").append(user.getId()).append('\n');
+                sb.append("Username: ").append(user.getUsername()).append('\n');
+                sb.append("Email: ").append(user.getEmail()).append('\n');
+            }
+
+            emailMessage.setText(sb.toString());
+            emailMessage.setHeader("X-Mailer", "My Mailer");
+            Transport.send(emailMessage);
+            logger.log(Level.INFO, "Feedback email has been sent.");
+
+            FacesContext currentInstance = FacesContext.getCurrentInstance();
+            currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Thank you for your feedback!", "Your message has been sent to the administrator."));
+
+            NavigationHandler myNav = currentInstance.getApplication().getNavigationHandler();
+
+            myNav.handleNavigation(currentInstance, null, "/index");
+
         } catch (Exception ex) {
-                logger.log(Level.SEVERE, "error when sending feedback email", ex);
+            logger.log(Level.SEVERE, "error when sending feedback email", ex);
         }
     }
 
@@ -130,6 +132,5 @@ public class FeedbackBean implements Serializable {
     public void setTopic(String topic) {
         this.topic = topic;
     }
-    
-    
+
 }

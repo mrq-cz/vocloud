@@ -3,12 +3,12 @@ package cz.mrq.vocloud.ejb;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-
 /**
  *
  * @author voadmin
  */
 public abstract class AbstractFacade<T> {
+
     private Class<T> entityClass;
 
     public AbstractFacade(Class<T> entityClass) {
@@ -35,7 +35,7 @@ public abstract class AbstractFacade<T> {
     public T find(Object id) {
         return getEntityManager().find(entityClass, id);
     }
-    
+
     void flush() {
         getEntityManager().flush();
     }

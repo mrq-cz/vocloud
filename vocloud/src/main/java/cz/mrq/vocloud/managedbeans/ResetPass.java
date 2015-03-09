@@ -19,11 +19,12 @@ import java.io.Serializable;
 @RequestScoped
 public class ResetPass implements Serializable {
 
-    @EJB private UserAccountFacade ejbFacade;
+    @EJB
+    private UserAccountFacade ejbFacade;
 
     private UserAccount user = new UserAccount();
     private Boolean disabled = false;
-    
+
     /**
      * Creates a new instance of ResetPass
      */
@@ -33,17 +34,17 @@ public class ResetPass implements Serializable {
     public UserAccount getUser() {
         return user;
     }
-    
+
     public void reset() {
         Boolean result = ejbFacade.resetPassword(user.getEmail());
         if (!result) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "No user with email "+user.getEmail()+" exists.", " "));
-        }  else {
+                    "No user with email " + user.getEmail() + " exists.", " "));
+        } else {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "New password has been sent to "+user.getEmail(), "Email should arrive in next few minutes."));
+                    "New password has been sent to " + user.getEmail(), "Email should arrive in next few minutes."));
             this.disabled = true;
-        }                   
+        }
     }
 
     public Boolean getDisabled() {
@@ -53,10 +54,5 @@ public class ResetPass implements Serializable {
     public void setDisabled(Boolean disabled) {
         this.disabled = disabled;
     }
-    
-    
-    
-    
-    
-    
+
 }

@@ -42,7 +42,7 @@ import java.util.logging.Logger;
 public class JobFacade extends AbstractFacade<Job> {
 
     private static final Logger logger = Logger.getLogger(JobFacade.class.toString());
-    
+
     @PersistenceContext(unitName = "vokorelPU")
     private EntityManager em;
     @EJB
@@ -253,26 +253,25 @@ public class JobFacade extends AbstractFacade<Job> {
 
     /**
      * this method run asynchronously to start post process scripts for a job
-     * 
+     *
      * requires java 7
-     * 
-     * @since 1.7 
+     *
+     * @since 1.7
      * @param job
      */
     @Asynchronous
     public void postProcess(Job job) {
-        String jobScripts = scriptsDir+"/"+job.getJobType();
+        String jobScripts = scriptsDir + "/" + job.getJobType();
         logger.log(Level.INFO, "starting post-process of job, scripts folder: {0} ", jobScripts);
         File jobScriptsDir = new File(jobScripts);
         if (!jobScriptsDir.exists() || !jobScriptsDir.isDirectory() || jobScriptsDir.list().length < 1) {
             logger.log(Level.INFO, "skipping post process because there are no scripts");
             return;
         }
-        
+
         job.setPhase(Phase.PROCESSING);
-        
+
         File workingDir = getFileDir(job);
-        
 
         // prepare post-process
         File postOutput = new File(workingDir, "post-scripts.out");
@@ -283,12 +282,12 @@ public class JobFacade extends AbstractFacade<Job> {
             return;
         }
         Process postProcess;
-        
+
         // run parts run any executable (must have permission) scripts *.sh in scripts directory
         ProcessBuilder postPB = new ProcessBuilder("run-parts", "-v", "--regex=", jobScripts);
-        
-        postPB.directory(workingDir);        
-        
+
+        postPB.directory(workingDir);
+
         try {
             postPB.redirectErrorStream(true);
             postPB.redirectOutput(postOutput);
@@ -297,17 +296,15 @@ public class JobFacade extends AbstractFacade<Job> {
         } catch (Exception e) {
             logger.log(Level.SEVERE, null, e);
         }
-        
+
         job.setPhase(Phase.COMPLETED);
-        
-        
-        File results = new File(workingDir,"results.zip");
+
+        File results = new File(workingDir, "results.zip");
         Toolbox.delete(results);
         Toolbox.compressFiles(workingDir, results);
-        
-        
+
         sendResults(job);
-               
+
     }
 
     public void prepareKorelJobExamples(UserAccount user) {
@@ -316,12 +313,12 @@ public class JobFacade extends AbstractFacade<Job> {
         }
 
         File[] examples = new File(examplesDir).listFiles();
-        
+
         if (examples == null) {
             logger.warning("No job examples copied!");
             return;
         }
-        
+
         for (File example : examples) {
             File jobFile = new File(example, "job.properties");
             if (jobFile.exists()) {

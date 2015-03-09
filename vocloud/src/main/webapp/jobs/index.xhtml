@@ -19,7 +19,7 @@
                 <p:dataTable id="data" style="max-width: 1200px" value="#{jobs.jobs}" var="job" rowStyleClass="#{job.phase eq 'ERROR' ? 'errorrow': null}">
                     <p:column >
                         <f:facet name="header">Type</f:facet>
-                        #{job.jobType}
+                            #{job.jobType}
                     </p:column>
                     <p:column>
                         <f:facet name="header">Id</f:facet>
@@ -40,7 +40,7 @@
                     </p:column>
                     <p:column id="phase" style="text-align: center">
                         <f:facet name="header">Phase</f:facet>
-                        #{job.phase}
+                            #{job.phase}
                     </p:column>
                     <p:column>
                         <f:facet name="header">Action</f:facet>
@@ -66,14 +66,14 @@
                 </p:dataTable>
                 <p> </p>
                 <h:outputText id="spaceusage" value="#{jobs.usedPercent}% full (Using #{jobs.spaceUsage})" />                
-            
+
                 <p:confirmDialog id="confirmDeleteDialog" widgetVar="confirmDelete" message="Are you sure to delete job #{jobs.selected.id}?" header="Delete #{jobs.selected.id}" severity="alert" >
                     <p:commandButton id="confirmDel" actionListener="#{jobs.delete}" update=":formList" value="Delete" title="delete job" onclick="confirmDelete.hide()" />
                     <p:commandButton id="declineDel" value="Cancel" onclick="confirmDelete.hide()" />
                 </p:confirmDialog>
             </h:form>
 
-            
+
         </ui:define>
     </ui:composition>
 

@@ -44,7 +44,7 @@ public class Job implements Serializable {
     @ManyToOne
     private UserAccount owner;
     private String jobType;
-    @JoinColumn(name = "uws_id", referencedColumnName = "id", nullable=true)
+    @JoinColumn(name = "uws_id", referencedColumnName = "id", nullable = true)
     @ManyToOne
     private UWS uws;
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
@@ -63,9 +63,6 @@ public class Job implements Serializable {
     private String uwsJobXml;
     @Transient
     private UWSParserManager parser;
-
-
-    
 
     /**
      * updates attributes from local UWS job object (only if uwsjob isn't null
@@ -101,7 +98,9 @@ public class Job implements Serializable {
         if (uwsJob == null) {
             try {
                 Phase uwsPhase = getUws().getJobPhase(remoteId);
-                if (uwsPhase != null) this.phase = uwsPhase;
+                if (uwsPhase != null) {
+                    this.phase = uwsPhase;
+                }
             } catch (IOException e) {
                 Logger.getLogger(Job.class.getName()).log(Level.SEVERE, "failed retrieving job phase", e);
             }
@@ -122,7 +121,9 @@ public class Job implements Serializable {
     }
 
     public void destroyOnUWS() {
-        if (uws == null) return;
+        if (uws == null) {
+            return;
+        }
         try {
             getUws().destroyJob(remoteId);
         } catch (IOException ex) {
@@ -249,19 +250,18 @@ public class Job implements Serializable {
     public void setResultsEmail(String resultsEmail) {
         this.resultsEmail = resultsEmail;
     }
-   
-    
+
     public long getExecutingTime() {
         Date sd = startedDate;
         Date fd = finishedDate;
-        if(sd == null) {
+        if (sd == null) {
             return 0;
         }
-        if(fd == null) {
+        if (fd == null) {
             sd = createdDate;
             fd = new Date();
         }
-        return (fd.getTime() - sd.getTime())/1000;
+        return (fd.getTime() - sd.getTime()) / 1000;
     }
 
     public String getUwsJobXml() {

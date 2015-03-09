@@ -23,7 +23,7 @@ import java.util.ResourceBundle;
 public class UserAccountController implements Serializable {
 
     private static final ResourceBundle bundle = ResourceBundle.getBundle("/cz/mrq/vocloud/Bundle");
-    
+
     private UserAccount current;
     private DataModel items = null;
     @EJB

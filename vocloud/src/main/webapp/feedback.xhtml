@@ -4,7 +4,7 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:p="http://primefaces.org/ui"
       xmlns:h="http://java.sun.com/jsf/html"
-        >
+      >
 
     <body>
 
@@ -39,19 +39,19 @@
                         <p:inputTextarea  cols="80" rows="6"  id="mess" required="true" autoResize="true" label="topic" value="#{feedback.message}">
                         </p:inputTextarea>
                         <p:message id="messM" for="mess" />  
-                     </h:panelGrid>   
-                     <h:panelGrid rendered="#{request.remoteUser ==  null}" id="captcha" columns="2" columnClasses="label, value, message" styleClass="grid"  >
-                            
-                            <p:spacer height="15" />
-                            <h:outputText value=" " />
+                    </h:panelGrid>   
+                    <h:panelGrid rendered="#{request.remoteUser ==  null}" id="captcha" columns="2" columnClasses="label, value, message" styleClass="grid"  >
 
-                           
-                            <h:outputText value="Prove that you are not a robot." />
-                            <h:outputText value=" " />
+                        <p:spacer height="15" />
+                        <h:outputText value=" " />
 
-                            
-                            <p:captcha  id="c" label="captcha" theme="white" />
-                            <p:message id="cMessage" for="c" />
+
+                        <h:outputText value="Prove that you are not a robot." />
+                        <h:outputText value=" " />
+
+
+                        <p:captcha  id="c" label="captcha" theme="white" />
+                        <p:message id="cMessage" for="c" />
 
                     </h:panelGrid> 
                     <br />

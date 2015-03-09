@@ -46,10 +46,10 @@ public class Result {
 
     @Override
     public String toString() {
-        return "Result{" +
-                "id='" + id + '\'' +
-                ", type='" + type + '\'' +
-                ", href='" + href + '\'' +
-                '}';
+        return "Result{"
+                + "id='" + id + '\''
+                + ", type='" + type + '\''
+                + ", href='" + href + '\''
+                + '}';
     }
 }

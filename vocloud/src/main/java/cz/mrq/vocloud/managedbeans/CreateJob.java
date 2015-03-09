@@ -40,15 +40,21 @@ public abstract class CreateJob implements Serializable {
 
     private static final Logger logger = Logger.getLogger(CreateJob.class.getName());
 
-    @EJB protected JobFacade jf;
-    @EJB protected UWSFacade uws;
-    @EJB protected UserSessionBean usb;
+    @EJB
+    protected JobFacade jf;
+    @EJB
+    protected UWSFacade uws;
+    @EJB
+    protected UserSessionBean usb;
 
-    @Inject @Config
+    @Inject
+    @Config
     protected String applicationAddress;
-    @Inject @Config
+    @Inject
+    @Config
     protected String tempDir;
-    @Inject @Config
+    @Inject
+    @Config
     protected String jobsDir;
 
     protected Job parent;
@@ -180,7 +186,7 @@ public abstract class CreateJob implements Serializable {
 
         // find uws and create job there
         job.setUws(uws.assign(job.getJobType()));
-        
+
         if (job.getUws() == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Can't create job!", "No worker is available."));
@@ -232,9 +238,7 @@ public abstract class CreateJob implements Serializable {
         }
 
         //navigate away
-
         //currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Job created.", "New job '" + job.getLabel() + "' created."));
-
         NavigationHandler myNav = currentInstance.getApplication().getNavigationHandler();
         myNav.handleNavigation(currentInstance, "create", "index");
 

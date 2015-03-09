@@ -40,10 +40,10 @@ public class ErrorSummary {
 
     @Override
     public String toString() {
-        return "ErrorSummary{" +
-                "type='" + type + '\'' +
-                ", message='" + message + '\'' +
-                ", detail='" + detail + '\'' +
-                '}';
+        return "ErrorSummary{"
+                + "type='" + type + '\''
+                + ", message='" + message + '\''
+                + ", detail='" + detail + '\''
+                + '}';
     }
 }

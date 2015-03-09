@@ -45,7 +45,9 @@ public class CreateKorelJob extends CreateJob {
     public void postInit() {
         editParPanel.setCollapsed(true);
         // read par file contents
-        for (File f : uploadedFiles) checkFileName(f.getName());
+        for (File f : uploadedFiles) {
+            checkFileName(f.getName());
+        }
         if (parent != null && par) {
             setParFileContents(new File(jf.getFileDir(parent), "korel.par"));
         }

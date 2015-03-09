@@ -45,16 +45,16 @@ public class UserAccount implements Serializable {
     @NotNull
     private String lastName;
     private String organization;
-    @Column(unique=true, nullable=false)
+    @Column(unique = true, nullable = false)
     @Pattern(regexp = "[a-zA-Z]+([a-zA-Z0-9][._-]?)+[a-zA-Z0-9]")
     @Size(min = 3)
     private String username;
     @Size(min = 6)
     private String pass;
-    @Column(unique=true, nullable=false)
+    @Column(unique = true, nullable = false)
     @Pattern(regexp = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\."
-    + "[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@"
-    + "(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message = "invalid email")
+            + "[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@"
+            + "(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message = "invalid email")
     private String email;
     @NotNull
     private Boolean enabled;
@@ -64,6 +64,8 @@ public class UserAccount implements Serializable {
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date lastLogin;
     private String lastIp;
+    @Column(nullable = false)
+    @NotNull
     private String groupName;
     private Long quota = 100000000L;
     @OneToMany(mappedBy = "owner")
@@ -147,18 +149,19 @@ public class UserAccount implements Serializable {
 
     public Long getQuota() {
         //default 1000000
-        if(quota == null) return 100000000L;
+        if (quota == null) {
+            return 100000000L;
+        }
         return quota;
     }
 
     public void setQuota(Long quota) {
         this.quota = quota;
     }
-    
-    
+
     /**
      * Password is hashed using sha256
-     * 
+     *
      * http://www.mkyong.com/java/java-sha-hashing-example/
      *
      * @param password
@@ -181,12 +184,11 @@ public class UserAccount implements Serializable {
         }
         return encPass;
     }
-    
-    
+
     public void setPass(String pass) {
         this.pass = hashPassword(pass);
     }
-    
+
     public boolean isPassword(String pass) {
         return (this.pass == null ? hashPassword(pass) == null : this.pass.equals(hashPassword(pass)));
     }

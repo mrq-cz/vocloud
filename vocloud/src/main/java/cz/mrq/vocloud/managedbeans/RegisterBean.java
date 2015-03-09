@@ -12,7 +12,6 @@ import javax.faces.bean.RequestScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -25,9 +24,11 @@ import java.io.Serializable;
 @RequestScoped
 public class RegisterBean implements Serializable {
 
-    @EJB private UserAccountFacade uaf;
+    @EJB
+    private UserAccountFacade uaf;
 
-    @Inject @Config
+    @Inject
+    @Config
     private String defaultQuota;
     private UserAccount user;
 
@@ -39,41 +40,39 @@ public class RegisterBean implements Serializable {
         FacesContext currentInstance = FacesContext.getCurrentInstance();
 
         user.setEnabled(Boolean.TRUE);
-        
+
         if (user.getUsername().equals("admin")) {
             user.setGroupName("ADMIN");
         } else {
             user.setGroupName("USER");
         }
-        user.setId(0x0L);
         if (defaultQuota == null) {
             user.setQuota(100000000L);
         } else {
             user.setQuota(Long.decode(defaultQuota));
-            
+
         }
-        
+
         try {
             HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
             user.setRegisteredIp(request.getRemoteAddr());
-            
+
             uaf.create(user);
             currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Welcome "+user.getFirstName()+"!", null));
+                    "Welcome " + user.getFirstName() + "!", null));
             currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Your account has been successfully registered, you can login right away.", null));
         } catch (Exception e) {
             currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Account registration failed: " + e.toString(), null));
         }
-        
+
         String redirect = "login";
         NavigationHandler myNav = currentInstance.getApplication().getNavigationHandler();
-        
+
         myNav.handleNavigation(currentInstance, null, redirect);
     }
-    
-    
+
     public void validateUniqUsername(FacesContext context,
             UIComponent toValidate,
             Object value) {

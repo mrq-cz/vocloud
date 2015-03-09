@@ -27,7 +27,7 @@ public class UWSJob {
     private String jobId;
     @XmlElement(nillable = true)
     private String runId;
-    @XmlElement(name="ownerId")
+    @XmlElement(name = "ownerId")
     private String owner;
     private Phase phase;
     private Date startTime;
@@ -42,16 +42,16 @@ public class UWSJob {
     private List<Parameter> parameters;
     @XmlElement(nillable = true)
     private ErrorSummary errorSummary;
-    
+
     //<editor-fold defaultstate="collapsed" desc="getters and setters">
     public Date getDestruction() {
         return destruction;
     }
-    
+
     public void setDestruction(Date destruction) {
         this.destruction = destruction;
     }
-    
+
     public void setDestruction(String destruction) {
         try {
             this.destruction = new SimpleDateFormat(DATE_FORMAT).parse(destruction);
@@ -59,15 +59,15 @@ public class UWSJob {
             Logger.getLogger(UWSJob.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public Date getEndTime() {
         return endTime;
     }
-    
+
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
-    
+
     public void setEndTime(String endTime) {
         try {
             this.endTime = new SimpleDateFormat(DATE_FORMAT).parse(endTime);
@@ -75,19 +75,19 @@ public class UWSJob {
             Logger.getLogger(UWSJob.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public long getExecutionDuration() {
         return executionDuration;
     }
-    
+
     public void setExecutionDuration(long executionDuration) {
         this.executionDuration = executionDuration;
     }
-    
+
     public String getJobId() {
         return jobId;
     }
-    
+
     public void setJobId(String jobId) {
         this.jobId = jobId;
     }
@@ -95,49 +95,53 @@ public class UWSJob {
     public String getOwner() {
         return owner;
     }
-    
+
     public void setOwner(String owner) {
         this.owner = owner;
     }
-    
+
     public List<Parameter> getParameters() {
-        if (results == null) return new ArrayList<>();
+        if (results == null) {
+            return new ArrayList<>();
+        }
         return parameters;
     }
-    
+
     public void setParameters(List<Parameter> parameters) {
         this.parameters = parameters;
     }
-    
+
     public Phase getPhase() {
         return phase;
     }
-    
+
     public void setPhase(Phase phase) {
         this.phase = phase;
     }
-    
+
     public List<Result> getResults() {
-        if (results == null) return new ArrayList<>();
+        if (results == null) {
+            return new ArrayList<>();
+        }
         return results;
     }
-    
+
     public void setResults(List<Result> results) {
         this.results = results;
     }
-    
+
     public String getRunId() {
         return runId;
     }
-    
+
     public void setRunId(String runId) {
         this.runId = runId;
     }
-    
+
     public Date getStartTime() {
         return startTime;
     }
-    
+
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
@@ -149,7 +153,7 @@ public class UWSJob {
     public void setErrorSummary(ErrorSummary errorSummary) {
         this.errorSummary = errorSummary;
     }
-    
+
     public void setStartTime(String startTime) {
         try {
             this.startTime = new SimpleDateFormat(DATE_FORMAT).parse(startTime);
@@ -159,30 +163,28 @@ public class UWSJob {
     }
 
     public Result getResult() {
-        return results != null && !results.isEmpty() ? results.get(0): null;
+        return results != null && !results.isEmpty() ? results.get(0) : null;
     }
 
     public String getResultUrl() {
-        return results != null && !results.isEmpty() ? results.get(0).getHref(): null;
+        return results != null && !results.isEmpty() ? results.get(0).getHref() : null;
     }
     //</editor-fold>
 
     @Override
     public String toString() {
-        return "UWSJob{" +
-                "\n\t jobId='" + jobId + '\'' +
-                "\n\t runId='" + runId + '\'' +
-                "\n\t owner='" + owner + '\'' +
-                "\n\t phase=" + phase +
-                "\n\t startTime=" + startTime +
-                "\n\t endTime=" + endTime +
-                "\n\t executionDuration=" + executionDuration +
-                "\n\t destruction=" + destruction +
-                "\n\t results=" + results +
-                "\n\t parameters=" + parameters +
-                "\n\t errorSummary='" + errorSummary + '\'' +
-                "\n}";
+        return "UWSJob{"
+                + "\n\t jobId='" + jobId + '\''
+                + "\n\t runId='" + runId + '\''
+                + "\n\t owner='" + owner + '\''
+                + "\n\t phase=" + phase
+                + "\n\t startTime=" + startTime
+                + "\n\t endTime=" + endTime
+                + "\n\t executionDuration=" + executionDuration
+                + "\n\t destruction=" + destruction
+                + "\n\t results=" + results
+                + "\n\t parameters=" + parameters
+                + "\n\t errorSummary='" + errorSummary + '\''
+                + "\n}";
     }
 }
-
-

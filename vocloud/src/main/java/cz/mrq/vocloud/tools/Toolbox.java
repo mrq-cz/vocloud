@@ -95,7 +95,7 @@ public class Toolbox {
             long stepToDownload = 1 << 24;
             long offset = 0;
             long downloaded;
-            while ((downloaded = fos.getChannel().transferFrom(rbc, offset, stepToDownload)) != 0){
+            while ((downloaded = fos.getChannel().transferFrom(rbc, offset, stepToDownload)) != 0) {
                 offset += downloaded;
             }
         } catch (IOException ex) {

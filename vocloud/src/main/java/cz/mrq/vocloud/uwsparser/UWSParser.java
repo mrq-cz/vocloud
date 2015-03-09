@@ -30,7 +30,7 @@ public class UWSParser {
         try {
             return parseJobUsingJAXB(xml);
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "cant parse uwsJob",e);
+            logger.log(Level.SEVERE, "cant parse uwsJob", e);
             return null;
         }
     }

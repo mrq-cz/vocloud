@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlValue;
  */
 @XmlRootElement(name = "parameter")
 public class Parameter {
+
     @XmlAttribute
     String id;
     @XmlValue
@@ -36,9 +37,9 @@ public class Parameter {
 
     @Override
     public String toString() {
-        return "Parameter{" +
-                "id='" + id + '\'' +
-                ", value='" + value + '\'' +
-                '}';
+        return "Parameter{"
+                + "id='" + id + '\''
+                + ", value='" + value + '\''
+                + '}';
     }
 }

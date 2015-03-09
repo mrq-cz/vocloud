@@ -32,21 +32,23 @@ public class Configuration {
         }
         return properties;
     }
-    
-    public @Produces @Config String getConfiguration(InjectionPoint p) {
+
+    public @Produces
+    @Config
+    String getConfiguration(InjectionPoint p) {
         Properties config = getProperties();
-        
+
         // class specific key
-        String key = p.getMember().getDeclaringClass().getSimpleName()+"."+p.getMember().getName();
-        
-        if(config.getProperty(key) == null) {
+        String key = p.getMember().getDeclaringClass().getSimpleName() + "." + p.getMember().getName();
+
+        if (config.getProperty(key) == null) {
             // global key
             key = p.getMember().getName();
             if (config.getProperty(key) == null) {
                 logger.log(Level.WARNING, "property not set {0}", key);
             }
         }
-        
+
         return config.getProperty(key);
     }
 }

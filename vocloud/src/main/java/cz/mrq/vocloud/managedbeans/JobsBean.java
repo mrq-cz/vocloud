@@ -36,8 +36,10 @@ public class JobsBean implements Serializable {
 
     private static final Logger logger = Logger.getLogger(JobsBean.class.getName());
 
-    @EJB private JobFacade jobFacade;
-    @EJB private UserSessionBean usb;
+    @EJB
+    private JobFacade jobFacade;
+    @EJB
+    private UserSessionBean usb;
 
     private List<Job> jobs;
     private UserAccount user;
@@ -62,8 +64,7 @@ public class JobsBean implements Serializable {
         String create = "create";
         if (selected.getJobType().equals("SOM")) {
             create = "create-som";
-        }
-        else if(selected.getJobType().equals("RDF")) {
+        } else if (selected.getJobType().equals("RDF")) {
             create = "create-rdf";
         }
 
@@ -113,7 +114,7 @@ public class JobsBean implements Serializable {
 
         this.refresh();
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "Job \""+name+"\" has been deleted."," "));
+                "Job \"" + name + "\" has been deleted.", " "));
     }
 
     public void deleteSelected() {
@@ -127,15 +128,16 @@ public class JobsBean implements Serializable {
         NavigationHandler myNav = FacesContext.getCurrentInstance().getApplication().getNavigationHandler();
         myNav.handleNavigation(FacesContext.getCurrentInstance(), "details", "index");
     }
-    
+
     public void detailsPollListener() {
         selected = jobFacade.find(selected.getId());
-        
+
         // stop pooling if job isn't in progress
-        if (selected.getPhase() != Phase.EXECUTING & selected.getPhase() != Phase.QUEUED)
+        if (selected.getPhase() != Phase.EXECUTING & selected.getPhase() != Phase.QUEUED) {
             detailsPoll.setStop(true);
-        else
+        } else {
             detailsPoll.setStop(false);
+        }
     }
 
     public void download(ActionEvent e) throws IOException {
@@ -150,9 +152,9 @@ public class JobsBean implements Serializable {
         response.setHeader("Content-disposition", "attachment; filename=\"" + file.getName() + "\"");
 
         try (BufferedOutputStream output = new BufferedOutputStream(response.getOutputStream());
-             BufferedInputStream input = new BufferedInputStream(new FileInputStream(file))) {
+                BufferedInputStream input = new BufferedInputStream(new FileInputStream(file))) {
             byte[] buffer = new byte[10240];
-            for (int length; (length = input.read(buffer)) > 0; ) {
+            for (int length; (length = input.read(buffer)) > 0;) {
                 output.write(buffer, 0, length);
             }
         }
@@ -282,6 +284,5 @@ public class JobsBean implements Serializable {
     public void setDetailsPoll(Poll detailsPoll) {
         this.detailsPoll = detailsPoll;
     }
-    
-    
+
 }

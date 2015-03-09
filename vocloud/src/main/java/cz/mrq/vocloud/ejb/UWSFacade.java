@@ -60,7 +60,7 @@ public class UWSFacade extends AbstractFacade<UWS> {
             if (uws.getEnabled() && uws.getType().equals(type)) {
                 float load = getLoad(uws);
                 logger.log(Level.INFO, "queering uws: {0} ({1}), load: {2}", new Object[]{uws.getLabel(), uws.getId(), load});
-                
+
                 if (load == -1) {
                     continue;
                 }
@@ -106,7 +106,6 @@ public class UWSFacade extends AbstractFacade<UWS> {
         } catch (IOException ex) {
             return -1;
         }
-        
 
         Pattern p = Pattern.compile("QUEUED|EXECUTING");
         Matcher m = p.matcher(ret);

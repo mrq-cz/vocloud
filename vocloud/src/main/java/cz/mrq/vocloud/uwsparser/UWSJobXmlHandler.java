@@ -31,11 +31,11 @@ public class UWSJobXmlHandler extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         current = Elements.getElement(localName);
-        
+
         if ("true".equals(attributes.getValue("xsi:nil"))) {
             current = Elements.UNKNOWN;
         }
-        
+
         if (current == Elements.result) {
             String result = attributes.getValue(2);
             if (result == null) {
@@ -45,18 +45,20 @@ public class UWSJobXmlHandler extends DefaultHandler {
             }
             // not updated since UWSJob object refactor
             //job.setResults(results);
-            
+
             current = Elements.UNKNOWN;
         }
     }
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-        if(current == Elements.UNKNOWN) return;
-        
+        if (current == Elements.UNKNOWN) {
+            return;
+        }
+
         String string = new String(ch, start, length);
 
-        Logger.getLogger(UWSParser.class.getName()).log(Level.WARNING, current.toString()+": "+string);
+        Logger.getLogger(UWSParser.class.getName()).log(Level.WARNING, current.toString() + ": " + string);
         switch (current) {
             case jobId:
                 job.setJobId(string);

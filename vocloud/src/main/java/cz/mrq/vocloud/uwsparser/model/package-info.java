@@ -2,7 +2,7 @@
         namespace = "http://www.ivoa.net/xml/UWS/v1.0",
         elementFormDefault = XmlNsForm.QUALIFIED)
 @XmlJavaTypeAdapters({
-        @XmlJavaTypeAdapter(value=UWSDateAdapter.class, type=Date.class)
+    @XmlJavaTypeAdapter(value = UWSDateAdapter.class, type = Date.class)
 })
 @XmlAccessorType(XmlAccessType.FIELD)
 package cz.mrq.vocloud.uwsparser.model;

@@ -15,7 +15,6 @@ import java.util.logging.Logger;
  */
 public class EditPanel {
 
-
     private Panel panel = new Panel();
     private String fileContents;
 

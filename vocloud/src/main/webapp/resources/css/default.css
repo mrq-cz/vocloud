@@ -21,12 +21,12 @@ h1 {
     font-size: 16px;
     font-family: sans-serif;
     margin-left: 8px;
-    
+
     text-align: justify;
 }
 
- h2.titl {
-    
+h2.titl {
+
     font-family: sans-serif;
     font-size: 28px;
     margin-left: 8px;
@@ -54,7 +54,7 @@ a:link:hover, a:visited:hover  {
 
 #navigation{
     width:100%;
-    
+
 
     margin: 0px;
 
