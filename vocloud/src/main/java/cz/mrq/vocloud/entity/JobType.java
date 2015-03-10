@@ -5,12 +5,14 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import java.io.Serializable;
+import javax.enterprise.inject.Vetoed;
 
 /**
  * JobType
  *
  * @author Lumir Mrkva (lumir@mrq.cz)
  */
+@Vetoed
 @Entity
 @NamedQueries({
     @NamedQuery(name = "JobType.findAll", query = "SELECT jt FROM JobType jt"),

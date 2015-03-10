@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
     <context-param>
         <param-name>javax.faces.PROJECT_STAGE</param-name>
         <param-value>Development</param-value>
@@ -11,7 +10,7 @@
         <init-param>
             <param-name>thresholdSize</param-name>
             <param-value>2097152</param-value>
-        </init-param> 
+        </init-param>
     </filter>
     <filter-mapping>
         <filter-name>PrimeFaces FileUpload Filter</filter-name>
@@ -62,6 +61,20 @@
             <description/>
             <role-name>USER</role-name>
             <role-name>ADMIN</role-name>
+            <role-name>MANAGER</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <security-constraint>
+        <display-name>management</display-name>
+        <web-resource-collection>
+            <web-resource-name>management</web-resource-name>
+            <description/>
+            <url-pattern>/management/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <description/>
+            <role-name>ADMIN</role-name>
+            <role-name>MANAGER</role-name>
         </auth-constraint>
     </security-constraint>
     <login-config>
@@ -96,4 +109,8 @@
         <param-name>facelets.SKIP_COMMENTS</param-name>
         <param-value>true</param-value>
     </context-param>
+    <security-role>
+        <description/>
+        <role-name>MANAGER</role-name>
+    </security-role>
 </web-app>

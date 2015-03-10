@@ -3,6 +3,7 @@ package cz.mrq.vocloud.managedbeans;
 import cz.mrq.vocloud.ejb.JobFacade;
 import cz.mrq.vocloud.ejb.UserSessionBean;
 import cz.mrq.vocloud.entity.UserAccount;
+import cz.mrq.vocloud.entity.UserGroupName;
 import cz.mrq.vocloud.tools.Config;
 
 import javax.ejb.EJB;
@@ -98,4 +99,5 @@ public class SessionBean implements Serializable {
     public Date getBuildDate() {
         return new Date(Long.parseLong(buildTimestamp));
     }
+
 }

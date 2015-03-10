@@ -1,41 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-To change this template, choose Tools | Templates
-and open the template in the editor.
--->
 <ui:component xmlns:ui="http://java.sun.com/jsf/facelets"
               xmlns:h="http://java.sun.com/jsf/html"
               xmlns:p="http://primefaces.org/ui"
-              xmlns:c="http://java.sun.com/jsp/jstl/core"
               xmlns="http://www.w3.org/1999/xhtml">
 
     <h:form>
         <p:menubar>
             <p:menuitem value="Home" action="/index.xhtml" />
-
-            <c:choose>
-                <c:when test="${request.remoteUser !=  null}">
-                    <p:menuitem ajax="false" action="/jobs/index" value="Jobs" icon="ui-icon-document" />
-                    <p:submenu label="Create" icon="ui-icon-disk">
-                        <p:menuitem ajax="false" action="/jobs/create" value="Korel" />
-                        <p:menuitem ajax="false" action="/jobs/create-som" value="SOM" />
-                        <p:menuitem ajax="false" action="/jobs/create-rdf" value="RDF" />
-                    </p:submenu>
-                    <p:menuitem ajax="false" action="/settings" value="Settings" icon="ui-icon-gear" />
-                    <c:if test="${sessionBean.user.groupName == 'ADMIN'}">
-                        <p:submenu label="Admin">
-                            <p:menuitem ajax="false" action="admin-users" value="Users" />
-                            <p:menuitem ajax="false" action="admin-uws" value="UWS" />
-                        </p:submenu>
-                    </c:if>
-                    <p:menuitem ajax="false" url="/help.xhtml" value="Help" icon="ui-icon-help" />
-                    <p:menuitem ajax="false" url="/logout.xhtml" value="Logout (#{request.remoteUser})" icon="ui-icon-close" />
-                </c:when>
-                <c:otherwise>
-                    <p:menuitem ajax="false" action="/register" value="Register" icon="ui-icon-gear" />
-                    <p:menuitem ajax="false" action="/login" value="Login" icon="ui-icon-check" />
-                </c:otherwise>
-            </c:choose>
+            <p:menuitem rendered="#{request.remoteUser != null}" ajax="false" action="/jobs/index" value="Jobs" icon="ui-icon-document" />
+            <p:submenu rendered="#{request.remoteUser != null}" label="Create" icon="ui-icon-disk">
+                <p:menuitem ajax="false" action="/jobs/create" value="Korel" />
+                <p:menuitem ajax="false" action="/jobs/create-som" value="SOM" />
+                <p:menuitem ajax="false" action="/jobs/create-rdf" value="RDF" />
+            </p:submenu>
+            <p:menuitem rendered="#{request.remoteUser != null}" ajax="false" action="/settings" value="Settings" icon="ui-icon-gear" />                    
+            <p:submenu rendered='#{request.isUserInRole("MANAGER") or request.isUserInRole("ADMIN")}' label="Filesystem management">
+                <p:menuitem ajax="false" value="Akce1" />
+                <p:menuitem ajax="false" value="Akce2" />
+            </p:submenu>
+            <p:submenu rendered='#{request.isUserInRole("ADMIN")}' label="Admin">
+                <p:menuitem ajax="false" action="admin-users" value="Users" />
+                <p:menuitem ajax="false" action="admin-uws" value="UWS" />
+            </p:submenu>
+            <p:menuitem rendered="#{request.remoteUser != null}" ajax="false" url="/help.xhtml" value="Help" icon="ui-icon-help" />
+            <p:menuitem rendered="#{request.remoteUser != null}" ajax="false" action="#{loginBean.logout()}" value="Logout (#{request.remoteUser})" icon="ui-icon-close" />
+            <p:menuitem rendered="#{request.remoteUser == null}" ajax="false" action="/register" value="Register" icon="ui-icon-gear" />
+            <p:menuitem rendered="#{request.remoteUser == null}" ajax="false" action="/login" value="Login" icon="ui-icon-check" />
         </p:menubar>
     </h:form>
 </ui:component>

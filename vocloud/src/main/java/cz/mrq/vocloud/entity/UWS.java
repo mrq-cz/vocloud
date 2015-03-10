@@ -8,11 +8,13 @@ import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.logging.Logger;
+import javax.enterprise.inject.Vetoed;
 
 /**
  *
  * @author voadmin
  */
+@Vetoed
 @Entity
 @NamedQueries({
     @NamedQuery(name = "UWS.findAll", query = "SELECT u FROM UWS u"),

@@ -2,6 +2,7 @@ package cz.mrq.vocloud.managedbeans;
 
 import cz.mrq.vocloud.ejb.UserAccountFacade;
 import cz.mrq.vocloud.entity.UserAccount;
+import cz.mrq.vocloud.entity.UserGroupName;
 import cz.mrq.vocloud.tools.Config;
 
 import javax.ejb.EJB;
@@ -30,7 +31,7 @@ public class RegisterBean implements Serializable {
     @Inject
     @Config
     private String defaultQuota;
-    private UserAccount user;
+    private final UserAccount user;
 
     public RegisterBean() {
         user = new UserAccount();
@@ -42,9 +43,9 @@ public class RegisterBean implements Serializable {
         user.setEnabled(Boolean.TRUE);
 
         if (user.getUsername().equals("admin")) {
-            user.setGroupName("ADMIN");
+            user.setGroupName(UserGroupName.ADMIN);
         } else {
-            user.setGroupName("USER");
+            user.setGroupName(UserGroupName.USER);
         }
         if (defaultQuota == null) {
             user.setQuota(100000000L);

@@ -12,11 +12,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.enterprise.inject.Vetoed;
 
 /**
  *
  * @author voadmin
  */
+@Vetoed
 @Entity
 @NamedQueries({
     @NamedQuery(name = "UserAccount.findAll", query = "SELECT u FROM UserAccount u"),
@@ -66,7 +68,8 @@ public class UserAccount implements Serializable {
     private String lastIp;
     @Column(nullable = false)
     @NotNull
-    private String groupName;
+    @Enumerated(EnumType.STRING)
+    private UserGroupName groupName;
     private Long quota = 100000000L;
     @OneToMany(mappedBy = "owner")
     private List<Job> jobs;
@@ -75,11 +78,11 @@ public class UserAccount implements Serializable {
 
     }
 
-    public String getGroupName() {
+    public UserGroupName getGroupName() {
         return groupName;
     }
 
-    public void setGroupName(String groupName) {
+    public void setGroupName(UserGroupName groupName) {
         this.groupName = groupName;
     }
 
@@ -241,13 +244,18 @@ public class UserAccount implements Serializable {
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (!(object instanceof UserAccount)) {
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
         }
-        UserAccount other = (UserAccount) object;
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final UserAccount other = (UserAccount) obj;
         return !((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id)));
     }
+    
+    
 
     @Override
     public String toString() {

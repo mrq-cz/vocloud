@@ -2,6 +2,7 @@ package cz.mrq.vocloud.gen;
 
 import cz.mrq.vocloud.ejb.UserAccountFacade;
 import cz.mrq.vocloud.entity.UserAccount;
+import cz.mrq.vocloud.entity.UserGroupName;
 import cz.mrq.vocloud.gen.util.JsfUtil;
 import cz.mrq.vocloud.gen.util.PaginationHelper;
 
@@ -225,5 +226,9 @@ public class UserAccountController implements Serializable {
                 throw new IllegalArgumentException("object " + object + " is of type " + object.getClass().getName() + "; expected type: " + UserAccountController.class.getName());
             }
         }
+    }
+    
+    public UserGroupName[] getUserGroupPossibilities(){
+        return UserGroupName.values();
     }
 }

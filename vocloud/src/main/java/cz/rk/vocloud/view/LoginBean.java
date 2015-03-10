@@ -6,6 +6,13 @@ import javax.enterprise.context.RequestScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -70,11 +77,16 @@ public class LoginBean {
             getRequest().login(username, password);
         } catch (ServletException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Invalid credentials", "Username or password is incorrect"));
+            return "loginerror?faces-redirect=true";
         }
         return "index?faces-redirect=true";
     }
 
     public String logout() {
+        if (!isUserLogged()) {
+            return null;
+        }
+        clearCache(getPrincipalName());//will not be used later //TODO
         FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
         try {
             getRequest().logout();
@@ -83,6 +95,18 @@ public class LoginBean {
             Logger.getLogger(getClass().toString()).warning("Logout unsuccessful!");
         }
         return null;
+    }
+
+    //temp method for fixing bug in wildfly
+    private void clearCache(String username) {
+        try {
+            ObjectName jaasMgr = new ObjectName("jboss.as:subsystem=security,security-domain=VocloudSecurityDomain");
+            Object[] params = {username};
+            String[] signature = {"java.lang.String"};
+            MBeanServer server = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
+            server.invoke(jaasMgr, "flushCache", params, signature);
+        } catch (MalformedObjectNameException | InstanceNotFoundException | MBeanException | ReflectionException ex) {
+        }
     }
 
 }

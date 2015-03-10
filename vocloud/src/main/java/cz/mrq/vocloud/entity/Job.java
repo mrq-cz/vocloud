@@ -11,11 +11,13 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.enterprise.inject.Vetoed;
 
 /**
  *
  * @author voadmin
  */
+@Vetoed
 @Entity
 @NamedQueries({
     @NamedQuery(name = "Job.findAll", query = "SELECT j FROM Job j"),

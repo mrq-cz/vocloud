@@ -16,7 +16,9 @@
             <h:form>
                 <h:panelGrid columns="2">
                     <h:outputLabel value="#{bundle.EditUserAccountLabel_groupName}" for="groupName" />
-                    <h:inputText id="groupName" value="#{userAccountController.selected.groupName}" title="#{bundle.EditUserAccountTitle_groupName}" />
+                    <h:selectOneMenu id="groupName" value="#{userAccountController.selected.groupName}" title="#{bundle.EditUserAccountTitle_groupName}">
+                        <f:selectItems value="#{userAccountController.userGroupPossibilities}" var="i" itemValue="#{i.name()}" itemLabel="#{i.name()}"/>
+                    </h:selectOneMenu>
                     <h:outputLabel value="#{bundle.EditUserAccountLabel_email}" for="email" />
                     <h:inputText id="email" value="#{userAccountController.selected.email}" title="#{bundle.EditUserAccountTitle_email}" required="true" requiredMessage="#{bundle.EditUserAccountRequiredMessage_email}"/>
                     <h:outputLabel value="#{bundle.EditUserAccountLabel_enabled}" for="enabled" />
@@ -45,7 +47,7 @@
                     <h:outputLabel value="#{bundle.EditUserAccountLabel_firstName}" for="firstName" />
                     <h:inputText id="firstName" value="#{userAccountController.selected.firstName}" title="#{bundle.EditUserAccountTitle_firstName}" />
                     <h:outputLabel value="#{bundle.EditUserAccountLabel_id}" for="id" />
-                    <h:inputText id="id" value="#{userAccountController.selected.id}" title="#{bundle.EditUserAccountTitle_id}" />
+                    <h:inputText id="id" disabled="true" value="#{userAccountController.selected.id}" title="#{bundle.EditUserAccountTitle_id}" />
                 </h:panelGrid>
                 <h:commandLink action="#{userAccountController.update}" value="#{bundle.EditUserAccountSaveLink}"/>
                 <br />
