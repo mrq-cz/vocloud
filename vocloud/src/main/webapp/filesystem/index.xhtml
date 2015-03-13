@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="windows-1250"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.ViewFilesystemTitle}" />
+        </ui:define>
+
+        <ui:define name="content">
+            test
+            <p:dataTable var="item" value="#{filesystemViewBean.filesystemItemList}">
+                <p:column>
+                    ic
+                </p:column>
+
+                <p:column headerText="#{bundle.FileName}">
+                    <h:outputText value="#{item.name}" />
+                </p:column>
+
+                <p:column headerText="Brand">
+                    <h:outputText value="blem" />
+                </p:column>
+
+                <p:column headerText="Color">
+                    <h:outputText value="blem" />
+                </p:column>
+            </p:dataTable>
+        </ui:define>
+    </ui:composition>
+
+</html>

@@ -5,21 +5,20 @@
         <Node id="jobs/index.xhtml" x="1150" y="450" zoom="true"/>
         <Node id="jobs/create-som.xhtml" x="400" y="750" zoom="true"/>
         <Node id="admin/uWS/Edit.xhtml" x="400" y="150" zoom="true"/>
-        <Node id="reset-password.xhtml" x="650" y="450" zoom="true"/>
         <Node id="admin/uWS/View.xhtml" x="650" y="600" zoom="true"/>
+        <Node id="reset-password.xhtml" x="650" y="450" zoom="true"/>
         <Node id="admin/uWS/List.xhtml" x="150" y="450" zoom="true"/>
         <Node id="jobs/details.xhtml" x="650" y="300" zoom="true"/>
         <Node id="settings.xhtml" x="900" y="150" zoom="true"/>
         <Node id="error/404.xhtml" x="150" y="300" zoom="true"/>
         <Node id="jobs/create.xhtml" x="900" y="600" zoom="true"/>
-        <Node id="admin/userAccount/View.xhtml" x="400" y="300" zoom="true"/>
         <Node id="admin/userAccount/Edit.xhtml" x="900" y="450" zoom="true"/>
+        <Node id="admin/userAccount/View.xhtml" x="400" y="300" zoom="true"/>
         <Node id="admin/userAccount/List.xhtml" x="1650" y="150" zoom="true"/>
         <Node id="feedback.xhtml" x="650" y="750" zoom="true"/>
         <Node id="admin/uWS/Create.xhtml" x="650" y="150" zoom="true"/>
-        <Node id="index.xhtml" x="150" y="600" zoom="true"/>
         <Node id="loginerror.xhtml" x="150" y="750" zoom="true"/>
-        <Node id="logout.xhtml" x="900" y="300" zoom="true"/>
+        <Node id="index.xhtml" x="150" y="600" zoom="true"/>
         <Node id="test/index.xhtml" x="1150" y="300" zoom="true"/>
         <Node id="*" x="150" y="150" zoom="true"/>
         <Node id="error/403.xhtml" x="1400" y="300" zoom="true"/>

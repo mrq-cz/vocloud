@@ -6,26 +6,27 @@
 
     <h:form>
         <p:menubar>
-            <p:menuitem value="Home" action="/index.xhtml" />
-            <p:menuitem rendered="#{request.remoteUser != null}" ajax="false" action="/jobs/index" value="Jobs" icon="ui-icon-document" />
-            <p:submenu rendered="#{request.remoteUser != null}" label="Create" icon="ui-icon-disk">
-                <p:menuitem ajax="false" action="/jobs/create" value="Korel" />
-                <p:menuitem ajax="false" action="/jobs/create-som" value="SOM" />
-                <p:menuitem ajax="false" action="/jobs/create-rdf" value="RDF" />
+            <p:menuitem value="#{bundle.MenuItemHome}" outcome="/index" />
+            <p:menuitem rendered="#{request.remoteUser != null}" ajax="false" action="/jobs/index" value="#{bundle.MenuItemJobs}" icon="ui-icon-document" />
+            <p:menuitem rendered="#{request.remoteUser != null}" ajax="false" action="/filesystem/index" value="#{bundle.MenuItemViewFilesystem}" icon="ui-icon-folder-collapsed" />
+            <p:submenu rendered="#{request.remoteUser != null}" label="#{bundle.SubmenuCreate}" icon="ui-icon-disk">
+                <p:menuitem ajax="false" action="/jobs/create" value="#{bundle.MenuItemKorel}" />
+                <p:menuitem ajax="false" action="/jobs/create-som" value="#{bundle.MenuItemSOM}" />
+                <p:menuitem ajax="false" action="/jobs/create-rdf" value="#{bundle.MenuItemRDF}" />
             </p:submenu>
-            <p:menuitem rendered="#{request.remoteUser != null}" ajax="false" action="/settings" value="Settings" icon="ui-icon-gear" />                    
-            <p:submenu rendered='#{request.isUserInRole("MANAGER") or request.isUserInRole("ADMIN")}' label="Filesystem management">
+            <p:menuitem rendered="#{request.remoteUser != null}" ajax="false" action="/settings" value="#{bundle.MenuItemSettings}" icon="ui-icon-gear" />                    
+            <p:submenu rendered='#{request.isUserInRole("MANAGER") or request.isUserInRole("ADMIN")}' label="#{bundle.SubmenuFilesystemManagement}">
                 <p:menuitem ajax="false" value="Akce1" />
                 <p:menuitem ajax="false" value="Akce2" />
             </p:submenu>
-            <p:submenu rendered='#{request.isUserInRole("ADMIN")}' label="Admin">
-                <p:menuitem ajax="false" action="admin-users" value="Users" />
-                <p:menuitem ajax="false" action="admin-uws" value="UWS" />
+            <p:submenu rendered='#{request.isUserInRole("ADMIN")}' label="#{bundle.SubmenuAdmin}">
+                <p:menuitem ajax="false" action="admin-users" value="#{bundle.MenuItemUsers}" />
+                <p:menuitem ajax="false" action="admin-uws" value="#{bundle.MenuItemUWS}" />
             </p:submenu>
-            <p:menuitem rendered="#{request.remoteUser != null}" ajax="false" url="/help.xhtml" value="Help" icon="ui-icon-help" />
-            <p:menuitem rendered="#{request.remoteUser != null}" ajax="false" action="#{loginBean.logout()}" value="Logout (#{request.remoteUser})" icon="ui-icon-close" />
-            <p:menuitem rendered="#{request.remoteUser == null}" ajax="false" action="/register" value="Register" icon="ui-icon-gear" />
-            <p:menuitem rendered="#{request.remoteUser == null}" ajax="false" action="/login" value="Login" icon="ui-icon-check" />
+            <p:menuitem rendered="#{request.remoteUser != null}" ajax="false" outcome="/help" value="#{bundle.MenuItemHelp}" icon="ui-icon-help" />
+            <p:menuitem rendered="#{request.remoteUser != null}" ajax="false" action="#{loginBean.logout()}" value="#{bundle.MenuItemLogout} (#{request.remoteUser})" icon="ui-icon-close" />
+            <p:menuitem rendered="#{request.remoteUser == null}" ajax="false" outcome="/register" value="#{bundle.MenuItemRegister}" icon="ui-icon-gear" />
+            <p:menuitem rendered="#{request.remoteUser == null}" ajax="false" outcome="/login" value="#{bundle.MenuItemLogin}" icon="ui-icon-check" />
         </p:menubar>
     </h:form>
 </ui:component>
