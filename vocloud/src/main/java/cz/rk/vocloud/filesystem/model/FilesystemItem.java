@@ -1,12 +1,13 @@
 package cz.rk.vocloud.filesystem.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  *
  * @author radio.koza
  */
-public abstract class FilesystemItem {
+public abstract class FilesystemItem implements Serializable{
     
     private final String name;
     private final String prefix;

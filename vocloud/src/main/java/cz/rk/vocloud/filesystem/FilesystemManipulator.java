@@ -5,6 +5,9 @@ import cz.rk.vocloud.filesystem.model.FilesystemFile;
 import cz.rk.vocloud.filesystem.model.FilesystemItem;
 import cz.rk.vocloud.filesystem.model.Folder;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -61,7 +64,7 @@ public class FilesystemManipulator {
         if (filesystemDirectory == null){
             throw new IllegalStateException("Filesystem directory is uninitialized");
         }
-        File[] files = filesystemDirectory.listFiles();
+        File[] files = filesystemDirectory.toPath().resolve(prefix).toFile().listFiles();
         List<Folder> folders = new ArrayList<>();
         List<FilesystemFile> fsFiles = new ArrayList<>();
         for (File i: files){
@@ -82,8 +85,15 @@ public class FilesystemManipulator {
     }
     
     public List<FilesystemItem> listFilesystemItems(){
-        //consider prefix as "/"
-        return listFilesystemItems("/");
+        //consider prefix as ""
+        return listFilesystemItems("");
     }
     
+    public InputStream getDownloadStream(FilesystemItem item) throws FileNotFoundException{
+        if (item.isFolder()){
+            throw new IllegalArgumentException("Unable to download folder " + item.getName());
+        }
+        File file = filesystemDirectory.toPath().resolve(item.getPrefix()).resolve(item.getName()).toFile();
+        return new FileInputStream(file);
+    }
 }

@@ -57,6 +57,11 @@
             <description/>
             <url-pattern>/settings.xhtml</url-pattern>
         </web-resource-collection>
+        <web-resource-collection>
+            <web-resource-name>filesystem</web-resource-name>
+            <description/>
+            <url-pattern>/filesystem/*</url-pattern>
+        </web-resource-collection>
         <auth-constraint>
             <description/>
             <role-name>USER</role-name>
@@ -65,7 +70,7 @@
         </auth-constraint>
     </security-constraint>
     <security-constraint>
-        <display-name>management</display-name>
+        <display-name>Manager</display-name>
         <web-resource-collection>
             <web-resource-name>management</web-resource-name>
             <description/>
