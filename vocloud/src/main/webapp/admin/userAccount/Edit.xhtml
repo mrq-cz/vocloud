@@ -22,7 +22,10 @@
                     <h:outputLabel value="#{bundle.EditUserAccountLabel_email}" for="email" />
                     <h:inputText id="email" value="#{userAccountController.selected.email}" title="#{bundle.EditUserAccountTitle_email}" required="true" requiredMessage="#{bundle.EditUserAccountRequiredMessage_email}"/>
                     <h:outputLabel value="#{bundle.EditUserAccountLabel_enabled}" for="enabled" />
-                    <h:inputText id="enabled" value="#{userAccountController.selected.enabled}" title="#{bundle.EditUserAccountTitle_enabled}" />
+                    <h:selectOneMenu id="enabled" value="#{userAccountController.selected.enabled}" title="#{bundle.EditUserAccountTitle_enabled}">
+                        <f:selectItem itemValue="true" itemLabel="#{bundle.TrueOption}"/>
+                        <f:selectItem itemValue="false" itemLabel="#{bundle.FalseOption}"/>
+                    </h:selectOneMenu>
                     <h:outputLabel value="#{bundle.EditUserAccountLabel_lastIp}" for="lastIp" />
                     <h:inputText id="lastIp" value="#{userAccountController.selected.lastIp}" title="#{bundle.EditUserAccountTitle_lastIp}" />
                     <h:outputLabel value="#{bundle.EditUserAccountLabel_lastLogin}" for="lastLogin" />

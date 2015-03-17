@@ -34,8 +34,8 @@ and open the template in the editor.
                         <p:password id="password" required="true" feedback="false" value="#{loginBean.password}"/>
                         <h:outputLabel for="reset" 
                                        value=" "/>
-                        <h:link id="reset" outcome="reset-password">Forgot password?</h:link>
-                        <h:commandButton value="Login" action="#{loginBean.login()}"/>    
+                        <p:link id="reset" outcome="reset-password">Forgot password?</p:link>
+                        <p:commandButton ajax="false" value="Login" action="#{loginBean.login()}"/>    
                     </h:panelGrid>
                 </h:form>  
             </ui:fragment>

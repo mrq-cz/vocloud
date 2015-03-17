@@ -60,7 +60,7 @@
         <web-resource-collection>
             <web-resource-name>filesystem</web-resource-name>
             <description/>
-            <url-pattern>/filesystem/*</url-pattern>
+            <url-pattern>/filesystem/index.xhtml</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <description/>
@@ -75,6 +75,11 @@
             <web-resource-name>management</web-resource-name>
             <description/>
             <url-pattern>/management/*</url-pattern>
+        </web-resource-collection>
+        <web-resource-collection>
+            <web-resource-name>filesystem</web-resource-name>
+            <description/>
+            <url-pattern>/filesystem/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <description/>

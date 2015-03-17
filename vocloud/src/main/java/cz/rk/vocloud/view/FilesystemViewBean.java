@@ -28,21 +28,28 @@ import org.primefaces.model.menu.MenuModel;
 public class FilesystemViewBean implements Serializable {
     
     @EJB
-    private FilesystemManipulator fsm;
+    protected FilesystemManipulator fsm;
     
     private MenuModel breadcrumb;
     
-    private String prefix = "";
-    private List<FilesystemItem> items;
+    protected String prefix = "";
+    protected List<FilesystemItem> items;
     
     
     @PostConstruct
-    private void init(){
+    protected void init(){
         items = fsm.listFilesystemItems(prefix);
+        //check validity of directory
+        if (items == null){
+            //reset to nominal state
+            prefix = "";
+            init();
+            return;
+        }
         //menu initialization
         breadcrumb = new DefaultMenuModel();
         DefaultMenuItem menuItem = new DefaultMenuItem("Root", "ui-icon-home");
-        menuItem.setCommand("#{filesystemViewBean.goToFolderIndex(0)}");
+        menuItem.setCommand("#{" + getThisNamedBeanName()  +".goToFolderIndex(0)}");
         menuItem.setAjax(false);
         breadcrumb.addElement(menuItem);
         String[] folders = prefix.split("/");
@@ -50,9 +57,13 @@ public class FilesystemViewBean implements Serializable {
         for (String i: folders){
             menuItem = new DefaultMenuItem(i);
             menuItem.setAjax(false);
-            menuItem.setCommand("#{filesystemViewBean.goToFolderIndex(" + (++counter) + ")}");
+            menuItem.setCommand("#{" + getThisNamedBeanName() + ".goToFolderIndex(" + (++counter) + ")}");
             breadcrumb.addElement(menuItem);
         }
+    }
+    
+    protected String getThisNamedBeanName(){
+        return "filesystemViewBean";
     }
     
     public List<FilesystemItem> getFilesystemItemList(){
@@ -117,7 +128,6 @@ public class FilesystemViewBean implements Serializable {
     }
     
     public void goToFolderIndex(int folderIndex){
-        System.out.println("called goToFolder " + folderIndex );
         if (folderIndex < 0){
             throw new IllegalArgumentException("Folder index must not be negative value");
         }

@@ -34,7 +34,7 @@ public class FilesystemManipulator {
     private File filesystemDirectory;
     
     @PostConstruct
-    private void init(){
+    public void init(){
         //initialize filesystem directory from String and check right access permissions
         filesystemDirectory = new File(filesystemDir).getAbsoluteFile();
         //check that directory exists
@@ -59,12 +59,14 @@ public class FilesystemManipulator {
         }
     }
     
-    
     public List<FilesystemItem> listFilesystemItems(String prefix){
         if (filesystemDirectory == null){
             throw new IllegalStateException("Filesystem directory is uninitialized");
         }
         File[] files = filesystemDirectory.toPath().resolve(prefix).toFile().listFiles();
+        if (files == null){
+            return null;
+        }
         List<Folder> folders = new ArrayList<>();
         List<FilesystemFile> fsFiles = new ArrayList<>();
         for (File i: files){
@@ -73,7 +75,7 @@ public class FilesystemManipulator {
             } else if (i.isFile()){
                 fsFiles.add(new FilesystemFile(i.getName(), prefix, i.length(), new Date(i.lastModified())));
             } else {
-                //should not happen
+                //partially deleted file - cached but not present
                 LOG.log(Level.WARNING, "Nor directory nor file! {0}", i.getPath());
             }
         }
@@ -95,5 +97,30 @@ public class FilesystemManipulator {
         }
         File file = filesystemDirectory.toPath().resolve(item.getPrefix()).resolve(item.getName()).toFile();
         return new FileInputStream(file);
+    }
+    
+    public boolean tryToCreateFolder(Folder folder){
+        File folderDescriptor = filesystemDirectory.toPath().resolve(folder.getPrefix()).resolve(folder.getName()).toFile();
+        return folderDescriptor.mkdir();
+    }
+    
+    public boolean tryToDeleteFilesystemItem(FilesystemItem item){
+        File fileDescriptor = filesystemDirectory.toPath().resolve(item.getPrefix()).resolve(item.getName()).toFile();
+        if (!fileDescriptor.exists()){
+            return false;
+        }
+        deleteFileRecursively(fileDescriptor);
+        return true;
+    }
+    
+    private void deleteFileRecursively(File descriptor){
+        if (descriptor.isFile()){
+            descriptor.delete();
+        } else {
+            for (File i: descriptor.listFiles()){
+                deleteFileRecursively(i);
+            }
+            descriptor.delete();
+        }
     }
 }

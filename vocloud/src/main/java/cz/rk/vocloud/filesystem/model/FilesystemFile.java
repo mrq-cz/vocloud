@@ -8,8 +8,8 @@ import java.util.Date;
  */
 public class FilesystemFile extends FilesystemItem{
     
-    private final long sizeInBytes;
-    private final Date lastModified;
+    protected final long sizeInBytes;
+    protected final Date lastModified;
     
     public FilesystemFile(String fileName, String relativeDir, long byteSize, Date lastMod){
         super(fileName, relativeDir);
