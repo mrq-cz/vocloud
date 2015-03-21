@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -99,7 +100,7 @@ public class FilesystemManipulator {
         return new FileInputStream(file);
     }
     
-    public boolean tryToCreateFolder(Folder folder){
+    public boolean tryToCreateFolder(Folder folder) throws InvalidPathException{
         File folderDescriptor = filesystemDirectory.toPath().resolve(folder.getPrefix()).resolve(folder.getName()).toFile();
         return folderDescriptor.mkdir();
     }
@@ -122,5 +123,14 @@ public class FilesystemManipulator {
             }
             descriptor.delete();
         }
+    }
+    
+    public boolean renameFilesystemItem(FilesystemItem item, String newName){
+        File source = filesystemDirectory.toPath().resolve(item.getPrefix()).resolve(item.getName()).toFile();
+        File target = filesystemDirectory.toPath().resolve(item.getPrefix()).resolve(newName).toFile();
+        if (target.exists()){
+            return false;
+        }
+        return source.renameTo(target);
     }
 }

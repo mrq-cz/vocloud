@@ -12,7 +12,7 @@
         </ui:define>
 
         <ui:define name="content">
-            <h:form>
+            <h:form id="form">
                 <h:panelGroup id="messagePanel" layout="block">
                     <p:messages showIcon="true" showDetail="true" showSummary="false"/>
                 </h:panelGroup>
@@ -22,7 +22,7 @@
                 <p:overlayPanel id="newFolderPanel" for="newFolderBtn" hideEffect="fade">
                     <h:panelGrid columns="2" cellpadding="10" cellspacing="5">
                         <p:inputText maxlength="30" value="#{filesystemManageBean.folderName}"/>
-                        <p:commandButton value="#{bundle.CreateFolderButton}" action="#{filesystemManageBean.createFolder()}" update="@form"/>
+                        <p:commandButton value="#{bundle.CreateFolderButton}" action="#{filesystemManageBean.createFolder()}" update="@form" />
                     </h:panelGrid>
                 </p:overlayPanel>
                 <p:breadCrumb model="#{filesystemManageBean.breadcrumbModel}"/>
@@ -58,6 +58,10 @@
                         <p:commandButton value="#{bundle.FileDelete}" icon="ui-icon-trash" action="#{filesystemManageBean.delete(item)}" update="@form">
                             <p:confirm header="#{bundle.ConfirmationTitle}" message="#{bundle.ConfirmationMessage}" icon="ui-icon-alert" />
                         </p:commandButton>
+                        <p:commandButton update=":dialogForm:fileRenamePanel" value="#{bundle.FileRename}" icon="ui-icon-pencil" oncomplete="PF('renameDialog').show()">
+                            <f:setPropertyActionListener target="#{filesystemManageBean.itemToRename}" value="#{item.name}" />
+                            <f:setPropertyActionListener target="#{filesystemManageBean.filesystemItemToRename}" value="#{item}" />
+                        </p:commandButton>
                     </p:column>
 
                 </p:dataTable>
@@ -65,6 +69,17 @@
                     <p:commandButton value="#{bundle.YesChoice}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
                     <p:commandButton value="#{bundle.NoChoice}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
                 </p:confirmDialog>
+            </h:form>
+            <h:form id="dialogForm">
+                <p:dialog header="#{bundle.RenameDialog}" widgetVar="renameDialog" modal="true" resizable="false">
+                    <p:outputPanel id="fileRenamePanel" style="text-align:center;">
+                        <h:panelGrid columns="2" cellpadding="10" cellspacing="5" rendered="#{filesystemManageBean.itemToRename != null}">
+                            <p:inputText maxlength="30" value="#{filesystemManageBean.itemToRename}"/>
+                            <p:commandButton id="renameBtn" value="#{bundle.FileRenameButton}" action="#{filesystemManageBean.renameFilesystemItem()}" update=":form,@form"/>
+                            <p:defaultCommand target="renameBtn" />
+                        </h:panelGrid>
+                    </p:outputPanel>
+                </p:dialog>  
             </h:form>
         </ui:define>
     </ui:composition>

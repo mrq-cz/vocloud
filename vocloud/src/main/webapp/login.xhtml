@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-To change this template, choose Tools | Templates
-and open the template in the editor.
--->
 <!DOCTYPE html>
 <html lang="en"
       xmlns="http://www.w3.org/1999/xhtml"
@@ -34,7 +30,7 @@ and open the template in the editor.
                         <p:password id="password" required="true" feedback="false" value="#{loginBean.password}"/>
                         <h:outputLabel for="reset" 
                                        value=" "/>
-                        <p:link id="reset" outcome="reset-password">Forgot password?</p:link>
+                        <h:link id="reset" outcome="reset-password">Forgot password?</h:link>
                         <p:commandButton ajax="false" value="Login" action="#{loginBean.login()}"/>    
                     </h:panelGrid>
                 </h:form>  
