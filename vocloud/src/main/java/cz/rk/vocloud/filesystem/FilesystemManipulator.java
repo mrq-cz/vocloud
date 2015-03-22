@@ -4,9 +4,11 @@ import cz.mrq.vocloud.tools.Config;
 import cz.rk.vocloud.filesystem.model.FilesystemFile;
 import cz.rk.vocloud.filesystem.model.FilesystemItem;
 import cz.rk.vocloud.filesystem.model.Folder;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import javax.annotation.PostConstruct;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import org.apache.commons.io.FileUtils;
 
 /**
  *
@@ -132,5 +135,23 @@ public class FilesystemManipulator {
             return false;
         }
         return source.renameTo(target);
+    }
+    
+    public String saveUploadedFile(String folder, String fileName, InputStream fileStream) throws IOException{
+        System.out.println("folder: " + folder + "; fileName: " + fileName);
+        File targetFile;
+        int counter = 0;
+        do {
+            if (counter == 0){
+                targetFile = filesystemDirectory.toPath().resolve(folder).resolve(fileName).toFile();
+            } else {
+                targetFile = filesystemDirectory.toPath().resolve(folder).resolve(fileName + " (" + counter + ")").toFile();
+            }
+            counter++;
+        } while (targetFile.exists());
+        BufferedInputStream bis = new BufferedInputStream(fileStream);
+        FileUtils.copyInputStreamToFile(bis, targetFile);
+        counter--;
+        return counter == 0 ? fileName : fileName + " (" + counter + ")";
     }
 }

@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import org.primefaces.model.DefaultStreamedContent;
@@ -26,21 +27,29 @@ import org.primefaces.model.menu.MenuModel;
 @Named
 @ViewScoped
 public class FilesystemViewBean implements Serializable {
-    
+
     @EJB
     protected FilesystemManipulator fsm;
-    
+
     private MenuModel breadcrumb;
-    
-    protected String prefix = "";
+
+    protected String prefix;
     protected List<FilesystemItem> items;
-    
-    
+
     @PostConstruct
-    protected void init(){
+    protected void viewBeanInitialization() {
+        //look for folderPrefix set from other windows
+        prefix = (String) FacesContext.getCurrentInstance().getExternalContext().getRequestMap().get("folderPrefix");
+        if (prefix == null) {
+            prefix = "";
+        }
+        init();
+    }
+
+    protected void init() {
         items = fsm.listFilesystemItems(prefix);
         //check validity of directory
-        if (items == null){
+        if (items == null) {
             //reset to nominal state
             prefix = "";
             init();
@@ -49,24 +58,24 @@ public class FilesystemViewBean implements Serializable {
         //menu initialization
         breadcrumb = new DefaultMenuModel();
         DefaultMenuItem menuItem = new DefaultMenuItem("Root", "ui-icon-home");
-        menuItem.setCommand("#{" + getThisNamedBeanName()  +".goToFolderIndex(0)}");
+        menuItem.setCommand("#{" + getThisNamedBeanName() + ".goToFolderIndex(0)}");
         menuItem.setAjax(false);
         breadcrumb.addElement(menuItem);
         String[] folders = prefix.split("/");
         int counter = 0;
-        for (String i: folders){
+        for (String i : folders) {
             menuItem = new DefaultMenuItem(i);
             menuItem.setAjax(false);
             menuItem.setCommand("#{" + getThisNamedBeanName() + ".goToFolderIndex(" + (++counter) + ")}");
             breadcrumb.addElement(menuItem);
         }
     }
-    
-    protected String getThisNamedBeanName(){
+
+    protected String getThisNamedBeanName() {
         return "filesystemViewBean";
     }
-    
-    public List<FilesystemItem> getFilesystemItemList(){
+
+    public List<FilesystemItem> getFilesystemItemList() {
         return items;
     }
 
@@ -77,48 +86,48 @@ public class FilesystemViewBean implements Serializable {
     public void setPrefix(String prefix) {
         this.prefix = prefix;
     }
-    
-    public MenuModel getBreadcrumbModel(){
+
+    public MenuModel getBreadcrumbModel() {
         return breadcrumb;
     }
-    
-    public String humanReadableSize(FilesystemItem item){
-        if (item.getSizeInBytes() == null){
+
+    public String humanReadableSize(FilesystemItem item) {
+        if (item.getSizeInBytes() == null) {
             //is folder - do nothing
             return null;
         }
         return Toolbox.humanReadableByteCount(item.getSizeInBytes(), true);
     }
-    
-    public int sortByName(Object first, Object second){
+
+    public int sortByName(Object first, Object second) {
         FilesystemItem a = (FilesystemItem) first;
         FilesystemItem b = (FilesystemItem) second;
         //folders first
-        if (a.isFolder() && !b.isFolder()){
+        if (a.isFolder() && !b.isFolder()) {
             return -1;
         }
-        if (!a.isFolder() && b.isFolder()){
+        if (!a.isFolder() && b.isFolder()) {
             return 1;
         }
         return a.getName().compareTo(b.getName());
     }
-    
-    public void goToFolder(FilesystemItem item){
+
+    public void goToFolder(FilesystemItem item) {
         //check that item is folder
-        if (!item.isFolder()){
+        if (!item.isFolder()) {
             throw new IllegalArgumentException("Presentation tier is in inconsistent state - passed item is not folder");
         }
         prefix += item.getName() + "/";
         //call initialization of view bean
         init();
     }
-    
-    public boolean isInRoot(){
+
+    public boolean isInRoot() {
         return prefix.equals("");
     }
-    
-    public void goBack(){
-        if (isInRoot()){
+
+    public void goBack() {
+        if (isInRoot()) {
             //do nothing
             return;
         }
@@ -126,30 +135,30 @@ public class FilesystemViewBean implements Serializable {
         //call initialization of view bean
         init();
     }
-    
-    public void goToFolderIndex(int folderIndex){
-        if (folderIndex < 0){
+
+    public void goToFolderIndex(int folderIndex) {
+        if (folderIndex < 0) {
             throw new IllegalArgumentException("Folder index must not be negative value");
         }
         //0 is considered as root
-        if (folderIndex == 0){
+        if (folderIndex == 0) {
             prefix = "";
         } else {
             String[] folders = prefix.split("/");
             //test size
-            if (folderIndex > folders.length){
+            if (folderIndex > folders.length) {
                 throw new IllegalArgumentException("Folder index has greater value than folder depth");
             }
             prefix = "";
-            for (int i = 0; i < folderIndex; i++){
+            for (int i = 0; i < folderIndex; i++) {
                 prefix += folders[i] + "/";
             }
         }
         //call initialization of view bean
         init();
     }
-    
-    public StreamedContent downloadFile(FilesystemItem item){
+
+    public StreamedContent downloadFile(FilesystemItem item) {
         InputStream stream;
         try {
             stream = fsm.getDownloadStream(item);
