@@ -40,4 +40,12 @@
             <to-view-id>/login.xhtml</to-view-id>
         </navigation-case>
     </navigation-rule>
+    <render-kit>
+        <renderer>
+            <component-family>org.primefaces.component</component-family>
+            <renderer-type>org.primefaces.component.FileUploadRenderer</renderer-type>
+            <renderer-class>cz.mrq.vocloud.fileupload.FileUploadRenderer</renderer-class>
+        </renderer>
+    </render-kit>
+
 </faces-config>

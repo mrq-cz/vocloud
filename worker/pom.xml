@@ -11,6 +11,7 @@
         <module>korel</module>
         <module>som</module>
         <module>rdf</module>
+        <module>preprocessing</module>
     </modules>
 
     <dependencies>
