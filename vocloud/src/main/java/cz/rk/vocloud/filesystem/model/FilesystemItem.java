@@ -16,6 +16,13 @@ public abstract class FilesystemItem implements Serializable{
     protected FilesystemItem(String name, String prefix){
         this.name = name.trim();
         this.prefix = prefix.trim();
+        //check prefix and name correctness
+        if (!isValidName(name)){
+            throw new IllegalArgumentException("Name of filesystem item is invalid: " + name);
+        }
+        if (prefix.contains(".")){
+            throw new IllegalArgumentException("Invalid use of . or .. in filesystem item prefix: " + prefix);
+        }
     }
     
     /**

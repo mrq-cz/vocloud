@@ -21,7 +21,7 @@
                     </p:commandButton>
                 </h:panelGrid>
             </h:form>
-            <h:form enctype="multipart/form-data;charset=UTF-8">
+            <h:form enctype="multipart/form-data;charset=UTF-8" acceptcharset="UTF-8">
                 <p:messages id="messages" autoUpdate="true" showSummary="false" showDetail="true" />
                 <p:fileUpload fileUploadListener="#{fileUploadBean.handleFileUpload}" mode="advanced" dragDropSupport="true"
                               multiple="true" update="messages" process="@form"/>

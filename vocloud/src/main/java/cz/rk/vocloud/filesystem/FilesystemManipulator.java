@@ -138,7 +138,7 @@ public class FilesystemManipulator {
     }
     
     public String saveUploadedFile(String folder, String fileName, InputStream fileStream) throws IOException{
-        System.out.println("folder: " + folder + "; fileName: " + fileName);
+//        System.out.println("folder: " + folder + "; fileName: " + fileName);
         File targetFile;
         int counter = 0;
         do {
