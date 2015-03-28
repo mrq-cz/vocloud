@@ -135,12 +135,19 @@ public class Job extends AbstractJob {
     }
 
     private boolean downloadFile(URL url, File file) {
+
         try (ReadableByteChannel rbc = Channels.newChannel(url.openStream());
             FileOutputStream fos = new FileOutputStream(file)) {
-            fos.getChannel().transferFrom(rbc, 0, 1 << 31);
+            long transferred = fos.getChannel().transferFrom(rbc, 0, 1 << 8);
+            long pos = transferred;
+            while(transferred > 0)
+            {
+                transferred = fos.getChannel().transferFrom(rbc, pos, 1 << 8);
+                pos += transferred;
+            }
             return true;
         } catch (IOException e) {
-            logger.log(Level.WARNING, "failed to download file", e);
+            logger.log(Level.WARNING, "failed to download file from url " + url, e);
             return false;
         }
     }
