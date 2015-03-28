@@ -40,4 +40,6 @@
             <to-view-id>/login.xhtml</to-view-id>
         </navigation-case>
     </navigation-rule>
+    
+
 </faces-config>

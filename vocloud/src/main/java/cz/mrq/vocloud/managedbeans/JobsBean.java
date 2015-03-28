@@ -65,6 +65,9 @@ public class JobsBean implements Serializable {
         }
         else if(selected.getJobType().equals("RDF")) {
             create = "create-rdf";
+        } else if(selected.getJobType().equals("Preprocessing"))
+        {
+            create = "create-preprocessing";
         }
 
         myNav.handleNavigation(FacesContext.getCurrentInstance(), "details", create);

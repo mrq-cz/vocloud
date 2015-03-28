@@ -89,6 +89,7 @@ public class Toolbox {
     }
 
     public static Boolean downloadFile(String address, File out) throws MalformedURLException {
+        Logger.getLogger(Toolbox.class.getName()).log(Level.WARNING, "Downloading from " + address);
         URL url = new URL(address);
         try (ReadableByteChannel rbc = Channels.newChannel(url.openStream());
                 FileOutputStream fos = new FileOutputStream(out)) {
@@ -99,7 +100,7 @@ public class Toolbox {
                 offset += downloaded;
             }
         } catch (IOException ex) {
-            Logger.getLogger(Toolbox.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Toolbox.class.getName()).log(Level.SEVERE, address, ex);
             return false;
         }
         return true;
