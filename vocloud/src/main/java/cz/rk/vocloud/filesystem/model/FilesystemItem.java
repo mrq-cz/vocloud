@@ -57,4 +57,8 @@ public abstract class FilesystemItem implements Serializable{
         return true;
     }
     
+    public String getCompletePath(){
+        return prefix + "/" + name;
+    }
+    
 }

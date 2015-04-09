@@ -8,6 +8,25 @@ import java.util.Date;
  */
 public class Folder extends FilesystemItem{
     
+    public static Folder createByFullPath(String folderPath){
+        if (folderPath == null){
+            throw new IllegalArgumentException("Folder path argument is null");
+        }
+        if (folderPath.trim().equals("")){
+            throw new IllegalArgumentException("Folder path argument is empty");
+        }
+        String[] splitArray = folderPath.split("/");
+        StringBuilder prefixBuilder = new StringBuilder();
+        if (splitArray.length > 1){
+            prefixBuilder.append(splitArray[0]);
+        }
+        for (int i = 1; i < splitArray.length - 1; i++){
+            prefixBuilder.append('/');
+            prefixBuilder.append(splitArray[i]);
+        }
+        return new Folder(splitArray[splitArray.length - 1], prefixBuilder.toString());
+    }
+    
     public Folder(String folderName, String relativeDir){
         super(folderName, relativeDir);
     }
@@ -26,6 +45,5 @@ public class Folder extends FilesystemItem{
     public boolean isFolder() {
         return true;
     }
-    
     
 }

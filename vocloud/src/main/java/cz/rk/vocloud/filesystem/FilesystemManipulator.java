@@ -154,4 +154,24 @@ public class FilesystemManipulator {
         counter--;
         return counter == 0 ? fileName : fileName + " (" + counter + ")";
     }
+    
+    /**
+     * 
+     * @param pathName
+     * @param fileStream
+     * @return If saved returns true, otherwise if already present false
+     * @throws IOException 
+     */
+    public boolean saveUploadedFileIfNotExists(String pathName, InputStream fileStream) throws IOException {
+        if (pathName.contains("..")){
+            throw new IllegalArgumentException("Char sequence .. is not supported");
+        }
+        File targetFile = filesystemDirectory.toPath().resolve(pathName).toFile();
+        if (targetFile.exists()){
+            return false;
+        }
+        BufferedInputStream bis = new BufferedInputStream(fileStream);
+        FileUtils.copyInputStreamToFile(bis, targetFile);
+        return true;
+    }
 }
