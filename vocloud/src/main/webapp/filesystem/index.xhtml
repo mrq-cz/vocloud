@@ -14,7 +14,7 @@
         <ui:define name="content">
             <h:form>
                 <p:breadCrumb model="#{filesystemViewBean.breadcrumbModel}"/>
-                <p:dataTable var="item" value="#{filesystemViewBean.filesystemItemList}">
+                <p:dataTable resizableColumns="true" var="item" value="#{filesystemViewBean.filesystemItemList}">
                     <p:column width="12">
                         <f:facet name="header">                            
                             <h:commandLink rendered="#{not filesystemViewBean.inRoot}" action="#{filesystemViewBean.goBack()}" styleClass="ui-icon ui-icon-arrowreturnthick-1-w" style="position:relative; left: -5px"/>

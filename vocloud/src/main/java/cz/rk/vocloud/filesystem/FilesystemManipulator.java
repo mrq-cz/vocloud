@@ -8,6 +8,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.InvalidPathException;
@@ -159,10 +160,11 @@ public class FilesystemManipulator {
      * 
      * @param pathName
      * @param fileStream
+     * @param close
      * @return If saved returns true, otherwise if already present false
      * @throws IOException 
      */
-    public boolean saveUploadedFileIfNotExists(String pathName, InputStream fileStream) throws IOException {
+    public boolean saveDownloadedFileIfNotExists(String pathName, InputStream fileStream, boolean close) throws IOException {
         if (pathName.contains("..")){
             throw new IllegalArgumentException("Character sequence .. is not supported");
         }
@@ -176,8 +178,35 @@ public class FilesystemManipulator {
         if (targetFile.exists()){
             return false;
         }
+        //mkdirs
+        if (targetFile.getParentFile() != null && !targetFile.getParentFile().exists()){
+            targetFile.getParentFile().mkdirs();
+        }
         BufferedInputStream bis = new BufferedInputStream(fileStream);
-        FileUtils.copyInputStreamToFile(bis, targetFile);
+        byte[] buffer = new byte[1048576];
+        int size;
+        try (FileOutputStream fos = new FileOutputStream(targetFile)){
+            while ((size = bis.read(buffer)) > 0){
+                fos.write(buffer, 0, size);
+            }
+        }
+        if (close){
+            bis.close();
+        }
         return true;
+    }
+    
+    public boolean fileExists(String pathName){
+        if (pathName.contains("..")){
+            throw new IllegalArgumentException("Character sequence .. is not supported");
+        }
+        //just to be sure
+        pathName = pathName.replaceAll("//", "/");
+        pathName = pathName.trim();
+        if (pathName.charAt(0) == '/'){
+            pathName = pathName.substring(1);
+        }
+        File targetFile = filesystemDirectory.toPath().resolve(pathName).toFile();
+        return targetFile.exists();
     }
 }

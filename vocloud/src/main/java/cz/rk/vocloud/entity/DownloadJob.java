@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -24,8 +25,9 @@ import javax.persistence.TemporalType;
  */
 @Vetoed
 @Entity
+@Table(name = "download_job")
 @NamedQueries({
-    @NamedQuery(name = "DownloadJob.findJobsInStates", query = "SELECT j FROM DownloadJob j WHERE j.state IN (:states)")
+    @NamedQuery(name = "DownloadJob.findJobsInStates", query = "SELECT j FROM DownloadJob j WHERE j.downloadState IN (:states)")
 })
 public class DownloadJob implements Serializable {
 
@@ -56,8 +58,8 @@ public class DownloadJob implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Basic(optional = false)
-    @Column(name = "state")
-    private DownloadState state;
+    @Column(name = "\"state\"")
+    private DownloadState downloadState;
 
     @Lob
     @Column(name = "log")
@@ -105,11 +107,11 @@ public class DownloadJob implements Serializable {
     }
 
     public DownloadState getState() {
-        return state;
+        return downloadState;
     }
 
     public void setState(DownloadState state) {
-        this.state = state;
+        this.downloadState = state;
     }
 
     public String getMessageLog() {
@@ -158,6 +160,8 @@ public class DownloadJob implements Serializable {
         final DownloadJob other = (DownloadJob) obj;
         return Objects.equals(this.id, other.id);
     }
+    
+    
     public void setPass(String pass) {
         this.pass = pass;
     }
