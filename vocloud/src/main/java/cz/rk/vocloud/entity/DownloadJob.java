@@ -63,6 +63,12 @@ public class DownloadJob implements Serializable {
     @Column(name = "log")
     private String messageLog;
 
+    @Column(name = "username")
+    private String username;
+    
+    @Column(name = "pass")
+    private String pass;
+    
     public DownloadJob() {
     }
 
@@ -122,6 +128,18 @@ public class DownloadJob implements Serializable {
         this.saveDir = saveDir;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPass() {
+        return pass;
+    }
+
     @Override
     public int hashCode() {
         int hash = 3;
@@ -140,5 +158,10 @@ public class DownloadJob implements Serializable {
         final DownloadJob other = (DownloadJob) obj;
         return Objects.equals(this.id, other.id);
     }
+    public void setPass(String pass) {
+        this.pass = pass;
+    }
+    
+    
 
 }

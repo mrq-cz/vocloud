@@ -59,6 +59,7 @@ public class DownloadManager {
         } catch (MalformedURLException ex) {
             return false;
         }
+        //clear downloadURL of doubleshashes
         DownloadJob job = djb.createNewDownloadJob(downloadURL, targetFolder);
         proc.processDownloadJob(job);//must get proxy business object to properly call async method
         return true;

@@ -164,8 +164,14 @@ public class FilesystemManipulator {
      */
     public boolean saveUploadedFileIfNotExists(String pathName, InputStream fileStream) throws IOException {
         if (pathName.contains("..")){
-            throw new IllegalArgumentException("Char sequence .. is not supported");
+            throw new IllegalArgumentException("Character sequence .. is not supported");
         }
+        //just to be sure
+        pathName = pathName.replaceAll("//", "/");
+        pathName = pathName.trim();
+        if (pathName.charAt(0) == '/'){
+            pathName = pathName.substring(1);
+        } 
         File targetFile = filesystemDirectory.toPath().resolve(pathName).toFile();
         if (targetFile.exists()){
             return false;
