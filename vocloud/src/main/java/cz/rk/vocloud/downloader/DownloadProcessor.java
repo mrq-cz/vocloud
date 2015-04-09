@@ -195,12 +195,12 @@ public class DownloadProcessor {
             return false;
         }
         String remoteFile = workingDir + "/" + file.getName();
-        boolean fileExists = fsm.fileExists(base + pathDirectoryCut(workingDir, directoryCut) + file.getName());
+        boolean fileExists = fsm.fileExists(base + pathDirectoryCut(workingDir, directoryCut) + "/" +  file.getName());
         if (fileExists) {
             downloadLog.append("File ").append(file.getName()).append(" already exists\n");
         } else {
             try {
-                boolean saveResult = fsm.saveDownloadedFileIfNotExists(base + pathDirectoryCut(workingDir, directoryCut) + file.getName(), ftp.retrieveFileStream(remoteFile), false);
+                boolean saveResult = fsm.saveDownloadedFileIfNotExists(base + pathDirectoryCut(workingDir, directoryCut) + "/" + file.getName(), ftp.retrieveFileStream(remoteFile), false);
                 if (!saveResult) {
                     downloadLog.append("File ").append(file.getName()).append(" already exists\n");//should not happen
                 }
