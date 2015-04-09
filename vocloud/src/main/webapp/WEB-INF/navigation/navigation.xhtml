@@ -14,6 +14,7 @@
                 <p:menuitem ajax="false" action="/jobs/create" value="#{bundle.MenuItemKorel}" />
                 <p:menuitem ajax="false" action="/jobs/create-som" value="#{bundle.MenuItemSOM}" />
                 <p:menuitem ajax="false" action="/jobs/create-rdf" value="#{bundle.MenuItemRDF}" />
+                <p:menuitem ajax="false" action="/jobs/create-preprocessing" value="#{bundle.MenuItemPreprocessing}" />
             </p:submenu>
             <p:menuitem rendered="#{request.remoteUser != null}" ajax="false" action="/settings" value="#{bundle.MenuItemSettings}" icon="ui-icon-gear" />                    
             <p:submenu rendered='#{request.isUserInRole("ADMIN")}' label="#{bundle.SubmenuAdmin}">
