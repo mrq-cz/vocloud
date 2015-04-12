@@ -24,7 +24,10 @@
                     <p:menuitem id="remoteDownloadBtn" action="remote-download" value="#{bundle.RemoteDownloadMenuItem}" icon="ui-icon-arrowthick-1-s">
                         <f:setPropertyActionListener target="#{requestScope['targetFolder']}" value="#{filesystemManageBean.prefix}" />
                     </p:menuitem>
-                    <p:menuitem id="SSAPDownloadBtn" value="#{bundle.SSAPDownloadMenuItem}" icon="ui-icon-arrowthick-1-s" />
+                    <p:menuitem id="SSAPDownloadBtn" action="ssap" value="#{bundle.SSAPDownloadMenuItem}" icon="ui-icon-arrowthick-1-s">
+                        <f:setPropertyActionListener target="#{requestScope['targetFolder']}" value="#{filesystemManageBean.prefix}" />
+                    </p:menuitem>
+
                 </p:menubar>
                 <p:overlayPanel id="newFolderPanel" for="newFolderBtn" hideEffect="fade">
                     <h:panelGrid columns="2" cellpadding="10" cellspacing="5">
