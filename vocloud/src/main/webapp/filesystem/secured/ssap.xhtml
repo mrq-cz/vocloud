@@ -28,7 +28,7 @@
                         <p:ajax process="@this" update="@form" />
                         <f:selectItem itemLabel="Upload VOTABLE file" itemValue="upload" />
                         <f:selectItem itemLabel="Remote VOTABLE download" itemValue="downloadResource" />
-                        <f:selectItem itemLabel="Direct VOTABLE input" itemValue="directInput" />
+                        <f:selectItem itemDisabled="true" itemLabel="Direct VOTABLE input" itemValue="directInput" />
                     </p:selectOneRadio>
                 </p:panel>
                 <p:panel header="Upload VOTABLE file" rendered="#{ssapBean.inputMethod eq 'upload'}">
@@ -43,7 +43,7 @@
                                 <p:outputLabel value="Processing uploaded file" />
                                 <h:graphicImage library="images" name="preloader.gif"/>
                             </h:panelGrid>
-                            <p:poll update="@form" widgetVar="poll" stop="#{not ssapBean.fileUploaded or ssapBean.votableParsed}"/>
+                            <p:poll update="@form" async="true" widgetVar="poll" process="@this" stop="#{not ssapBean.fileUploaded or ssapBean.votableParsed}"/>
                         </ui:fragment>
                         <ui:fragment rendered="#{ssapBean.votableParsed}">
                             <table cellspacing="2" cellpadding="10">
@@ -66,7 +66,30 @@
 
                 </p:panel>
                 <p:panel header="Remote VOTABLE download" rendered="#{ssapBean.inputMethod eq 'downloadResource'}">
-                    remote download
+                    <ui:fragment rendered="#{not ssapBean.fileDownloadSet}">
+                        <h:panelGrid columns="2" cellpadding="10" cellspacing="2">
+                            <p:outputLabel for="votableDownloadResourceUrl">URL address of SSAP query: </p:outputLabel>
+                            <p:inputText id="votableDownloadResourceUrl" required="true" requiredMessage="URL address of SSAP query must not be empty" value="#{ssapBean.downloadUrl}" validator="urlValidator" size="100"/>
+                        </h:panelGrid>
+                        <p:commandButton ajax="true" value="Load VOTABLE" action="#{ssapBean.downloadVotable()}" update="@form" async="true" />
+                    </ui:fragment>
+                    <ui:fragment rendered="#{ssapBean.fileDownloadSet and ssapBean.votableParsed}">
+                        <table cellspacing="2" cellpadding="10">
+                            <tbody>
+                                <ui:repeat value="#{ssapBean.processedFileInfo}" var="record">
+                                    <tr>
+                                        <td>
+                                            <h:outputText value="#{record.label}" />
+                                        </td>
+                                        <td>
+                                            <h:outputText value="#{record.value}" />
+                                        </td>
+                                    </tr>
+                                </ui:repeat>
+                            </tbody>
+                        </table>
+                        <p:commandButton ajax="true" value="Replace by new votable" actionListener="#{ssapBean.replaceDownloadedFile}" update="@form"/>
+                    </ui:fragment>
                 </p:panel>
                 <p:panel header="Direct VOTABLE input" rendered="#{ssapBean.inputMethod eq 'directInput'}">
                     direct input
@@ -97,6 +120,11 @@
                     </h:panelGrid>
                 </p:panel>
 
+                <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+
+                <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                    <p:graphicImage library="images" name="preloader.gif"/>
+                </p:dialog>
             </h:form>
         </ui:define>
     </ui:composition>

@@ -8,6 +8,9 @@ import cz.rk.vocloud.ssap.model.Option;
 import cz.rk.vocloud.ssap.model.Param;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +27,7 @@ import javax.faces.model.SelectItem;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.io.input.CountingInputStream;
 import org.primefaces.component.inputtext.InputText;
 import org.primefaces.component.selectonemenu.SelectOneMenu;
 import org.primefaces.event.FileUploadEvent;
@@ -44,17 +48,30 @@ public class SsapBean implements Serializable {
     private boolean votableParsed = false;
     private boolean datalinkAvailable = false;
 
-    private boolean fileUploaded = false;
+    private boolean fileUploaded = false;//upload method
+    private boolean fileDownloadSet = false;//remote download method
 
     private boolean allowDatalink = true;
 
-    private List<FileInfoValue> processedFileInfo;
+    private String downloadUrl;
+    private List<ResourceInfo> processedInfo;
     private IndexedSSAPVotable parsedVotable;
     private HtmlPanelGrid datalinkPanelGrid = new HtmlPanelGrid();
 
     @PostConstruct
     protected void init() {
         targetFolder = (String) FacesContext.getCurrentInstance().getExternalContext().getRequestMap().get("targetFolder");
+    }
+
+    private void resetVariables() {
+        this.fileUploaded = false;
+        this.fileDownloadSet = false;
+        this.votableParsed = false;
+        this.datalinkAvailable = false;
+        this.allowDatalink = true;
+        this.processedInfo = null;
+        this.parsedVotable = null;
+        this.downloadUrl = null;
     }
 
     public String getTargetFolder() {
@@ -78,16 +95,12 @@ public class SsapBean implements Serializable {
     }
 
     public void setInputMethod(String method) {
-        if (method.equals(this.inputMethod)){
+        if (method.equals(this.inputMethod)) {
             return;//nothing to change
         }
         this.inputMethod = method;
         //properly reset variables
-        votableParsed = false;
-        datalinkAvailable = false;
-        fileUploaded = false;
-        allowDatalink = true;
-        parsedVotable = null;
+        resetVariables();
     }
 
     public String getInputMethod() {
@@ -96,10 +109,10 @@ public class SsapBean implements Serializable {
 
     public void handleFileUpload(FileUploadEvent event) {
         fileUploaded = true;
-        processedFileInfo = new ArrayList<>();
+        processedInfo = new ArrayList<>();
         String fileName = new String(event.getFile().getFileName().getBytes(Charset.forName("ISO-8859-1")), Charset.forName("UTF-8"));//this encoding bug could be system specific! --need retest on other sys
-        processedFileInfo.add(new FileInfoValue("File name: ", fileName));
-        processedFileInfo.add(new FileInfoValue("File size: ", Toolbox.humanReadableByteCount(event.getFile().getSize(), false)));
+        processedInfo.add(new ResourceInfo("File name: ", fileName));
+        processedInfo.add(new ResourceInfo("File size: ", Toolbox.humanReadableByteCount(event.getFile().getSize(), false)));
         try {
             parsedVotable = VotableParser.parseVotable(event.getFile().getInputstream());
         } catch (IOException ex) {
@@ -114,28 +127,75 @@ public class SsapBean implements Serializable {
             return;
         }
         String queryStatus = parsedVotable.getQueryStatus();//can be null if votable has not the format defined by specification
-        processedFileInfo.add(new FileInfoValue("Votable query status: ", queryStatus == null ? "undefined" : queryStatus));
-        //forbid to continue if query status is error
-        if ("ERROR".equals(queryStatus)){
+        processedInfo.add(new ResourceInfo("Votable query status: ", queryStatus == null ? "undefined" : queryStatus));
+        //throw hint if query status is error
+        if ("ERROR".equals(queryStatus)) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Error query status", "Votable has ERROR status set"));
         }
-        processedFileInfo.add(new FileInfoValue("Record count: ", Integer.toString(parsedVotable.getRows().size())));
-        processedFileInfo.add(new FileInfoValue("Datalink: ", parsedVotable.isDatalinkAvailable() ? "available" : "not available"));
+        processedInfo.add(new ResourceInfo("Record count: ", Integer.toString(parsedVotable.getRows().size())));
+        processedInfo.add(new ResourceInfo("Datalink: ", parsedVotable.isDatalinkAvailable() ? "available" : "not available"));
         if (parsedVotable.isDatalinkAvailable()) {
-            processedFileInfo.add(new FileInfoValue("Datalink access url: ", parsedVotable.getDatalinkResourceUrl()));
+            processedInfo.add(new ResourceInfo("Datalink access url: ", parsedVotable.getDatalinkResourceUrl()));
             constructDatalinkPanelGrid();
             datalinkAvailable = true;
+        } else {
+            datalinkAvailable = false;
+            allowDatalink = false;
         }
         votableParsed = true;
     }
+    
+    public void downloadVotable(){
+        try {
+            fileDownloadSet = true;
+            HttpURLConnection conn = (HttpURLConnection) (new URL(downloadUrl).openConnection());
+            //setup processedInfo
+            processedInfo = new ArrayList<>();
+            processedInfo.add(new ResourceInfo("Resource url: ", downloadUrl));
+            CountingInputStream is = new CountingInputStream(conn.getInputStream());
+            //try to parse votable
+            parsedVotable = VotableParser.parseVotable(is);
+            String queryStatus = parsedVotable.getQueryStatus();
+            //throw hint if query status is error
+            processedInfo.add(new ResourceInfo("Votable query status: ", queryStatus == null ? "undefined" : queryStatus));
+            if ("ERROR".equals(queryStatus)){
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Error query status", "Votable has ERROR status set"));
+            }
+            processedInfo.add(new ResourceInfo("Downloaded size: ", Toolbox.humanReadableByteCount(is.getByteCount(), false)));
+            processedInfo.add(new ResourceInfo("Record count: ", Integer.toString(parsedVotable.getRows().size())));
+            processedInfo.add(new ResourceInfo("Datalink: ", parsedVotable.isDatalinkAvailable() ? "available" : "not available"));
+            if (parsedVotable.isDatalinkAvailable()) {
+                processedInfo.add(new ResourceInfo("Datalink access url: ", parsedVotable.getDatalinkResourceUrl()));
+                constructDatalinkPanelGrid();
+                datalinkAvailable = true;
+            } else {
+                datalinkAvailable = false;
+                allowDatalink = false;
+            }
+            votableParsed = true;
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(SsapBean.class.getName()).log(Level.SEVERE, null, ex);
+            //this should not happen thanks to validation
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Invalid format of URL address", "URL address is malformed"));
+            fileDownloadSet = false;
+        } catch (IOException ex){
+            Logger.getLogger(SsapBean.class.getName()).log(Level.WARNING, null, ex);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error in connection", "Connection to the resource failed"));
+            fileDownloadSet = false;
+        } catch (UnparseableVotableException ex) {
+            Logger.getLogger(SsapBean.class.getName()).log(Level.INFO, "Unparseable resource", ex);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Error parsing VOTABLE", "Unable to parse VOTABLE properly"));
+            fileDownloadSet = false;
+        }
+    }
 
-    public boolean hasSomeData(){
-        if (parsedVotable == null){
+    public boolean hasSomeData() {
+        if (parsedVotable == null) {
             return false;
         }
         return !parsedVotable.getRows().isEmpty();
     }
-    
+
     public boolean isVotableParsed() {
         return votableParsed;
     }
@@ -156,17 +216,16 @@ public class SsapBean implements Serializable {
         this.fileUploaded = fileUploaded;
     }
 
-    public List<FileInfoValue> getProcessedFileInfo() {
-        return processedFileInfo;
+    public List<ResourceInfo> getProcessedFileInfo() {
+        return processedInfo;
     }
 
     public void replaceUploadedFile() {
-        this.fileUploaded = false;
-        this.votableParsed = false;
-        this.datalinkAvailable = false;
-        this.allowDatalink = true;
-        this.processedFileInfo = null;
-        this.parsedVotable = null;
+        resetVariables();
+    }
+    
+    public void replaceDownloadedFile() {
+        resetVariables();
     }
 
     public boolean isAllowDatalink() {
@@ -212,7 +271,7 @@ public class SsapBean implements Serializable {
     }
 
     public void createDownloadTask() {
-        //TODO append message
+        //TODO implement
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         for (Param p : parsedVotable.getDatalinkInputParams()) {
             if (p.isIdParam()) {
@@ -232,12 +291,28 @@ public class SsapBean implements Serializable {
         this.datalinkPanelGrid = datalinkPanelGrid;
     }
 
-    public static class FileInfoValue {
+    public boolean isFileDownloadSet() {
+        return fileDownloadSet;
+    }
+
+    public void setFileDownloadSet(boolean fileDownloaded) {
+        this.fileDownloadSet = fileDownloaded;
+    }
+
+    public String getDownloadUrl() {
+        return downloadUrl;
+    }
+
+    public void setDownloadUrl(String downloadURL) {
+        this.downloadUrl = downloadURL;
+    }
+
+    public static class ResourceInfo implements Serializable{
 
         private final String label;
         private final String value;
 
-        public FileInfoValue(String label, String value) {
+        public ResourceInfo(String label, String value) {
             this.label = label;
             this.value = value;
         }
@@ -251,4 +326,5 @@ public class SsapBean implements Serializable {
         }
 
     }
+    
 }
