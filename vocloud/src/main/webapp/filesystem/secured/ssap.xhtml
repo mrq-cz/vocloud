@@ -21,7 +21,7 @@
                     </p:commandButton>
                 </h:panelGrid>
             </h:form>
-            <h:form enctype="multipart/form-data;charset=UTF-8" acceptcharset="UTF-8">
+            <h:form id="mainForm" enctype="multipart/form-data;charset=UTF-8" acceptcharset="UTF-8">
                 <p:messages />
                 <p:panel header="Select VOTABLE input method">
                     <p:selectOneRadio id="selectMethodRadio" value="#{ssapBean.inputMethod}" columns="1" layout="grid" required="true" requiredMessage="You must choose the input method">
@@ -38,14 +38,14 @@
                                       multiple="false" update="@form" process="@form"/>
                     </h:panelGrid>
                     <ui:fragment rendered="#{ssapBean.fileUploaded}">
-                        <ui:fragment rendered="#{not ssapBean.fileProcessed}">
+                        <ui:fragment rendered="#{not ssapBean.votableParsed}">
                             <h:panelGrid columns="2" cellpadding="10" cellspacing="2">
                                 <p:outputLabel value="Processing uploaded file" />
                                 <h:graphicImage library="images" name="preloader.gif"/>
                             </h:panelGrid>
-                            <p:poll update="@form" listener="#{ssapBean.test}" widgetVar="poll" stop="#{not ssapBean.fileUploaded or ssapBean.fileProcessed}"/>
+                            <p:poll update="@form" widgetVar="poll" stop="#{not ssapBean.fileUploaded or ssapBean.votableParsed}"/>
                         </ui:fragment>
-                        <ui:fragment rendered="#{ssapBean.fileProcessed}">
+                        <ui:fragment rendered="#{ssapBean.votableParsed}">
                             <table cellspacing="2" cellpadding="10">
                                 <tbody>
                                     <ui:repeat value="#{ssapBean.processedFileInfo}" var="record">
@@ -71,18 +71,31 @@
                 <p:panel header="Direct VOTABLE input" rendered="#{ssapBean.inputMethod eq 'directInput'}">
                     direct input
                 </p:panel>
-                <p:tab id="datalink" title="Datalink protocol options" rendered="#{ssapBean.votableParsed and ssapBean.datalinkAvailable}">
-                    <p:panel header="Datalink parameters specification" >
-                        datalink
-                    </p:panel>
-                </p:tab>
-                <p:tab id="confirmation" title="Confirmation"  rendered="#{ssapBean.votableParsed and ssapBean.datalinkSolved}">
-                    <p:panel header="Confirmation">
-                        confirmation
-                    </p:panel>
-                </p:tab>
 
+                <p:panel id="datalinkOptionsPanel" header="Datalink options" rendered="#{ssapBean.votableParsed and ssapBean.datalinkAvailable}">
+                    <h:panelGrid columns="2" cellpadding="10" cellspacing="2">
+                        <h:outputText value="Allow datalink protocol: " />
+                        <p:selectBooleanCheckbox value="#{ssapBean.allowDatalink}">
+                            <p:ajax process="@this" update="datalinkOptionsPanel,confirmationPanel" />
+                        </p:selectBooleanCheckbox>
+                    </h:panelGrid>
+                    <h:panelGrid rendered="#{ssapBean.allowDatalink}" binding="#{ssapBean.datalinkPanelGrid}" columns="2" cellpadding="10" cellspacing="2"/>
+                </p:panel>
+                <p:panel id="confirmationPanel" header="Download confirmation" rendered="#{ssapBean.votableParsed}">
+                    <h:panelGrid columns="2" cellpadding="10" cellspacing="2">
+                        <h:outputText value="Target download folder: " />
+                        <h:outputText value="/#{ssapBean.targetFolder}" />
 
+                        <h:outputText value="Download method: " />
+                        <h:outputText value="Datalink protocol" rendered="#{ssapBean.allowDatalink}" />
+                        <h:outputText value="Direct download with ACCREF value" rendered="#{not ssapBean.allowDatalink}" />
+
+                        <p:commandButton disabled="#{not ssapBean.hasSomeData()}" value="Create download task" ajax="true" update="@form" actionListener="#{ssapBean.createDownloadTask()}" />
+                        <p:commandButton ajax="false" value="Back to filesystem management" action="/filesystem/secured/index">
+                            <f:setPropertyActionListener target="#{requestScope['folderPrefix']}" value="#{ssapBean.targetFolder}"/>
+                        </p:commandButton>
+                    </h:panelGrid>
+                </p:panel>
 
             </h:form>
         </ui:define>
