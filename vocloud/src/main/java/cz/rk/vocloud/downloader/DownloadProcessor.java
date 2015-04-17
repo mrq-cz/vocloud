@@ -11,6 +11,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,7 +47,7 @@ public class DownloadProcessor {
     @EJB
     private FilesystemManipulator fsm;
 
-    //===============================ASYNCHRONOUS DOWNLOADING METHOD============
+    //==============================ASYNCHRONOUS DOWNLOADING METHODS============
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     @Asynchronous
     public void processDownloadJob(DownloadJob job) {
@@ -57,7 +58,7 @@ public class DownloadProcessor {
         djb.edit(job);
         boolean success = false;
         try {
-            success = startDownloading(job.getDownloadUrl(), job.getSaveDir(), downloadLog);
+            success = startDownloading(job.getDownloadUrl(), job.getSaveDir(), job.getFileName(), downloadLog);
         } catch (Exception ex) {
             LOG.log(Level.WARNING, "Runtime exception during job processing", ex);
             downloadLog.append("Runtime exception thrown\n").append(ex.toString()).append('\n');
@@ -71,8 +72,17 @@ public class DownloadProcessor {
             LOG.log(Level.INFO, "Download job {0} was finished with one or more exceptions", job.getDownloadUrl());
         }
         job.setFinishTime(new Date());
-        job.setMessageLog(downloadLog.toString());//todo
+        job.setMessageLog(downloadLog.toString());//todo create special object for logging and do not use simple stringbuilder class
         djb.edit(job);
+    }
+    
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+    @Asynchronous
+    public void processDownloadJobs(List<DownloadJob> jobs){
+        //synchronously delegate to processDownloadJob method
+        for (DownloadJob job: jobs){
+            processDownloadJob(job);//this method will be invoked synchronously - not called through proxy object
+        }
     }
 
     //=================================UTIL=====================================
@@ -91,8 +101,7 @@ public class DownloadProcessor {
 
     //==================================HTTP downloading========================
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-    private boolean processHttpLink(URL url, final int directoryCut, String saveDir, StringBuilder downloadLog) {
-//        System.out.println("processing " + url);
+    private boolean processHttpLink(URL url, final int directoryCut, String saveDir, StringBuilder downloadLog, String fileName) {
         boolean success = true;
         HttpURLConnection conn = null;
         try {
@@ -105,7 +114,6 @@ public class DownloadProcessor {
             String ct = conn.getContentType();
             String charset = null;
             if (ct == null) {
-//            System.err.println("Content type is null");
             } else {
                 String[] splitArray = ct.split(";");
                 ct = splitArray[0];
@@ -113,12 +121,10 @@ public class DownloadProcessor {
                     for (int i = 1; i < splitArray.length; i++) {
                         if (splitArray[i].contains("charset=")) {
                             charset = splitArray[i].replace("charset=", "").trim();
-//                        System.out.println("charset defined: " + charset);
                             break;
                         }
                     }
                 }
-//            System.out.println("Content type: " + ct);
             }
             if (ct != null && ct.equals("text/html")) {
                 //download recursively
@@ -138,22 +144,22 @@ public class DownloadProcessor {
                         continue;
                     }
                     queue.add(href);
-//                System.out.println("   " + href);
 
                 }
                 while (!queue.isEmpty()) {
                     try {
-                        if (!processHttpLink(new URL(queue.poll()), directoryCut, saveDir, downloadLog)) {
+                        if (!processHttpLink(new URL(queue.poll()), directoryCut, saveDir, downloadLog, null)) {
                             success = false;
                         }
                     } catch (IOException ex) {
                     }
                 }
             } else {
-                String fileName = pathDirectoryCut(conn.getURL().getPath().split("\\?")[0], directoryCut);
+                if (fileName == null){
+                    fileName = pathDirectoryCut(conn.getURL().getPath().split("\\?")[0], directoryCut);
+                }
                 if (fileName.equals("")) {
                     fileName = conn.getURL().getPath().split("\\?")[0].replaceAll("^.*/([^/]+)$", "$1");
-//                System.out.println("Filename " + fileName);
                 }
                 try {
                     fileName = URLDecoder.decode(fileName, "UTF-8");
@@ -304,7 +310,7 @@ public class DownloadProcessor {
 
     //===========================MAIN DOWNLOADING START POINT===================
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-    private boolean startDownloading(String link, String saveDir, StringBuilder downloadLog) {
+    private boolean startDownloading(String link, String saveDir, String fileName, StringBuilder downloadLog) {
         boolean resultSuccess = false;
         try {
             URL url = new URL(link);
@@ -317,7 +323,7 @@ public class DownloadProcessor {
             switch (url.getProtocol().toUpperCase()) {
                 case "HTTP":
                 case "HTTPS":
-                    resultSuccess = processHttpLink(url, directoryCut, saveDir, downloadLog);
+                    resultSuccess = processHttpLink(url, directoryCut, saveDir, downloadLog, fileName);
                     break;
                 case "FTP":
                     resultSuccess = processFtpLink(url, directoryCut, saveDir, downloadLog);

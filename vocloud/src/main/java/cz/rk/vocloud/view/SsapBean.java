@@ -1,6 +1,7 @@
 package cz.rk.vocloud.view;
 
 import cz.mrq.vocloud.tools.Toolbox;
+import cz.rk.vocloud.downloader.DownloadManager;
 import cz.rk.vocloud.ssap.UnparseableVotableException;
 import cz.rk.vocloud.ssap.VotableParser;
 import cz.rk.vocloud.ssap.model.IndexedSSAPVotable;
@@ -13,10 +14,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UISelectItems;
@@ -57,6 +61,10 @@ public class SsapBean implements Serializable {
     private List<ResourceInfo> processedInfo;
     private IndexedSSAPVotable parsedVotable;
     private HtmlPanelGrid datalinkPanelGrid = new HtmlPanelGrid();
+    
+    //download manager
+    @EJB
+    private DownloadManager downloadManager;
 
     @PostConstruct
     protected void init() {
@@ -151,7 +159,7 @@ public class SsapBean implements Serializable {
             HttpURLConnection conn = (HttpURLConnection) (new URL(downloadUrl).openConnection());
             //setup processedInfo
             processedInfo = new ArrayList<>();
-            processedInfo.add(new ResourceInfo("Resource url: ", downloadUrl));
+            processedInfo.add(new ResourceInfo("Resource url: ", "<a href=\"" + downloadUrl + "\" target=\"_blank\">" + downloadUrl + "</a>"));
             CountingInputStream is = new CountingInputStream(conn.getInputStream());
             //try to parse votable
             parsedVotable = VotableParser.parseVotable(is);
@@ -173,7 +181,7 @@ public class SsapBean implements Serializable {
                 allowDatalink = false;
             }
             votableParsed = true;
-        } catch (MalformedURLException ex) {
+        } catch (ClassCastException | MalformedURLException ex) {
             Logger.getLogger(SsapBean.class.getName()).log(Level.SEVERE, null, ex);
             //this should not happen thanks to validation
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Invalid format of URL address", "URL address is malformed"));
@@ -256,8 +264,12 @@ public class SsapBean implements Serializable {
                 SelectOneMenu menu = new SelectOneMenu();
                 menu.setId("datalinkProperty" + p.getName());
                 List<SelectItem> items = new ArrayList<>();
+                SelectItem item = new SelectItem();//null value
+                item.setValue("");
+                item.setLabel("Nothing selected");
+                items.add(item);
                 for (Option o : p.getOptions()) {
-                    SelectItem item = new SelectItem();
+                    item = new SelectItem();
                     item.setValue(o.getValue());
                     item.setLabel(o.getName());
                     items.add(item);
@@ -271,15 +283,32 @@ public class SsapBean implements Serializable {
     }
 
     public void createDownloadTask() {
-        //TODO implement
-        HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        for (Param p : parsedVotable.getDatalinkInputParams()) {
-            if (p.isIdParam()) {
-                continue;
+        boolean success = false;
+        if (!allowDatalink){
+            //download jobs through accref value
+            success = downloadManager.enqueueVotableAccrefDownload(parsedVotable, targetFolder);
+        } else {
+            //datalink is allowed
+            //first catch datalink parameters from the request
+            HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+            Map<String, String> paramMap = new HashMap<>();
+            for (Param p : parsedVotable.getDatalinkInputParams()) {
+                if (p.isIdParam()) {
+                    continue;
+                }
+                String value = request.getParameter("mainForm:datalinkProperty" + p.getName() + (p.getOptions().isEmpty() ? "" : "_input"));
+                //moreover select one menu has postfix _input at the end
+                if (value != null && !value.trim().equals("")){
+                    paramMap.put(p.getName(), value);
+                }
             }
-            String tmp = request.getParameter("mainForm:datalinkProperty" + p.getName() + (p.getOptions().isEmpty() ? "" : "_input"));
-            //moreover select one menu has postfix _input at the end
-            System.out.println("caught: " + tmp);
+            success = downloadManager.enqueueVotableDatalinkDownload(parsedVotable, paramMap, targetFolder);
+        }
+        if (success){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully enqueued", "Download task was successfully enqueued"));
+            resetVariables();
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error enqueuing new download task", "New download task was NOT successfully enqueued"));
         }
     }
 

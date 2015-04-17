@@ -37,7 +37,7 @@ public class DownloadJob implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Basic(optional = false)
     @Column(name = "create_time")
@@ -71,14 +71,17 @@ public class DownloadJob implements Serializable {
     @Column(name = "pass")
     private String pass;
     
+    @Column(name = "filename")
+    private String fileName;
+    
     public DownloadJob() {
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -164,6 +167,14 @@ public class DownloadJob implements Serializable {
     
     public void setPass(String pass) {
         this.pass = pass;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
     
     
