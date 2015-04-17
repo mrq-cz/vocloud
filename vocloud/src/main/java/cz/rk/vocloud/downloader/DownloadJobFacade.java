@@ -84,4 +84,11 @@ public class DownloadJobFacade extends AbstractFacade<DownloadJob> {
         return query.getResultList();
     }
     
+    public List<DownloadJob> findAllJobsPaginated(int offset, int count){
+        TypedQuery<DownloadJob> q = em.createNamedQuery("DownloadJob.findCreateDescOrdered", DownloadJob.class);
+        q.setFirstResult(offset);
+        q.setMaxResults(count);
+        return q.getResultList();
+    }
+    
 }

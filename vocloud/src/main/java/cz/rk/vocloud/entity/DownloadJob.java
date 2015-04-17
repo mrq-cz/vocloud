@@ -27,7 +27,8 @@ import javax.persistence.TemporalType;
 @Entity
 @Table(name = "download_job")
 @NamedQueries({
-    @NamedQuery(name = "DownloadJob.findJobsInStates", query = "SELECT j FROM DownloadJob j WHERE j.downloadState IN (:states)")
+    @NamedQuery(name = "DownloadJob.findJobsInStates", query = "SELECT j FROM DownloadJob j WHERE j.downloadState IN (:states)"),
+    @NamedQuery(name = "DownloadJob.findCreateDescOrdered", query = "SELECT j FROM DownloadJob j ORDER BY j.createTime DESC")
 })
 public class DownloadJob implements Serializable {
 

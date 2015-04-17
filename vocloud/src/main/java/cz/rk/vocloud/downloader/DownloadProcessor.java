@@ -72,15 +72,18 @@ public class DownloadProcessor {
             LOG.log(Level.INFO, "Download job {0} was finished with one or more exceptions", job.getDownloadUrl());
         }
         job.setFinishTime(new Date());
-        job.setMessageLog(downloadLog.toString());//todo create special object for logging and do not use simple stringbuilder class
+        String message = downloadLog.toString().trim();
+        if (!message.equals("")) {
+            job.setMessageLog(message);//todo create special object for logging and do not use simple stringbuilder class
+        }
         djb.edit(job);
     }
-    
+
     @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     @Asynchronous
-    public void processDownloadJobs(List<DownloadJob> jobs){
+    public void processDownloadJobs(List<DownloadJob> jobs) {
         //synchronously delegate to processDownloadJob method
-        for (DownloadJob job: jobs){
+        for (DownloadJob job : jobs) {
             processDownloadJob(job);//this method will be invoked synchronously - not called through proxy object
         }
     }
@@ -155,7 +158,7 @@ public class DownloadProcessor {
                     }
                 }
             } else {
-                if (fileName == null){
+                if (fileName == null) {
                     fileName = pathDirectoryCut(conn.getURL().getPath().split("\\?")[0], directoryCut);
                 }
                 if (fileName.equals("")) {
@@ -201,7 +204,7 @@ public class DownloadProcessor {
             return false;
         }
         String remoteFile = workingDir + "/" + file.getName();
-        boolean fileExists = fsm.fileExists(base + pathDirectoryCut(workingDir, directoryCut) + "/" +  file.getName());
+        boolean fileExists = fsm.fileExists(base + pathDirectoryCut(workingDir, directoryCut) + "/" + file.getName());
         if (fileExists) {
             downloadLog.append("File ").append(file.getName()).append(" already exists\n");
         } else {
