@@ -36,8 +36,6 @@ public class DownloadQueueBean implements Serializable{
             public List<DownloadJob> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
                 List<DownloadJob> jobs = djf.findAllJobsPaginated(first, pageSize);//sorting and filtering will not be used
                 model.setRowCount(djf.count());
-                System.out.println("Jobs count " + jobs.size());
-                System.out.println("Total count " + djf.count());
                 return jobs;
             }
         
