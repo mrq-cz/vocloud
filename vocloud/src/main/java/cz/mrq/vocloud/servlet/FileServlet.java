@@ -31,9 +31,11 @@ public class FileServlet extends HttpServlet {
 
     private static final int DEFAULT_BUFFER_SIZE = 10240;
 
+    @Override
     public void init() throws ServletException {
     }
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 

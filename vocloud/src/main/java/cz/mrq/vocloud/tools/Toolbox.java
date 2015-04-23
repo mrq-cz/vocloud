@@ -84,7 +84,8 @@ public class Toolbox {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.connect();
-
+        int responseCode = connection.getResponseCode();
+        connection.disconnect();
         return connection.getResponseCode();
     }
 

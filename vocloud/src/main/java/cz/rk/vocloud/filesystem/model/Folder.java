@@ -15,6 +15,10 @@ public class Folder extends FilesystemItem{
         if (folderPath.trim().equals("")){
             throw new IllegalArgumentException("Folder path argument is empty");
         }
+        folderPath = folderPath.replaceAll("\\\\", "/").replaceAll("//", "/");
+        if (folderPath.charAt(0) == '/'){
+            folderPath = folderPath.substring(1);
+        }
         String[] splitArray = folderPath.split("/");
         StringBuilder prefixBuilder = new StringBuilder();
         if (splitArray.length > 1){

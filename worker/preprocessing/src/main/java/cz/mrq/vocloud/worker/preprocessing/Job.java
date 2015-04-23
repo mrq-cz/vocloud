@@ -44,6 +44,11 @@ public class Job extends AbstractJob {
             } catch (MalformedURLException ex) {
                 throw new UWSException(UWSException.BAD_REQUEST, "ZIP input file address malformed.");
             }
+        } else if (additionalParameters.containsKey("config")) {
+            System.out.println("Printing config file");
+            String configFile = additionalParameters.get("config");
+            System.out.println(configFile);
+            throw new UWSException(UWSException.NOT_IMPLEMENTED, "Not implemented config file yet");
         } else {
             throw new UWSException(UWSException.BAD_REQUEST, "ZIP input file has to be specified.");
         }
@@ -64,9 +69,11 @@ public class Job extends AbstractJob {
         try {
             logger.info("downloading");
 
-            if (!downloadFile(zip, zipFile))
-            if (!downloadFile(new URL(zip.getProtocol(), owner, zip.getPort(), zip.getPath()), zipFile))
-                throw new Exception();
+            if (!downloadFile(zip, zipFile)) {
+                if (!downloadFile(new URL(zip.getProtocol(), owner, zip.getPort(), zip.getPath()), zipFile)) {
+                    throw new Exception();
+                }
+            }
         } catch (Exception e) {
             throw new UWSException(UWSException.BAD_REQUEST, "Cannot download ZIP file.");
         }
@@ -84,7 +91,7 @@ public class Job extends AbstractJob {
         }
 
         Process process = null;
-        ProcessBuilder pb = new ProcessBuilder("python3",Config.binariesLocation + "/run_preprocessing.py", "config.json");
+        ProcessBuilder pb = new ProcessBuilder("python3", Config.binariesLocation + "/run_preprocessing.py", "config.json");
         pb.directory(workingDir);
 
         try {
@@ -137,11 +144,10 @@ public class Job extends AbstractJob {
     private boolean downloadFile(URL url, File file) {
 
         try (ReadableByteChannel rbc = Channels.newChannel(url.openStream());
-            FileOutputStream fos = new FileOutputStream(file)) {
+                FileOutputStream fos = new FileOutputStream(file)) {
             long transferred = fos.getChannel().transferFrom(rbc, 0, 1 << 8);
             long pos = transferred;
-            while(transferred > 0)
-            {
+            while (transferred > 0) {
                 transferred = fos.getChannel().transferFrom(rbc, pos, 1 << 8);
                 pos += transferred;
             }

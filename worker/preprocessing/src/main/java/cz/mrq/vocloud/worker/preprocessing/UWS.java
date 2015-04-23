@@ -21,69 +21,69 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@WebServlet(name = "uws-preprocess",urlPatterns = {"/uws/*"})
+@WebServlet(name = "uws-preprocess", urlPatterns = {"/uws/*"})
 public class UWS extends HttpServlet {
 
     private static final long serialVersionUID = 2L;
     private static final Logger logger = Logger.getLogger(UWS.class.getName());
 
     protected QueuedBasicUWS<Job> uws;
-	protected File restoreFile;
+    protected File restoreFile;
 
-	@Override
-	public void init(ServletConfig config) throws ServletException {
-		super.init(config);
-		
-		ServletContext context = config.getServletContext();
-		
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+
+        ServletContext context = config.getServletContext();
+
         loadProperties(context);
-                
-		// Restore the last saved UWS, if any:
-		restoreFile = new File(context.getRealPath("/WEB-INF/"), "uwsRestore");
+
+        // Restore the last saved UWS, if any:
+        restoreFile = new File(context.getRealPath("/WEB-INF/"), "uwsRestore");
         try {
-		    uws = (QueuedBasicUWS<Job>) UWSToolBox.restoreUWS(restoreFile, true);
+            uws = (QueuedBasicUWS<Job>) UWSToolBox.restoreUWS(restoreFile, true);
         } catch (Exception e) {
             logger.log(Level.WARNING, "loading saved uws failed, creating new");
             uws = null;
         }
-		
-		// If no saved UWS has been found, initialize the UWS:
-		if (uws == null){
-			// Ensure the results directory is empty (this wont delete directories)
-			UWSToolBox.clearDirectory(Config.resultsDir);
-			
-			try{
-				// Create the UWS:
-				uws = new QueuedBasicUWS<>(Job.class, Config.maxJobs);
-				
-				// Set the destruction time for all jobs:
-				uws.getDestructionTimeController().setDefaultDestructionInterval(1, DateField.MONTH);
-				uws.getDestructionTimeController().setMaxDestructionInterval(1, DateField.MONTH);
-				
-				// Set the execution time for all jobs:
-				uws.getExecutionDurationController().setDefaultExecutionDuration(3600);
-				uws.getExecutionDurationController().setMaxExecutionDuration(3600);
-				
-				// Set the way the UWS must identify a user:
-				uws.setUserIdentifier(new UserIdentifier() {
-					private static final long serialVersionUID = 2L;
 
-					@Override
-					public String extractUserId(UWSUrl urlInterpreter, HttpServletRequest request) throws UWSException {
-						return request.getRemoteAddr();
-					}
-				});
-				
-				// Set a description:
-				uws.setDescription("UWS Preprocessing");
-				
-				// Create the job list "som":
-				uws.addJobList(new JobList<Job>("preprocess"));
-			}catch(UWSException ex){
-				throw new ServletException(ex);
-			}
-		}
-	}
+        // If no saved UWS has been found, initialize the UWS:
+        if (uws == null) {
+            // Ensure the results directory is empty (this wont delete directories)
+            UWSToolBox.clearDirectory(Config.resultsDir);
+
+            try {
+                // Create the UWS:
+                uws = new QueuedBasicUWS<>(Job.class, Config.maxJobs);
+
+                // Set the destruction time for all jobs:
+                uws.getDestructionTimeController().setDefaultDestructionInterval(1, DateField.MONTH);
+                uws.getDestructionTimeController().setMaxDestructionInterval(1, DateField.MONTH);
+
+                // Set the execution time for all jobs:
+                uws.getExecutionDurationController().setDefaultExecutionDuration(3600);
+                uws.getExecutionDurationController().setMaxExecutionDuration(3600);
+
+                // Set the way the UWS must identify a user:
+                uws.setUserIdentifier(new UserIdentifier() {
+                    private static final long serialVersionUID = 2L;
+
+                    @Override
+                    public String extractUserId(UWSUrl urlInterpreter, HttpServletRequest request) throws UWSException {
+                        return request.getRemoteAddr();
+                    }
+                });
+
+                // Set a description:
+                uws.setDescription("UWS Preprocessing");
+
+                // Create the job list "som":
+                uws.addJobList(new JobList<Job>("preprocess"));
+            } catch (UWSException ex) {
+                throw new ServletException(ex);
+            }
+        }
+    }
 
     private void loadProperties(ServletContext context) {
         Properties configFile = new Properties();
@@ -111,20 +111,20 @@ public class UWS extends HttpServlet {
         Config.binariesLocation = configFile.getProperty("binaries_location", Config.binariesLocation);
     }
 
-	@Override
-	public void destroy() {
-		// Save the current state of this UWS:
+    @Override
+    public void destroy() {
+        // Save the current state of this UWS:
         UWSToolBox.saveUWS(uws, restoreFile, true);
-		super.destroy();
-	}
+        super.destroy();
+    }
 
-	@Override
-	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		//logger.log(Level.INFO, "Executing service");
-		try {
-			uws.executeRequest(req, resp);
-		} catch(UWSException uwsEx) {
-			resp.sendError(uwsEx.getHttpErrorCode(), uwsEx.getMessage());
-		}
-	}
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        //logger.log(Level.INFO, "Executing service");
+        try {
+            uws.executeRequest(req, resp);
+        } catch (UWSException uwsEx) {
+            resp.sendError(uwsEx.getHttpErrorCode(), uwsEx.getMessage());
+        }
+    }
 }
