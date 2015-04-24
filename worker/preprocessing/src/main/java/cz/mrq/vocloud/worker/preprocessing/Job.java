@@ -44,11 +44,6 @@ public class Job extends AbstractJob {
             } catch (MalformedURLException ex) {
                 throw new UWSException(UWSException.BAD_REQUEST, "ZIP input file address malformed.");
             }
-        } else if (additionalParameters.containsKey("config")) {
-            System.out.println("Printing config file");
-            String configFile = additionalParameters.get("config");
-            System.out.println(configFile);
-            throw new UWSException(UWSException.NOT_IMPLEMENTED, "Not implemented config file yet");
         } else {
             throw new UWSException(UWSException.BAD_REQUEST, "ZIP input file has to be specified.");
         }

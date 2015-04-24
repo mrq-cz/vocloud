@@ -12,6 +12,7 @@
         <module>som</module>
         <module>rdf</module>
         <module>preprocessing</module>
+        <module>universal-worker</module>
     </modules>
 
     <dependencies>
