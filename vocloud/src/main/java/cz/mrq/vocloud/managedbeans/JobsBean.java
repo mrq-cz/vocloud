@@ -84,53 +84,53 @@ public class JobsBean implements Serializable {
         myNav.handleNavigation(FacesContext.getCurrentInstance(), "index", "details");
     }
 
-    public void start(ActionEvent e) {
-        selected = (Job) e.getComponent().getAttributes().get("selectedJob");
-        try {
-            jobFacade.start(selected);
-        } catch (Exception ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Cant start a job!", ex.toString()));
-            logger.log(Level.SEVERE, null, ex);
-        }
-        this.refresh();
-    }
-
-    public void abort(ActionEvent e) {
-        selected = (Job) e.getComponent().getAttributes().get("selectedJob");
-        try {
-            jobFacade.abort(selected);
-        } catch (Exception ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Cant abort a job!", ex.toString()));
-            logger.log(Level.SEVERE, null, ex);
-        }
-        this.refresh();
-    }
-
-    public void delete(ActionEvent e) {
-        if (selected == null) {
-            selected = (Job) e.getComponent().getAttributes().get("selectedJob");
-        }
-        String name = selected.getLabel();
-        jobFacade.delete(selected);
-
-        this.refresh();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "Job \"" + name + "\" has been deleted.", " "));
-    }
-
-    public void deleteSelected() {
-        if (selected == null) {
-            return;
-        }
-        jobFacade.delete(selected);
-
-        this.refresh();
-        // navigate back to the joblist
-        NavigationHandler myNav = FacesContext.getCurrentInstance().getApplication().getNavigationHandler();
-        myNav.handleNavigation(FacesContext.getCurrentInstance(), "details", "index");
-    }
+//    public void start(ActionEvent e) {
+//        selected = (Job) e.getComponent().getAttributes().get("selectedJob");
+//        try {
+//            jobFacade.start(selected);
+//        } catch (Exception ex) {
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                    "Cant start a job!", ex.toString()));
+//            logger.log(Level.SEVERE, null, ex);
+//        }
+//        this.refresh();
+//    }
+//
+//    public void abort(ActionEvent e) {
+//        selected = (Job) e.getComponent().getAttributes().get("selectedJob");
+//        try {
+//            jobFacade.abort(selected);
+//        } catch (Exception ex) {
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                    "Cant abort a job!", ex.toString()));
+//            logger.log(Level.SEVERE, null, ex);
+//        }
+//        this.refresh();
+//    }
+//
+//    public void delete(ActionEvent e) {
+//        if (selected == null) {
+//            selected = (Job) e.getComponent().getAttributes().get("selectedJob");
+//        }
+//        String name = selected.getLabel();
+//        jobFacade.delete(selected);
+//
+//        this.refresh();
+//        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+//                "Job \"" + name + "\" has been deleted.", " "));
+//    }
+//
+//    public void deleteSelected() {
+//        if (selected == null) {
+//            return;
+//        }
+//        jobFacade.delete(selected);
+//
+//        this.refresh();
+//        // navigate back to the joblist
+//        NavigationHandler myNav = FacesContext.getCurrentInstance().getApplication().getNavigationHandler();
+//        myNav.handleNavigation(FacesContext.getCurrentInstance(), "details", "index");
+//    }
 
     public void detailsPollListener() {
         selected = jobFacade.find(selected.getId());
@@ -173,51 +173,51 @@ public class JobsBean implements Serializable {
 
     }
 
-    /**
-     * get files of selected job (without 0 length files)
-     *
-     * @return
-     */
-    public List<File> getFiles() {
-        File[] listFiles = jobFacade.getFileDir(selected).listFiles();
-        List<File> files = new ArrayList<>();
-        if (listFiles != null) {
-            for (File f : listFiles) {
-                if (f.length() > 1 & !(f.getName().endsWith("png") || f.getName().endsWith("html") || f.isDirectory())) {
-                    files.add(f);
-                }
-            }
-        }
-        return files;
-    }
-
-    public List<File> getImages() {
-        File[] listFiles = jobFacade.getFileDir(selected).listFiles();
-        List<File> images = new ArrayList<>();
-        if (listFiles != null) {
-            for (File file : listFiles) {
-                if (file.getName().endsWith("png") & file.length() != 0) {
-                    images.add(file);
-                }
-            }
-        }
-        Collections.sort(images);
-        return images;
-    }
-
-    public List<File> getPages() {
-        File[] listFiles = jobFacade.getFileDir(selected).listFiles();
-        List<File> pages = new ArrayList<>();
-        if (listFiles != null) {
-            for (File file : listFiles) {
-                if ((file.getName().endsWith("html") || file.getName().endsWith("htm")) & file.length() != 0) {
-                    pages.add(file);
-                }
-            }
-        }
-        Collections.sort(pages);
-        return pages;
-    }
+//    /**
+//     * get files of selected job (without 0 length files)
+//     *
+//     * @return
+//     */
+//    public List<File> getFiles() {
+//        File[] listFiles = jobFacade.getFileDir(selected).listFiles();
+//        List<File> files = new ArrayList<>();
+//        if (listFiles != null) {
+//            for (File f : listFiles) {
+//                if (f.length() > 1 & !(f.getName().endsWith("png") || f.getName().endsWith("html") || f.isDirectory())) {
+//                    files.add(f);
+//                }
+//            }
+//        }
+//        return files;
+//    }
+//
+//    public List<File> getImages() {
+//        File[] listFiles = jobFacade.getFileDir(selected).listFiles();
+//        List<File> images = new ArrayList<>();
+//        if (listFiles != null) {
+//            for (File file : listFiles) {
+//                if (file.getName().endsWith("png") & file.length() != 0) {
+//                    images.add(file);
+//                }
+//            }
+//        }
+//        Collections.sort(images);
+//        return images;
+//    }
+//
+//    public List<File> getPages() {
+//        File[] listFiles = jobFacade.getFileDir(selected).listFiles();
+//        List<File> pages = new ArrayList<>();
+//        if (listFiles != null) {
+//            for (File file : listFiles) {
+//                if ((file.getName().endsWith("html") || file.getName().endsWith("htm")) & file.length() != 0) {
+//                    pages.add(file);
+//                }
+//            }
+//        }
+//        Collections.sort(pages);
+//        return pages;
+//    }
 
     public List<Job> getJobs() {
         return jobs;
@@ -258,27 +258,27 @@ public class JobsBean implements Serializable {
         this.selectedFile = selectedFile;
     }
 
-    public Long getUsedSize() {
-        if (jobFacade == null) {
-            return 0L;
-        }
-        return jobFacade.getSize(user);
-    }
+//    public Long getUsedSize() {
+//        if (jobFacade == null) {
+//            return 0L;
+//        }
+//        return jobFacade.getSize(user);
+//    }
 
-    public int getUsedPercent() {
-        if (user == null) {
-            return 0;
-        }
-        Long used = getUsedSize();
-        if (used == null) {
-            return 0;
-        }
-        return (int) (((float) used / (float) user.getQuota()) * 100);
-    }
+//    public int getUsedPercent() {
+//        if (user == null) {
+//            return 0;
+//        }
+//        Long used = getUsedSize();
+//        if (used == null) {
+//            return 0;
+//        }
+//        return (int) (((float) used / (float) user.getQuota()) * 100);
+//    }
 
-    public String getSpaceUsage() {
-        return Toolbox.humanReadableByteCount(getUsedSize(), true) + " / " + Toolbox.humanReadableByteCount(user.getQuota(), true);
-    }
+//    public String getSpaceUsage() {
+//        return Toolbox.humanReadableByteCount(getUsedSize(), true) + " / " + Toolbox.humanReadableByteCount(user.getQuota(), true);
+//    }
 
     public Poll getDetailsPoll() {
         return detailsPoll;

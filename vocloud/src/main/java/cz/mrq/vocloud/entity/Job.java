@@ -59,87 +59,86 @@ public class Job implements Serializable {
     private Phase phase;
     private String resultsEmail;
 
-    @Transient
-    private UWSJob uwsJob;
-    @Transient
-    private String uwsJobXml;
-    @Transient
-    private UWSParserManager parser;
-
-    /**
-     * updates attributes from local UWS job object (only if uwsjob isn't null
-     * obviously)
-     */
-    public void updateFromUWSJob() {
-        if (uwsJob != null) {
-            this.startedDate = uwsJob.getStartTime();
-            this.finishedDate = uwsJob.getEndTime();
-            this.remoteId = uwsJob.getJobId();
-            this.phase = uwsJob.getPhase();
-        } else {
-            Logger.getLogger(Job.class.getName()).warning("trying to update from non-existent uwsJob");
-        }
-    }
-
-    /**
-     * updates attributes according to data online on UWS server
-     */
-    public void updateFromUWS() {
-        if (uws == null || remoteId == null) {
-            return; // cant update without uws
-        }
-        String xml;
-        try {
-            xml = getUws().getJob(remoteId);
-        } catch (IOException ex) {
-            Logger.getLogger(Job.class.getName()).log(Level.SEVERE, "cannot update job", ex);
-            return;
-        }
-        uwsJobXml = xml;
-        uwsJob = getParser().parseJob(xml);
-        if (uwsJob == null) {
-            try {
-                Phase uwsPhase = getUws().getJobPhase(remoteId);
-                if (uwsPhase != null) {
-                    this.phase = uwsPhase;
-                }
-            } catch (IOException e) {
-                Logger.getLogger(Job.class.getName()).log(Level.SEVERE, "failed retrieving job phase", e);
-            }
-            return;
-        }
-        updateFromUWSJob();
-    }
-
-    public void start() throws IOException {
-        String output = getUws().startJob(remoteId);
-        uwsJob = getParser().parseJob(output);
-        updateFromUWSJob();
-    }
-
-    public void abort() throws IOException {
-        uwsJob = getParser().parseJob(getUws().abortJob(remoteId));
-        updateFromUWSJob();
-    }
-
-    public void destroyOnUWS() {
-        if (uws == null) {
-            return;
-        }
-        try {
-            getUws().destroyJob(remoteId);
-        } catch (IOException ex) {
-            Logger.getLogger(Job.class.getName()).log(Level.WARNING, "cant destroy job on UWS", ex.toString());
-        }
-    }
-
-    private UWSParserManager getParser() {
-        if (parser == null) {
-            parser = UWSParserManager.getInstance();
-        }
-        return parser;
-    }
-
+//    @Transient
+//    private UWSJob uwsJob;
+//    @Transient
+//    private String uwsJobXml;
+//    @Transient
+//    private UWSParserManager parser;
+//
+////    /**
+////     * updates attributes from local UWS job object (only if uwsjob isn't null
+////     * obviously)
+////     */
+////    public void updateFromUWSJob() {
+////        if (uwsJob != null) {
+////            this.startedDate = uwsJob.getStartTime();
+////            this.finishedDate = uwsJob.getEndTime();
+////            this.remoteId = uwsJob.getJobId();
+////            this.phase = uwsJob.getPhase();
+////        } else {
+////            Logger.getLogger(Job.class.getName()).warning("trying to update from non-existent uwsJob");
+////        }
+////    }
+////
+////    /**
+////     * updates attributes according to data online on UWS server
+////     */
+////    public void updateFromUWS() {
+////        if (uws == null || remoteId == null) {
+////            return; // cant update without uws
+////        }
+////        String xml;
+////        try {
+////            xml = getUws().getJob(remoteId);
+////        } catch (IOException ex) {
+////            Logger.getLogger(Job.class.getName()).log(Level.SEVERE, "cannot update job", ex);
+////            return;
+////        }
+////        uwsJobXml = xml;
+////        uwsJob = getParser().parseJob(xml);
+////        if (uwsJob == null) {
+////            try {
+////                Phase uwsPhase = getUws().getJobPhase(remoteId);
+////                if (uwsPhase != null) {
+////                    this.phase = uwsPhase;
+////                }
+////            } catch (IOException e) {
+////                Logger.getLogger(Job.class.getName()).log(Level.SEVERE, "failed retrieving job phase", e);
+////            }
+////            return;
+////        }
+////        updateFromUWSJob();
+////    }
+////
+////    public void start() throws IOException {
+////        String output = getUws().startJob(remoteId);
+////        uwsJob = getParser().parseJob(output);
+////        updateFromUWSJob();
+////    }
+////
+////    public void abort() throws IOException {
+////        uwsJob = getParser().parseJob(getUws().abortJob(remoteId));
+////        updateFromUWSJob();
+////    }
+////
+////    public void destroyOnUWS() {
+////        if (uws == null) {
+////            return;
+////        }
+////        try {
+////            getUws().destroyJob(remoteId);
+////        } catch (IOException ex) {
+////            Logger.getLogger(Job.class.getName()).log(Level.WARNING, "cant destroy job on UWS", ex.toString());
+////        }
+////    }
+////
+////    private UWSParserManager getParser() {
+////        if (parser == null) {
+////            parser = UWSParserManager.getInstance();
+////        }
+////        return parser;
+////    }
     public Boolean isCompleted() {
         return (this.phase == Phase.COMPLETED);
     }
@@ -229,14 +228,13 @@ public class Job implements Serializable {
         this.remoteId = remoteId;
     }
 
-    public UWSJob getUwsJob() {
-        return uwsJob;
-    }
-
-    public void setUwsJob(UWSJob uwsJob) {
-        this.uwsJob = uwsJob;
-    }
-
+//    public UWSJob getUwsJob() {
+//        return uwsJob;
+//    }
+//
+//    public void setUwsJob(UWSJob uwsJob) {
+//        this.uwsJob = uwsJob;
+//    }
     public Date getStartedDate() {
         return startedDate;
     }
@@ -266,10 +264,9 @@ public class Job implements Serializable {
         return (fd.getTime() - sd.getTime()) / 1000;
     }
 
-    public String getUwsJobXml() {
-        return uwsJobXml;
-    }
-
+//    public String getUwsJobXml() {
+//        return uwsJobXml;
+//    }
     @Override
     public int hashCode() {
         int hash = 0;
@@ -288,10 +285,7 @@ public class Job implements Serializable {
 
     @Override
     public String toString() {
-        return "Job{" + "id=" + id + ", label=" + label + ", notes=" + notes + ", owner=" + owner
-                + ", jobType=" + jobType + ", uws=" + uws + ", createdDate=" + createdDate
-                + ", finishedDate=" + finishedDate + ", remoteId=" + remoteId
-                + ", phase=" + phase + ", uwsJob=" + uwsJob + '}';
+        return "Job{" + "id=" + id + ", label=" + label + ", notes=" + notes + ", owner=" + owner + ", jobType=" + jobType + ", uws=" + uws + ", createdDate=" + createdDate + ", startedDate=" + startedDate + ", finishedDate=" + finishedDate + ", remoteId=" + remoteId + ", phase=" + phase + ", resultsEmail=" + resultsEmail + '}';
     }
     //</editor-fold>
 }

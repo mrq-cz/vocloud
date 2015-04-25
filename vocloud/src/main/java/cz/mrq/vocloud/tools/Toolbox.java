@@ -86,11 +86,11 @@ public class Toolbox {
         connection.connect();
         int responseCode = connection.getResponseCode();
         connection.disconnect();
-        return connection.getResponseCode();
+        return responseCode;
     }
 
     public static Boolean downloadFile(String address, File out) throws MalformedURLException {
-        Logger.getLogger(Toolbox.class.getName()).log(Level.WARNING, "Downloading from " + address);
+        Logger.getLogger(Toolbox.class.getName()).log(Level.WARNING, "Downloading from {0}", address);
         URL url = new URL(address);
         try (ReadableByteChannel rbc = Channels.newChannel(url.openStream());
                 FileOutputStream fos = new FileOutputStream(out)) {

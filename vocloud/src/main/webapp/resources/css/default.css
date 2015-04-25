@@ -64,3 +64,15 @@ a:link:hover, a:visited:hover  {
 .errorrow {
     background-color: #ffcccc;
 }
+
+.redRow {
+    background-color: #ff6363 !important;
+    background-image: none !important;
+    color: #000000 !important;
+}
+
+.greenRow {
+    background-color: #33ff66 !important;
+    background-image: none !important;
+    color: #000000 !important;
+}

@@ -13,14 +13,16 @@ import javax.faces.validator.ValidatorException;
  *
  * @author radio.koza
  */
-@FacesValidator
+@FacesValidator(value = "urlValidator")
 public class UrlValidator implements Validator {
 
     @Override
     public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
         StringBuilder url = new StringBuilder();
         String urlValue = value.toString();
-
+        if (urlValue.length() == 0){
+            return;
+        }
         if (!urlValue.startsWith("http://", 0) || !urlValue.startsWith("https://", 0)) {
             url.append("http://");
         }

@@ -58,9 +58,9 @@ public class SessionBean implements Serializable {
             if (lastLogin == null) {
                 last = "this is your first login";
                 // if first and no jobs, copy examples
-                if (jf.findByOwnerId(user).isEmpty()) {
-                    jf.prepareKorelJobExamples(user);
-                }
+//                if (jf.findByOwnerId(user).isEmpty()) {
+//                    jf.prepareKorelJobExamples(user);
+//                }
             } else {
                 last = u.getLastIp() + " (" + df.format(lastLogin) + ")";
             }

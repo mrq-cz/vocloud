@@ -43,14 +43,14 @@ public class CreateKorelJob extends CreateJob {
 
     @Override
     public void postInit() {
-        editParPanel.setCollapsed(true);
-        // read par file contents
-        for (File f : uploadedFiles) {
-            checkFileName(f.getName());
-        }
-        if (parent != null && par) {
-            setParFileContents(new File(jf.getFileDir(parent), "korel.par"));
-        }
+//        editParPanel.setCollapsed(true);
+//        // read par file contents
+//        for (File f : uploadedFiles) {
+//            checkFileName(f.getName());
+//        }
+//        if (parent != null && par) {
+//            setParFileContents(new File(jf.getFileDir(parent), "korel.par"));
+//        }
     }
 
     @Override
@@ -111,12 +111,12 @@ public class CreateKorelJob extends CreateJob {
 
     @Override
     public void handleSave() {
-        //replace korel.par by data from textfield
-        try {
-            FileUtils.writeStringToFile(new File(getJobFolder(), "korel.par"), getParFileContents());
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
+//        //replace korel.par by data from textfield
+//        try {
+//            FileUtils.writeStringToFile(new File(getJobFolder(), "korel.par"), getParFileContents());
+//        } catch (IOException ex) {
+//            logger.log(Level.SEVERE, null, ex);
+//        }
     }
 
     Boolean checkFileName(String fileName) {
@@ -135,14 +135,14 @@ public class CreateKorelJob extends CreateJob {
         return false;
     }
 
-    public String getParFileContents() {
-        if (parFileContents == null) {
-            if (parent != null) {
-                setParFileContents(new File(jf.getFileDir(parent), "korel.par"));
-            }
-        }
-        return parFileContents;
-    }
+//    public String getParFileContents() {
+//        if (parFileContents == null) {
+//            if (parent != null) {
+//                setParFileContents(new File(jf.getFileDir(parent), "korel.par"));
+//            }
+//        }
+//        return parFileContents;
+//    }
 
     public Boolean getDat() {
         return dat;

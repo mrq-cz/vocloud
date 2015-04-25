@@ -77,26 +77,26 @@ public abstract class CreateJob implements Serializable {
 
     @PostConstruct
     public void init() {
-
-        // if we are creating from other job, get parent
-        parent = (Job) FacesContext.getCurrentInstance().getAttributes().get("parent");
-
-        // copy values from parent
-        if (parent != null) {
-            job.setLabel(parent.getLabel() + " (copy)");
-            job.setNotes(parent.getNotes());
-
-            // add parameters
-            File dir = jf.getFileDir(parent);
-
-            File[] files = dir.listFiles();
-            if (files != null) {
-                for (File f : files) {
-                    uploadedFiles.add(f);
-                }
-            }
-            postInit();
-        }
+//
+//        // if we are creating from other job, get parent
+//        parent = (Job) FacesContext.getCurrentInstance().getAttributes().get("parent");
+//
+//        // copy values from parent
+//        if (parent != null) {
+//            job.setLabel(parent.getLabel() + " (copy)");
+//            job.setNotes(parent.getNotes());
+//
+//            // add parameters
+//            File dir = jf.getFileDir(parent);
+//
+//            File[] files = dir.listFiles();
+//            if (files != null) {
+//                for (File f : files) {
+//                    uploadedFiles.add(f);
+//                }
+//            }
+//            postInit();
+//        }
     }
 
     protected abstract void postInit();
@@ -133,116 +133,116 @@ public abstract class CreateJob implements Serializable {
      * creates job
      */
     public void save() {
-        FacesContext currentInstance = FacesContext.getCurrentInstance();
-
-        // check for free space
-        if (usb.getUser().getQuota() <= jf.getSize(usb.getUser())) {
-            logger.log(Level.SEVERE, "Job cant be created not enough user space");
-            currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Job could been created, you exceeded your disk quota.", "Please free some space first."));
-        }
-
-        // set owner and save to the database to get id
-        job.setOwner(usb.getUser());
-        job.setId(0L);
-        job.setCreatedDate(new Date());
-        jf.create(job);
-
-        // results email
-        if (email) {
-            job.setResultsEmail(usb.getUser().getEmail());
-        }
-
-        // create job folder and copy uploaded files there
-        getJobFolder().mkdirs();
-        for (File f : uploadedFiles) {
-            try {
-                if (f.exists()) {
-                    FileUtils.copyFileToDirectory(f, getJobFolder());
-                }
-            } catch (IOException ex) {
-                logger.log(Level.SEVERE, "cannot copy file", ex);
-            }
-        }
-
-        handleSave();
-
-        // prepare params
-        File parameters = prepareParameters();
-
-        // expose for download
-        String exposeLocal = currentInstance.getExternalContext().getRealPath("/") + "/download/" + tid;
-        File expose = new File(exposeLocal);
-        expose.mkdirs();
-        try {
-            FileUtils.copyFileToDirectory(parameters, expose);
-        } catch (IOException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Can't create job!", "Parameters file can't be exposed."));
-            logger.log(Level.SEVERE, null, ex);
-        }
-
-        String link = applicationAddress + "/download/" + tid + "/" + parameters.getName();
-
-        // find uws and create job there
-        job.setUws(uws.assign(job.getJobType()));
-
-        if (job.getUws() == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Can't create job!", "No worker is available."));
-            jf.delete(job);
-            return;
-        }
-
-        String param = "zip=" + link;
-        String reply;
-        try {
-            reply = job.getUws().createJob(param);
-        } catch (IOException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Can't create job!", "Job worker is unavailable."));
-            logger.log(Level.SEVERE, "cant create a job", ex);
-            jf.delete(job);
-            return;
-        }
-
-        // link up Job with UWSjob
-        UWSJob uwsJob = UWSParserManager.getInstance().parseJob(reply);
-        if (uwsJob == null || uwsJob.getJobId() == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Failed to create a job on worker '" + job.getUws().getLabel() + "' !",
-                    "Worker is probably not configured properly."));
-            logger.log(Level.SEVERE, "can't create job");
-            job.setPhase(Phase.ERROR);
-        }
-        job.setUwsJob(uwsJob);
-        job.updateFromUWSJob();
-
-        jf.edit(job);
-
-        // execute if wanted
-        if (run) {
-            try {
-                jf.start(job);
-            } catch (IOException ex) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Failed to start a job on worker '" + job.getUws().getLabel() + "' !", ex.getMessage()));
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            }
-        }
-
-        // refresh jobs bean (if exist)
-        JobsBean jb = (JobsBean) currentInstance.getExternalContext().getSessionMap().get("jobs");
-        if (jb != null) {
-            jb.refresh();
-        }
-
-        //navigate away
-        //currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Job created.", "New job '" + job.getLabel() + "' created."));
-        NavigationHandler myNav = currentInstance.getApplication().getNavigationHandler();
-        myNav.handleNavigation(currentInstance, "create", "index");
-
-        deleteTempFiles();
+//        FacesContext currentInstance = FacesContext.getCurrentInstance();
+//
+//        // check for free space
+//        if (usb.getUser().getQuota() <= jf.getSize(usb.getUser())) {
+//            logger.log(Level.SEVERE, "Job cant be created not enough user space");
+//            currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                    "Job could been created, you exceeded your disk quota.", "Please free some space first."));
+//        }
+//
+//        // set owner and save to the database to get id
+//        job.setOwner(usb.getUser());
+//        job.setId(0L);
+//        job.setCreatedDate(new Date());
+//        jf.create(job);
+//
+//        // results email
+//        if (email) {
+//            job.setResultsEmail(usb.getUser().getEmail());
+//        }
+//
+//        // create job folder and copy uploaded files there
+//        getJobFolder().mkdirs();
+//        for (File f : uploadedFiles) {
+//            try {
+//                if (f.exists()) {
+//                    FileUtils.copyFileToDirectory(f, getJobFolder());
+//                }
+//            } catch (IOException ex) {
+//                logger.log(Level.SEVERE, "cannot copy file", ex);
+//            }
+//        }
+//
+//        handleSave();
+//
+//        // prepare params
+//        File parameters = prepareParameters();
+//
+//        // expose for download
+//        String exposeLocal = currentInstance.getExternalContext().getRealPath("/") + "/download/" + tid;
+//        File expose = new File(exposeLocal);
+//        expose.mkdirs();
+//        try {
+//            FileUtils.copyFileToDirectory(parameters, expose);
+//        } catch (IOException ex) {
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                    "Can't create job!", "Parameters file can't be exposed."));
+//            logger.log(Level.SEVERE, null, ex);
+//        }
+//
+//        String link = applicationAddress + "/download/" + tid + "/" + parameters.getName();
+//
+//        // find uws and create job there
+//        job.setUws(uws.assign(job.getJobType()));
+//
+//        if (job.getUws() == null) {
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                    "Can't create job!", "No worker is available."));
+//            jf.delete(job);
+//            return;
+//        }
+//
+//        String param = "zip=" + link;
+//        String reply;
+//        try {
+//            reply = job.getUws().createJob(param);
+//        } catch (IOException ex) {
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                    "Can't create job!", "Job worker is unavailable."));
+//            logger.log(Level.SEVERE, "cant create a job", ex);
+//            jf.delete(job);
+//            return;
+//        }
+//
+//        // link up Job with UWSjob
+//        UWSJob uwsJob = UWSParserManager.getInstance().parseJob(reply);
+//        if (uwsJob == null || uwsJob.getJobId() == null) {
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                    "Failed to create a job on worker '" + job.getUws().getLabel() + "' !",
+//                    "Worker is probably not configured properly."));
+//            logger.log(Level.SEVERE, "can't create job");
+//            job.setPhase(Phase.ERROR);
+//        }
+//        job.setUwsJob(uwsJob);
+//        job.updateFromUWSJob();
+//
+//        jf.edit(job);
+//
+//        // execute if wanted
+//        if (run) {
+//            try {
+//                jf.start(job);
+//            } catch (IOException ex) {
+//                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                        "Failed to start a job on worker '" + job.getUws().getLabel() + "' !", ex.getMessage()));
+//                logger.log(Level.SEVERE, ex.getMessage(), ex);
+//            }
+//        }
+//
+//        // refresh jobs bean (if exist)
+//        JobsBean jb = (JobsBean) currentInstance.getExternalContext().getSessionMap().get("jobs");
+//        if (jb != null) {
+//            jb.refresh();
+//        }
+//
+//        //navigate away
+//        //currentInstance.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Job created.", "New job '" + job.getLabel() + "' created."));
+//        NavigationHandler myNav = currentInstance.getApplication().getNavigationHandler();
+//        myNav.handleNavigation(currentInstance, "create", "index");
+//
+//        deleteTempFiles();
     }
 
     protected abstract File prepareParameters();

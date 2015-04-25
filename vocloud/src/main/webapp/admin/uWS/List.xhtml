@@ -4,7 +4,7 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:pou="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui">
 
     <ui:composition template="/WEB-INF/template.xhtml">
         <ui:define name="title">
@@ -13,73 +13,128 @@
         <ui:define name="content">
             <h:form styleClass="jsfcrud_list_form">
                 <h:panelGroup id="messagePanel" layout="block">
-                    <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+                    <p:messages autoUpdate="true" showDetail="true"/>
                 </h:panelGroup>
-                <h:outputText escape="false" value="#{bundle.ListUWSEmpty}" rendered="#{uWSController.items.rowCount == 0}"/>
-                <h:panelGroup rendered="#{uWSController.items.rowCount > 0}">
-                    <h:outputText value="#{uWSController.pagination.pageFirstItem + 1}..#{uWSController.pagination.pageLastItem + 1}/#{uWSController.pagination.itemsCount}"/>&nbsp;
-                    <h:commandLink action="#{uWSController.previous}" value="#{bundle.Previous} #{uWSController.pagination.pageSize}" rendered="#{uWSController.pagination.hasPreviousPage}"/>&nbsp;
-                    <h:commandLink action="#{uWSController.next}" value="#{bundle.Next} #{uWSController.pagination.pageSize}" rendered="#{uWSController.pagination.hasNextPage}"/>&nbsp;
-                    <pou:dataTable value="#{uWSController.items}" var="item" >
+                <p:panel header="UWS types" toggleable="true">
+                    <h:outputText escape="false" value="(No UWS types found)" rendered="#{empty uWSController.uwsTypes}"/>
+                    <p:dataTable value="#{uWSController.uwsTypes}" var="item" rendered="#{not empty uWSController.uwsTypes}">
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Identifier" />
+                            </f:facet>
+                            <h:outputText value="#{item.stringIdentifier}" />
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Short description" />
+                            </f:facet>
+                            <h:outputText value="#{item.shortDescription}" />
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Managers only" />
+                            </f:facet>
+                            <h:outputText value="#{item.restricted}" />
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Documentation URL" />
+                            </f:facet>
+                            <h:outputText value="#{item.documentationUrl}" />
+                        </p:column>
+                        <p:column>
+                            <p:commandLink ajax="false" action="#{uWSController.uwsTypeView(item)}" value="#{bundle.ListUWSViewLink} "/>
+                            <p:commandLink ajax="false" action="#{uWSController.uwsTypeEdit(item)}" value="#{bundle.ListUWSEditLink} "/>
+                            <p:commandLink ajax="false" action="#{uWSController.uwsTypeDestroy(item)}" value="#{bundle.ListUWSDestroyLink}">
+                                <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-alert" />
+                            </p:commandLink>
+                        </p:column>
+                    </p:dataTable>
+                    <br />
+                    <p:commandLink ajax="false" value="Create new UWS Type" action="#{uWSController.uwsTypeCreateNew()}" />
+                </p:panel>
+                <p:panel header="Workers" toggleable="true">
+                    <h:outputText escape="false" value="(No Workers found)" rendered="#{empty uWSController.workers}"/>
+                    <p:dataTable value="#{uWSController.workers}" var="item" rendered="#{not empty uWSController.workers}">
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="ID" />
+                            </f:facet>
+                            <h:outputText value="#{item.id}" />
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Resource URL" />
+                            </f:facet>
+                            <h:outputText value="#{item.resourceUrl}" />
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Short description" />
+                            </f:facet>
+                            <h:outputText value="#{item.shortDescription}" />
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Max running jobs" />
+                            </f:facet>
+                            <h:outputText value="#{item.maxJobs}" />
+                        </p:column>
+                        <p:column>
+                            <p:commandLink ajax="false" action="#{uWSController.workerView(item)}" value="#{bundle.ListUWSViewLink} "/>
+                            <p:commandLink ajax="false" action="#{uWSController.workerEdit(item)}" value="#{bundle.ListUWSEditLink} "/>
+                            <p:commandLink ajax="false" action="#{uWSController.workerDestroy(item)}" value="#{bundle.ListUWSDestroyLink}">
+                                <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-alert" />
+                            </p:commandLink>
+                        </p:column>
+                    </p:dataTable>
+                    <br />
+                    <p:commandLink ajax="false" value="Create new Worker" action="#{uWSController.workerCreateNew()}" />
+                </p:panel>
 
-                        <pou:column>
+                <p:panel header="UWSs" toggleable="true">
+                    <h:outputText value="#{bundle.ListUWSEmpty}" rendered="#{empty uWSController.uwss}"/>
+                    <p:dataTable value="#{uWSController.uwss}" var="item" rendered="#{not empty uWSController.uwss}" rowStyleClass="#{item.enabled ? 'greenRow' : 'redRow'}">
+                        <p:column>
                             <f:facet name="header">
                                 <h:outputText value="#{bundle.ListUWSTitle_id}"/>
                             </f:facet>
                             <h:outputText value="#{item.id}"/>
-                        </pou:column>
-                        <pou:column>
+                        </p:column>
+                        <p:column>
                             <f:facet name="header">
                                 <h:outputText value="#{bundle.ListUWSTitle_enabled}"/>
                             </f:facet>
                             <h:outputText value="#{item.enabled}"/>
-                        </pou:column>
-                        <pou:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{bundle.ListUWSTitle_locationUrl}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.locationUrl}"/>
-                        </pou:column>
-                        <pou:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{bundle.ListUWSTitle_label}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.label}"/>
-                        </pou:column>
-                        <pou:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{bundle.ListUWSTitle_priority}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.priority}"/>
-                        </pou:column>
-                        <pou:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{bundle.ListUWSTitle_threads}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.threads}"/>
-                        </pou:column>
-                        <pou:column>
+                        </p:column>
+                        <p:column>
                             <f:facet name="header">
                                 <h:outputText value="#{bundle.ListUWSTitle_type}"/>
                             </f:facet>
-                            <h:outputText value="#{item.type}"/>
-                        </pou:column>
-                        <pou:column>
+                            <h:outputText value="#{item.uwsType.shortDescription}"/>
+                        </p:column>
+                        <p:column>
                             <f:facet name="header">
-                                <h:outputText value="&nbsp;"/>
+                                <h:outputText value="UWS URL"/>
                             </f:facet>
-                            <h:commandLink action="#{uWSController.prepareView}" value="#{bundle.ListUWSViewLink}"/>
-                            <h:outputText value=" "/>
-                            <h:commandLink action="#{uWSController.prepareEdit}" value="#{bundle.ListUWSEditLink}"/>
-                            <h:outputText value=" "/>
-                            <h:commandLink action="#{uWSController.destroy}" value="#{bundle.ListUWSDestroyLink}"/>
-                        </pou:column>
-                    </pou:dataTable>
+                            <h:outputText value="#{item.uwsUrl}"/>
+                        </p:column>
+                        <p:column>
+                            <p:commandLink ajax="false" action="#{uWSController.uwsView(item)}" value="#{bundle.ListUWSViewLink} "/>
+                            <p:commandLink ajax="false" action="#{uWSController.uwsEdit(item)}" value="#{bundle.ListUWSEditLink} "/>
+                            <p:commandLink ajax="false" action="#{uWSController.uwsDestroy(item)}" value="#{bundle.ListUWSDestroyLink}">
+                                <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-alert" />
+                            </p:commandLink>
+                        </p:column>
+                    </p:dataTable>
+                    <br />
+                    <p:commandLink ajax="false" action="#{uWSController.uwsCreateNew()}" value="#{bundle.ListUWSCreateLink}"/>
+                </p:panel>
 
-                </h:panelGroup>
-                <br />
-                <h:commandLink action="#{uWSController.prepareCreate}" value="#{bundle.ListUWSCreateLink}"/>
-
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                </p:confirmDialog>
             </h:form>
         </ui:define>
     </ui:composition>

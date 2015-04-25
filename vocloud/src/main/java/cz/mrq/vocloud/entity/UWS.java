@@ -1,78 +1,78 @@
 package cz.mrq.vocloud.entity;
 
-import cz.mrq.vocloud.tools.Toolbox;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.logging.Logger;
+import java.util.Objects;
 import javax.enterprise.inject.Vetoed;
 
 /**
  *
- * @author voadmin
+ * @author radio.koza
  */
 @Vetoed
 @Entity
 @NamedQueries({
     @NamedQuery(name = "UWS.findAll", query = "SELECT u FROM UWS u"),
     @NamedQuery(name = "UWS.findById", query = "SELECT u FROM UWS u WHERE u.id = :id"),
-    @NamedQuery(name = "UWS.findByEnabled", query = "SELECT u FROM UWS u WHERE u.enabled = :enabled"),
-    @NamedQuery(name = "UWS.findByLocationUrl", query = "SELECT u FROM UWS u WHERE u.locationUrl = :locationUrl"),
-    @NamedQuery(name = "UWS.findByLabel", query = "SELECT u FROM UWS u WHERE u.label = :label"),
-    @NamedQuery(name = "UWS.findByPriority", query = "SELECT u FROM UWS u WHERE u.priority = :priority"),
-    @NamedQuery(name = "UWS.findByThreads", query = "SELECT u FROM UWS u WHERE u.threads = :threads"),
-    @NamedQuery(name = "UWS.findByType", query = "SELECT u FROM UWS u WHERE u.jobType = :jobType")})
+    @NamedQuery(name = "UWS.findByEnabled", query = "SELECT u FROM UWS u WHERE u.enabled = :enabled")})
 public class UWS implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    @NotNull
-    @Size(min = 1, max = 255)
-    @Column(unique = true, nullable = false)
-    private String label;
-    @NotNull
-    @Size(max = 255)
-    private String jobType;
-    @NotNull
-    @Size(max = 255)
-    private String locationUrl;
-    @NotNull
+    @Column(nullable = false)
     private Boolean enabled;
-    private int priority;
-    private int threads;
 
-    public String startJob(String jobId) throws IOException {
-        return Toolbox.httpPost(locationUrl + "/" + jobId + "/phase?PHASE=RUN");
-    }
+    //definition of relations
+    @ManyToOne(optional = false)
+    private UWSType uwsType;
 
-    public String abortJob(String jobId) throws IOException {
-        return Toolbox.httpPost(locationUrl + "/" + jobId + "/phase?PHASE=ABORT");
-    }
+    @ManyToOne(optional = false)
+    private Worker worker;
 
-    public void destroyJob(String jobId) throws IOException {
-        Toolbox.httpPost(locationUrl + "/" + jobId + "/?ACTION=DELETE");
-    }
-
-    public String createJob(String parameters) throws IOException {
-        String req = locationUrl + "/?" + parameters;
-        Logger.getLogger(UWS.class.toString()).info("posting " + req);
-        return Toolbox.httpPost(req);
-    }
-
-    public String getJob(String jobId) throws IOException {
-        return Toolbox.httpGet(locationUrl + "/" + jobId);
-    }
-
-    public Phase getJobPhase(String jobId) throws IOException {
-        return Phase.getPhase(Toolbox.httpGet(locationUrl + "/" + jobId + "/phase").trim());
-    }
-
+    //=======================TODO move to facade!===============================
+//    public String startJob(String jobId) throws IOException {
+//        return Toolbox.httpPost(locationUrl + "/" + jobId + "/phase?PHASE=RUN");
+//    }
+//
+//    public String abortJob(String jobId) throws IOException {
+//        return Toolbox.httpPost(locationUrl + "/" + jobId + "/phase?PHASE=ABORT");
+//    }
+//
+//    public void destroyJob(String jobId) throws IOException {
+//        Toolbox.httpPost(locationUrl + "/" + jobId + "/?ACTION=DELETE");
+//    }
+//
+//    public String createJob(String parameters) throws IOException {
+//        String req = locationUrl + "/?" + parameters;
+//        Logger.getLogger(UWS.class.toString()).log(Level.INFO, "posting {0}", req);
+//        return Toolbox.httpPost(req);
+//    }
+//
+//    public String getJob(String jobId) throws IOException {
+//        return Toolbox.httpGet(locationUrl + "/" + jobId);
+//    }
+//
+//    public Phase getJobPhase(String jobId) throws IOException {
+//        return Phase.getPhase(Toolbox.httpGet(locationUrl + "/" + jobId + "/phase").trim());
+//    }
+    //========================/ end TODO========================================
     //<editor-fold defaultstate="collapsed" desc="getters setters...">
+    //define non-parametric constructor to fullfil specification of JPA entities
+    public UWS() {
+        //define enabled default true
+        this.enabled = true;
+    }
+
+    public UWS(UWSType uwsType, Worker worker) {
+        this.enabled = true; //enabled by default
+        this.uwsType = uwsType;
+        this.worker = worker;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -89,66 +89,54 @@ public class UWS implements Serializable {
         this.enabled = enabled;
     }
 
-    public String getLocationUrl() {
-        return locationUrl;
+    public UWSType getUwsType() {
+        return uwsType;
     }
 
-    public void setLocationUrl(String location) {
-        this.locationUrl = location;
+    public void setUwsType(UWSType uwsType) {
+        this.uwsType = uwsType;
     }
 
-    public String getLabel() {
-        return label;
+    public Worker getWorker() {
+        return worker;
     }
 
-    public void setLabel(String name) {
-        this.label = name;
+    public void setWorker(Worker worker) {
+        this.worker = worker;
     }
-
-    public int getPriority() {
-        return priority;
-    }
-
-    public void setPriority(int priority) {
-        this.priority = priority;
-    }
-
-    public int getThreads() {
-        return threads;
-    }
-
-    public void setThreads(int threads) {
-        this.threads = threads;
-    }
-
-    public String getType() {
-        return jobType;
-    }
-
-    public void setType(String type) {
-        this.jobType = type;
+    
+    public String getUwsUrl(){
+        if (uwsType == null || worker == null){
+            return null;
+        }
+        return worker.getResourceUrl() + '/' + uwsType.getStringIdentifier();
     }
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        int hash = 7;
+        hash = 83 * hash + Objects.hashCode(this.id);
         return hash;
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (!(object instanceof UWS)) {
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
         }
-        UWS other = (UWS) object;
-        return !((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id)));
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final UWS other = (UWS) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public String toString() {
-        return "entity.UWS[ id=" + id + " ]";
+        return "UWS{" + "id=" + id + ", enabled=" + enabled + ", uwsType=" + uwsType + ", worker=" + worker + '}';
     }
-    //</editor-fold>
 
 }

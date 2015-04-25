@@ -1,7 +1,6 @@
 package cz.rk.vocloud.worker;
 
 import cz.rk.vocloud.schema.Worker;
-import org.zeroturnaround.zip.ZipUtil;
 import uws.UWSException;
 import uws.job.AbstractJob;
 import uws.job.Result;
@@ -12,13 +11,13 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
+import org.zeroturnaround.zip.ZipUtil;
 
 /**
  *
@@ -31,16 +30,19 @@ public class Job extends AbstractJob {
     private static final String OUTPUT_FILE_NAME = "run.out";
     private static final String ERROR_FILE_NAME = "run.err";
     private static final String RETURN_FILE_NAME = "run.ret";
-
+    private static final String PROCESS_DATA_FOLDER_NAME = ".processData";
+    private static final String WORKING_DIR_NAME = "workingDir";
+    
     private String configFile;
     private File workingDir;
+    private File jobDir;
     private Worker workerSettings;
 
     private File outputFile;
     private File errorFile;
     private File returnFile;
 
-    private final Set<File> missedFilesList = new HashSet<>();
+    private final List<File> externalFiles = new ArrayList<>();
 
     public Job(Map<String, String> lstParam) throws UWSException {
         super(lstParam);
@@ -77,11 +79,16 @@ public class Job extends AbstractJob {
         }
         //define aborted variable
         Boolean aborted = false;
+        //create job directory
+        jobDir = new File(Config.resultsDir + "/" + getJobId());
+        jobDir.mkdirs();
         //create working directory
-        workingDir = new File(Config.resultsDir + "/" + getJobId());
-        workingDir.mkdirs();
+        workingDir = new File(jobDir, WORKING_DIR_NAME);
+        workingDir.mkdir();
+        File processDataDir = new File(workingDir, PROCESS_DATA_FOLDER_NAME);
+        processDataDir.mkdir();
         //print config file
-        File config = new File(workingDir, "config.json");
+        File config = new File(processDataDir, "config.json");
         try (FileOutputStream fos = new FileOutputStream(config)) {
             fos.write(configFile.getBytes(Charset.forName("UTF-8")));
         } catch (IOException ex) {
@@ -93,9 +100,9 @@ public class Job extends AbstractJob {
         downloadFiles(aborted);//extract them from config file
         // prepare output files
         try {
-            outputFile = new File(workingDir, OUTPUT_FILE_NAME);
-            errorFile = new File(workingDir, ERROR_FILE_NAME);
-            returnFile = new File(workingDir, RETURN_FILE_NAME);
+            outputFile = new File(processDataDir, OUTPUT_FILE_NAME);
+            errorFile = new File(processDataDir, ERROR_FILE_NAME);
+            returnFile = new File(processDataDir, RETURN_FILE_NAME);
             outputFile.createNewFile();
             errorFile.createNewFile();
             returnFile.createNewFile();
@@ -133,15 +140,15 @@ public class Job extends AbstractJob {
             LOG.log(Level.SEVERE, "error when executing job", e);
             throw new UWSException(UWSException.INTERNAL_SERVER_ERROR, e, "error when executing job");
         }
-        if (process == null){
+        if (process == null) {
             LOG.severe("Process was not started");
             throw new UWSException("Process was not started");
         }
         // write return code to the file
-        try (PrintStream ps = new PrintStream(returnFile)){
+        try (PrintStream ps = new PrintStream(returnFile)) {
             LOG.log(Level.INFO, "Process exit value: {0}", process.exitValue());
             ps.println(process.exitValue());
-        } catch (IOException ex){
+        } catch (IOException ex) {
             LOG.log(Level.SEVERE, null, ex);
             throw new UWSException(ex);
         }
@@ -163,7 +170,7 @@ public class Job extends AbstractJob {
         for (String command : commands) {
             tmp = command
                     .replace("${binaries-location}", workerSettings.getBinariesLocation())
-                    .replace("${config-file}", "config.json");
+                    .replace("${config-file}", PROCESS_DATA_FOLDER_NAME + "/config.json");
             resolved.add(tmp);
         }
         return resolved;
@@ -201,31 +208,22 @@ public class Job extends AbstractJob {
 
     @Override
     public void clearResources() {
-        // delete working dir
-        if (workingDir != null) {
-            for (File f : workingDir.listFiles()) {
-                f.delete();
-            }
-            boolean res = workingDir.delete();
-            if (!res) {
-                LOG.log(Level.WARNING, "Cannot delete working dir {0}", workingDir.toString());
-            }
+        try {
+            // delete working dir recursively
+            FileUtils.deleteDirectory(jobDir);
+        } catch (IOException ex) {
+            LOG.log(Level.WARNING, "Cannot delete job directory {0}", workingDir.toString());
         }
         super.clearResources();
     }
 
     private void prepareResults() throws UWSException {
-        File zip = new File(workingDir, "results.zip");
-        File[] workingDirFolder = workingDir.listFiles();
-        List<File> toBeZipped = new ArrayList<>();
-        for (File i: workingDirFolder){
-            if (!missedFilesList.contains(i)){
-                toBeZipped.add(i);
-            }
+        File zip = new File(jobDir, "results.zip");
+        //remove downloaded files
+        for (File f : externalFiles) {
+            f.delete();
         }
-        
-        ZipUtil.packEntries(toBeZipped.toArray(new File[0]), zip);
-
+        ZipUtil.pack(workingDir, zip);
         addResult(new Result("Results", "zip", Config.resultsLink + "/" + this.getJobId() + "/results.zip"));
     }
 }

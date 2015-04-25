@@ -8,7 +8,7 @@ import java.io.Serializable;
 import javax.enterprise.inject.Vetoed;
 
 /**
- * JobType
+ * JobType - still not used entity
  *
  * @author Lumir Mrkva (lumir@mrq.cz)
  */
