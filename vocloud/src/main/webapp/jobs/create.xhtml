@@ -4,14 +4,15 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:p="http://primefaces.org/ui"
-      >
+
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
 
     <body>
 
         <ui:composition template="./../WEB-INF/template.xhtml">
 
             <ui:define name="title">
-                Create new Korel job
+                <h:outputText value="Create new #{createJobBean.chosenUwsType.shortDescription} job" rendered="#{createJobBean.nonRestrictedUwsTypeFound}" />
             </ui:define>
 
             <ui:define name="messages">
@@ -19,6 +20,33 @@
             </ui:define>
 
             <ui:define name="content">
+                <f:metadata>
+                    <f:viewAction action="#{createJobBean.checkNonRestrictedParamValidity()}" />
+                </f:metadata>
+                <ui:fragment rendered="#{createJobBean.chosenUwsType.description != null}">
+                    <h4><h:outputText value="#{createJobBean.chosenUwsType.shortDescription}"/> description</h4>
+                    <div class="uwsTypeDescription">
+                        <h:outputText value="#{createJobBean.chosenUwsType.description}" />
+                    </div>
+                </ui:fragment>
+                <h:panelGrid columns="2" cellpadding="" cellspacing="2" rendered="#{createJobBean.chosenUwsType.documentationUrl != null}">
+                    <p:outputLabel value="Documentation URL: "/>
+                    <p:link target="_blank" href="#{createJobBean.chosenUwsType.documentationUrl}" value="#{createJobBean.chosenUwsType.documentationUrl}" />  
+                </h:panelGrid>
+                <h:form>
+                    <p:panel header="Job configuration">
+                        <h3>Upload JSON configuration file</h3>
+                        <p:fileUpload fileUploadListener="#{createJobBean.handleConfigUpload}" mode="advanced" dragDropSupport="true"
+                                      update="configTextArea" sizeLimit="500000" allowTypes="/(\.|\/)(txt|json)$/" />
+                        <h3>JSON configuration preview</h3>
+                        <p:inputTextarea id="configTextArea" rows="20" cols="100" maxlength="500000" value="#{createJobBean.configurationJson}" />
+                    </p:panel>
+                    <p:splitButton ajax="false" value="Save and run">
+                        <p:menuitem ajax="false" value="Save" />
+                    </p:splitButton>
+                    <p:commandButton ajax="false" value="Cancel" action="index?faces-redirect=true" />
+                </h:form>
+                <!--
                 <h:form enctype="multipart/form-data">
                     <h:panelGrid columns="2" style="padding-bottom: 20px">
                         <h:outputLabel style="font-weight: bold" value="Project label:" for="label" />
@@ -74,7 +102,7 @@
                         <p:menuitem update=":createMessages"  value="Save" action="#{createKorelJob.save}" />
                     </p:splitButton>
                     <p:commandButton ajax="false" value="Cancel" action="index.xhtml" />
-                </h:form>
+                </h:form>-->
             </ui:define>
 
         </ui:composition>

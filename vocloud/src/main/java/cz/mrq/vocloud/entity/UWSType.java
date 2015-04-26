@@ -22,7 +22,9 @@ import javax.validation.constraints.Size;
 @Vetoed
 @Entity
 @NamedQueries({
-    @NamedQuery(name = "UWSType.findAllByIdentifierOrdered", query = "SELECT t FROM UWSType t ORDER BY t.stringIdentifier")
+    @NamedQuery(name = "UWSType.findAllByIdentifierOrdered", query = "SELECT t FROM UWSType t ORDER BY t.stringIdentifier"),
+    @NamedQuery(name = "UWSType.findAllowedNonRestricted", query = "SELECT DISTINCT u.uwsType FROM UWS u WHERE u.enabled = TRUE AND u.uwsType.restricted = FALSE ORDER BY u.uwsType.shortDescription"),
+    @NamedQuery(name = "UWSType.findByStringIdentifier", query = "SELECT t FROM UWSType t WHERE t.stringIdentifier = :strId")
 })
 public class UWSType implements Serializable {
 
@@ -95,7 +97,10 @@ public class UWSType implements Serializable {
     }
 
     public void setShortDescription(String shortDescription) {
-        this.shortDescription = shortDescription;
+        this.shortDescription = shortDescription.trim();
+        if (this.shortDescription.length() == 0){
+            this.shortDescription = null;
+        }
     }
 
     public String getDescription() {
@@ -103,7 +108,10 @@ public class UWSType implements Serializable {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = description.trim();
+        if (this.description.length() == 0){
+            this.description = null;
+        }
     }
 
     public String getDocumentationUrl() {
