@@ -21,7 +21,9 @@ import javax.persistence.OneToMany;
 @Vetoed
 @Entity
 @NamedQueries({
-    @NamedQuery(name = "Worker.findAllByIdOrdered", query = "SELECT w FROM Worker w ORDER BY w.id")
+    @NamedQuery(name = "Worker.findAllByIdOrdered", query = "SELECT w FROM Worker w ORDER BY w.id"),
+    @NamedQuery(name = "Worker.findWorkersWithUwsType", query = "SELECT DISTINCT u.worker FROM UWS u WHERE :uwsType = u.uwsType"),
+    @NamedQuery(name = "Worker.countWorkerJobsInPhase", query = "SELECT COUNT(j) FROM Job j WHERE j.uws.worker = :worker AND j.phase = :phase")
 })
 public class Worker implements Serializable {
 

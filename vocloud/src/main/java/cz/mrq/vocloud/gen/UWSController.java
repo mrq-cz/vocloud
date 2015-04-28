@@ -113,14 +113,17 @@ public class UWSController implements Serializable {
 
     //==============================create new methods==========================
     public String uwsTypeCreateNew() {
+        editingUwsType = null;
         return "create-uws-type?faces-redirect=true";
     }
 
     public String workerCreateNew() {
+        editingWorker = null;
         return "create-worker?faces-redirect=true";
     }
 
     public String uwsCreateNew() {
+        editingUws = null;
         if (workers.isEmpty() && uwsTypes.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning", "You must first create UWS Type and Worker"));
         } else if (workers.isEmpty()) {

@@ -4,9 +4,12 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -33,16 +36,13 @@ public class Toolbox {
             throw new IOException(conn.getResponseMessage());
         }
 
-        // Buffer the result into a string
-        BufferedReader rd = new BufferedReader(
-                new InputStreamReader(conn.getInputStream()));
-
-        String line;
-        while ((line = rd.readLine()) != null) {
-            sb.append(line);
-            sb.append("\n");
+        try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            String line;
+            while ((line = rd.readLine()) != null) {
+                sb.append(line);
+                sb.append("\n");
+            }
         }
-        rd.close();
 
         conn.disconnect();
 
@@ -79,6 +79,37 @@ public class Toolbox {
         return sb.toString();
     }
 
+    public static String httpPostWithBody(String urlStr, Map<String, String> bodyParams) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        URL url = new URL(urlStr);
+        HttpURLConnection conn;
+        try {
+            conn = (HttpURLConnection) url.openConnection();
+        } catch (ClassCastException ex) {
+            throw new IOException(ex);
+        }
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        conn.setUseCaches(false);
+        conn.setDoInput(true);
+        conn.setDoOutput(true);
+        try (DataOutputStream dos = new DataOutputStream(conn.getOutputStream())) {
+            for (Map.Entry<String, String> entry : bodyParams.entrySet()) {
+                dos.write((entry.getKey() + "=").getBytes(Charset.forName("UTF-8")));
+                dos.write((URLEncoder.encode(entry.getValue(), "UTF-8") + "&").getBytes(Charset.forName("UTF-8")));
+            }
+            dos.flush();
+        }
+        try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            String line;
+            while ((line = rd.readLine()) != null) {
+                sb.append(line).append('\n');
+            }
+        }
+        conn.disconnect();
+        return sb.toString();
+    }
+
     public static int getResponseCode(String urlStr) throws IOException {
         URL url = new URL(urlStr);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -89,8 +120,8 @@ public class Toolbox {
         return responseCode;
     }
 
-    public static Boolean downloadFile(String address, File out) throws MalformedURLException {
-        Logger.getLogger(Toolbox.class.getName()).log(Level.WARNING, "Downloading from {0}", address);
+    public static boolean downloadFile(String address, File out) throws MalformedURLException {
+        Logger.getLogger(Toolbox.class.getName()).log(Level.INFO, "Downloading from {0}", address);
         URL url = new URL(address);
         try (ReadableByteChannel rbc = Channels.newChannel(url.openStream());
                 FileOutputStream fos = new FileOutputStream(out)) {

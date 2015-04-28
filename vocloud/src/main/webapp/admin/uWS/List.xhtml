@@ -115,6 +115,12 @@
                         </p:column>
                         <p:column>
                             <f:facet name="header">
+                                <h:outputText value="Worker"/>
+                            </f:facet>
+                            <h:outputText value="#{item.worker.shortDescription}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
                                 <h:outputText value="UWS URL"/>
                             </f:facet>
                             <h:outputText value="#{item.uwsUrl}"/>

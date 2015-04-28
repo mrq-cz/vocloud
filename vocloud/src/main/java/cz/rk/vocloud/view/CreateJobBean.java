@@ -1,6 +1,8 @@
 package cz.rk.vocloud.view;
 
+import cz.mrq.vocloud.ejb.JobFacade;
 import cz.mrq.vocloud.ejb.UWSTypeFacade;
+import cz.mrq.vocloud.entity.Job;
 import cz.mrq.vocloud.entity.UWSType;
 import java.io.IOException;
 import java.io.Serializable;
@@ -9,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.ejb.EJBException;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
@@ -27,11 +30,17 @@ public class CreateJobBean implements Serializable {
     private static final Logger LOG = Logger.getLogger(CreateJobBean.class.getName());
 
     @EJB
-    private UWSTypeFacade facade;
+    private UWSTypeFacade uwsTypeFacade;
+    @EJB
+    private JobFacade jobFacade;
 
     private UWSType chosenUwsType;
 
     private String configurationJson;
+
+    private String jobLabel;
+    private String jobNotes;
+    private boolean jobEmail;
 
     @PostConstruct
     private void init() {
@@ -40,7 +49,7 @@ public class CreateJobBean implements Serializable {
             //undefined param
             return;//page will be rendered with error message
         }
-        chosenUwsType = facade.findByStringIdentifier(uwsTypeStrId);
+        chosenUwsType = uwsTypeFacade.findByStringIdentifier(uwsTypeStrId);
     }
 
     public boolean isNonRestrictedUwsTypeFound() {
@@ -94,4 +103,47 @@ public class CreateJobBean implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
 
+    public String getJobLabel() {
+        return jobLabel;
+    }
+
+    public void setJobLabel(String jobLabel) {
+        this.jobLabel = jobLabel;
+    }
+
+    public String getJobNotes() {
+        return jobNotes;
+    }
+
+    public void setJobNotes(String jobNotes) {
+        this.jobNotes = jobNotes;
+    }
+
+    public boolean isJobEmail() {
+        return jobEmail;
+    }
+
+    public void setJobEmail(boolean jobEmail) {
+        this.jobEmail = jobEmail;
+    }
+
+    public String saveNewJob(boolean runImmediately) {
+        Job job = new Job();
+        job.setLabel(jobLabel);
+        if (jobNotes.length() > 0) {
+            job.setNotes(jobNotes);
+        }
+        job.setResultsEmail(jobEmail);
+        job.setUwsType(chosenUwsType);
+        job.setConfigurationJson(configurationJson);
+        try {
+            jobFacade.enqueueNewJob(job, runImmediately);
+        } catch (EJBException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Exception thrown during job enqueuing"));
+            return null;//no navigation
+        }
+        FacesContext.getCurrentInstance().getExternalContext().getFlash().setKeepMessages(true);//to survive redirect
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "New " + chosenUwsType.getShortDescription() + " job was successfully enqueued"));
+        return "index?faces-redirect=true";
+    }
 }

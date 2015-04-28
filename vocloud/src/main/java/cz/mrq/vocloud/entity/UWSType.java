@@ -38,8 +38,8 @@ public class UWSType implements Serializable {
     private String stringIdentifier;
     @Column(nullable = false, length = 100)
     private String shortDescription;//short description to be used instead of stringIdentifier
-    @Column(nullable = false, length = 1000) //max 1000 characters
-    private String description;//description of this uws type - mandatory
+    @Column(nullable = true, length = 1000) //max 1000 characters
+    private String description;//description of this uws type
     @Column(nullable = true, length = 255)
     private String documentationUrl;//url link to the documentation - nullable
     @Column(nullable = false)//must be defined
@@ -48,6 +48,8 @@ public class UWSType implements Serializable {
     //define relations
     @OneToMany(mappedBy = "uwsType")
     private List<UWS> uwsList = new ArrayList<>();//initialized to empty collection
+    @OneToMany(mappedBy = "uwsType")
+    private List<Job> jobs = new ArrayList<>();
 
     public UWSType() {
         //nothing to do here
@@ -98,7 +100,7 @@ public class UWSType implements Serializable {
 
     public void setShortDescription(String shortDescription) {
         this.shortDescription = shortDescription.trim();
-        if (this.shortDescription.length() == 0){
+        if (this.shortDescription.length() == 0) {
             this.shortDescription = null;
         }
     }
@@ -109,7 +111,7 @@ public class UWSType implements Serializable {
 
     public void setDescription(String description) {
         this.description = description.trim();
-        if (this.description.length() == 0){
+        if (this.description.length() == 0) {
             this.description = null;
         }
     }
@@ -118,7 +120,7 @@ public class UWSType implements Serializable {
         return documentationUrl;
     }
 
-    public void setDocumentationUrl(String documentationUrl) {        
+    public void setDocumentationUrl(String documentationUrl) {
         this.documentationUrl = documentationUrl.trim();
         if (this.documentationUrl.length() == 0) {
             this.documentationUrl = null;
@@ -139,6 +141,14 @@ public class UWSType implements Serializable {
 
     public void setUwsList(List<UWS> uwsList) {
         this.uwsList = uwsList;
+    }
+
+    public List<Job> getJobs() {
+        return jobs;
+    }
+
+    public void setJobs(List<Job> jobs) {
+        this.jobs = jobs;
     }
 
     @Override
@@ -164,7 +174,5 @@ public class UWSType implements Serializable {
     public String toString() {
         return "UWSType{" + "id=" + id + ", stringIdentifier=" + stringIdentifier + ", shortDescription=" + shortDescription + ", description=" + description + ", documentationUrl=" + documentationUrl + ", restricted=" + restricted + ", uwsList=" + uwsList + '}';
     }
-    
-    
 
 }

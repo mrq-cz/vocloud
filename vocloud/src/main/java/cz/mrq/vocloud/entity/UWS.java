@@ -1,8 +1,9 @@
 package cz.mrq.vocloud.entity;
 
-
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.enterprise.inject.Vetoed;
 
@@ -15,7 +16,8 @@ import javax.enterprise.inject.Vetoed;
 @NamedQueries({
     @NamedQuery(name = "UWS.findAll", query = "SELECT u FROM UWS u"),
     @NamedQuery(name = "UWS.findById", query = "SELECT u FROM UWS u WHERE u.id = :id"),
-    @NamedQuery(name = "UWS.findByEnabled", query = "SELECT u FROM UWS u WHERE u.enabled = :enabled")})
+    @NamedQuery(name = "UWS.findByEnabled", query = "SELECT u FROM UWS u WHERE u.enabled = :enabled"),
+})
 public class UWS implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -33,35 +35,13 @@ public class UWS implements Serializable {
     @ManyToOne(optional = false)
     private Worker worker;
 
-    //=======================TODO move to facade!===============================
-//    public String startJob(String jobId) throws IOException {
-//        return Toolbox.httpPost(locationUrl + "/" + jobId + "/phase?PHASE=RUN");
-//    }
-//
-//    public String abortJob(String jobId) throws IOException {
-//        return Toolbox.httpPost(locationUrl + "/" + jobId + "/phase?PHASE=ABORT");
-//    }
-//
-//    public void destroyJob(String jobId) throws IOException {
-//        Toolbox.httpPost(locationUrl + "/" + jobId + "/?ACTION=DELETE");
-//    }
-//
-//    public String createJob(String parameters) throws IOException {
-//        String req = locationUrl + "/?" + parameters;
-//        Logger.getLogger(UWS.class.toString()).log(Level.INFO, "posting {0}", req);
-//        return Toolbox.httpPost(req);
-//    }
-//
-//    public String getJob(String jobId) throws IOException {
-//        return Toolbox.httpGet(locationUrl + "/" + jobId);
-//    }
-//
-//    public Phase getJobPhase(String jobId) throws IOException {
-//        return Phase.getPhase(Toolbox.httpGet(locationUrl + "/" + jobId + "/phase").trim());
-//    }
-    //========================/ end TODO========================================
+    @OneToMany(mappedBy = "uws")
+    private List<Job> jobs = new ArrayList<>();
+
+
     //<editor-fold defaultstate="collapsed" desc="getters setters...">
     //define non-parametric constructor to fullfil specification of JPA entities
+
     public UWS() {
         //define enabled default true
         this.enabled = true;
@@ -104,12 +84,20 @@ public class UWS implements Serializable {
     public void setWorker(Worker worker) {
         this.worker = worker;
     }
-    
-    public String getUwsUrl(){
-        if (uwsType == null || worker == null){
+
+    public String getUwsUrl() {
+        if (uwsType == null || worker == null) {
             return null;
         }
         return worker.getResourceUrl() + '/' + uwsType.getStringIdentifier();
+    }
+
+    public List<Job> getJobs() {
+        return jobs;
+    }
+
+    public void setJobs(List<Job> jobs) {
+        this.jobs = jobs;
     }
 
     @Override
@@ -128,10 +116,7 @@ public class UWS implements Serializable {
             return false;
         }
         final UWS other = (UWS) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.id, other.id);
     }
 
     @Override

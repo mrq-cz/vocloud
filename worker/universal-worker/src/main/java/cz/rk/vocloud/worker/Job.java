@@ -56,6 +56,9 @@ public class Job extends AbstractJob {
             configFile = additionalParameters.get("config");//could be big file - remove from map
             additionalParameters.remove("config");
         } else {
+            for (Map.Entry<String, String> i: additionalParameters.entrySet()){
+                System.out.println("key: |" + i.getKey() + "|");
+            }
             throw new UWSException(UWSException.BAD_REQUEST, "Config file has to be specified.");
         }
         return true;

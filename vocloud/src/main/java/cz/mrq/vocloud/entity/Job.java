@@ -1,15 +1,12 @@
 package cz.mrq.vocloud.entity;
 
-import cz.mrq.vocloud.uwsparser.UWSParserManager;
 import cz.mrq.vocloud.uwsparser.model.UWSJob;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.logging.Level;
+import java.util.Objects;
 import java.util.logging.Logger;
 import javax.enterprise.inject.Vetoed;
 
@@ -24,13 +21,14 @@ import javax.enterprise.inject.Vetoed;
     @NamedQuery(name = "Job.findById", query = "SELECT j FROM Job j WHERE j.id = :id"),
     @NamedQuery(name = "Job.findByCreatedDate", query = "SELECT j FROM Job j WHERE j.createdDate = :createdDate"),
     @NamedQuery(name = "Job.findByFinishedDate", query = "SELECT j FROM Job j WHERE j.finishedDate = :finishedDate"),
-    @NamedQuery(name = "Job.findByJobtype", query = "SELECT j FROM Job j WHERE j.jobType = :jobType"),
     @NamedQuery(name = "Job.findByLabel", query = "SELECT j FROM Job j WHERE j.label = :label"),
     @NamedQuery(name = "Job.findByNotes", query = "SELECT j FROM Job j WHERE j.notes = :notes"),
     @NamedQuery(name = "Job.findByPhase", query = "SELECT j FROM Job j WHERE j.phase = :phase"),
     @NamedQuery(name = "Job.findByOwnerId", query = "SELECT j FROM Job j WHERE j.owner = :owner"),
-    @NamedQuery(name = "Job.userJobList", query = "SELECT j FROM Job j WHERE j.owner = :owner ORDER BY j.id DESC"),
-    @NamedQuery(name = "Job.findByRemoteId", query = "SELECT j FROM Job j WHERE j.remoteId = :remoteId")})
+    @NamedQuery(name = "Job.userJobList", query = "SELECT j FROM Job j WHERE j.owner = :owner ORDER BY j.createdDate DESC"),
+    @NamedQuery(name = "Job.findByRemoteId", query = "SELECT j FROM Job j WHERE j.remoteId = :remoteId"),
+    @NamedQuery(name = "Job.countUserJobs", query = "SELECT COUNT(j) FROM Job j WHERE j.owner = :owner")
+})
 public class Job implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -38,27 +36,38 @@ public class Job implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @NotNull
+    @Size(max = 100)
+    @Column(nullable = false, length = 100)
     private String label;
+
     @Size(max = 2048)
     @Column(length = 2048)
     private String notes;
-    @JoinColumn(name = "owner_id", referencedColumnName = "id")
-    @ManyToOne
-    private UserAccount owner;
-    private String jobType;
-    @JoinColumn(name = "uws_id", referencedColumnName = "id", nullable = true)
-    @ManyToOne
-    private UWS uws;
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
-    private Date createdDate;
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
-    private Date startedDate;
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
-    private Date finishedDate;
-    private String remoteId;
-    private Phase phase;
-    private String resultsEmail;
 
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    private Date createdDate;//assigned by vocloud
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    private Date startedDate;//value from worker
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    private Date finishedDate;//value from worker
+
+    private String remoteId;//id of the job on the worker
+    @Enumerated(EnumType.STRING)
+    private Phase phase;
+    @Column(nullable = false)
+    private Boolean resultsEmail;//flag if user should be informed in email about end of job
+    @ManyToOne(optional = false)
+    private UserAccount owner;
+    @ManyToOne
+    private UWS uws;//TODO uws is assigned in pending phase despite option to run immediately
+    @ManyToOne(optional = false)
+    private UWSType uwsType;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(nullable = false)
+    private String configurationJson;
+    
 //    @Transient
 //    private UWSJob uwsJob;
 //    @Transient
@@ -66,20 +75,21 @@ public class Job implements Serializable {
 //    @Transient
 //    private UWSParserManager parser;
 //
-////    /**
-////     * updates attributes from local UWS job object (only if uwsjob isn't null
-////     * obviously)
-////     */
-////    public void updateFromUWSJob() {
-////        if (uwsJob != null) {
-////            this.startedDate = uwsJob.getStartTime();
-////            this.finishedDate = uwsJob.getEndTime();
-////            this.remoteId = uwsJob.getJobId();
-////            this.phase = uwsJob.getPhase();
-////        } else {
-////            Logger.getLogger(Job.class.getName()).warning("trying to update from non-existent uwsJob");
-////        }
-////    }
+    /**
+     * updates attributes from local UWS job object (only if uwsjob isn't null
+     * obviously)
+     * @param uwsJob
+     */
+    public void updateFromUWSJob(UWSJob uwsJob) {
+        if (uwsJob != null) {
+            this.startedDate = uwsJob.getStartTime();
+            this.finishedDate = uwsJob.getEndTime();
+            this.remoteId = uwsJob.getJobId();
+            this.phase = uwsJob.getPhase();
+        } else {
+            Logger.getLogger(Job.class.getName()).warning("trying to update from non-existent uwsJob");
+        }
+    }
 ////
 ////    /**
 ////     * updates attributes according to data online on UWS server
@@ -139,45 +149,34 @@ public class Job implements Serializable {
 ////        }
 ////        return parser;
 ////    }
-    public Boolean isCompleted() {
+    public boolean isCompleted() {
         return (this.phase == Phase.COMPLETED);
     }
 
-    //<editor-fold defaultstate="collapsed" desc="getters & setters">
+    /**
+     * Returns execution time in seconds.
+     *
+     * @return Execution time in seconds.
+     */
+    public long getExecutingTime() {
+        Date sd = startedDate;
+        Date fd = finishedDate;
+        if (sd == null) {
+            return 0;
+        }
+        if (fd == null) {
+            sd = createdDate;
+            fd = new Date();
+        }
+        return (fd.getTime() - sd.getTime()) / 1000;
+    }
+
     public Long getId() {
         return id;
     }
 
-    public String getStringId() {
-        return id.toString();
-    }
-
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Date getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public Date getFinishedDate() {
-        return finishedDate;
-    }
-
-    public void setFinishedDate(Date finishedDate) {
-        this.finishedDate = finishedDate;
-    }
-
-    public String getJobType() {
-        return jobType;
-    }
-
-    public void setJobType(String jobType) {
-        this.jobType = jobType;
     }
 
     public String getLabel() {
@@ -196,12 +195,36 @@ public class Job implements Serializable {
         this.notes = notes;
     }
 
-    public UserAccount getOwner() {
-        return owner;
+    public Date getCreatedDate() {
+        return createdDate;
     }
 
-    public void setOwner(UserAccount owner) {
-        this.owner = owner;
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Date getStartedDate() {
+        return startedDate;
+    }
+
+    public void setStartedDate(Date startedDate) {
+        this.startedDate = startedDate;
+    }
+
+    public Date getFinishedDate() {
+        return finishedDate;
+    }
+
+    public void setFinishedDate(Date finishedDate) {
+        this.finishedDate = finishedDate;
+    }
+
+    public String getRemoteId() {
+        return remoteId;
+    }
+
+    public void setRemoteId(String remoteId) {
+        this.remoteId = remoteId;
     }
 
     public Phase getPhase() {
@@ -212,6 +235,22 @@ public class Job implements Serializable {
         this.phase = phase;
     }
 
+    public Boolean getResultsEmail() {
+        return resultsEmail;
+    }
+
+    public void setResultsEmail(Boolean resultsEmail) {
+        this.resultsEmail = resultsEmail;
+    }
+
+    public UserAccount getOwner() {
+        return owner;
+    }
+
+    public void setOwner(UserAccount owner) {
+        this.owner = owner;
+    }
+
     public UWS getUws() {
         return uws;
     }
@@ -220,72 +259,46 @@ public class Job implements Serializable {
         this.uws = uws;
     }
 
-    public String getRemoteId() {
-        return remoteId;
+    public UWSType getUwsType() {
+        return uwsType;
     }
 
-    public void setUwsId(String remoteId) {
-        this.remoteId = remoteId;
+    public void setUwsType(UWSType uwsType) {
+        this.uwsType = uwsType;
     }
 
-//    public UWSJob getUwsJob() {
-//        return uwsJob;
-//    }
-//
-//    public void setUwsJob(UWSJob uwsJob) {
-//        this.uwsJob = uwsJob;
-//    }
-    public Date getStartedDate() {
-        return startedDate;
+    public String getConfigurationJson() {
+        return configurationJson;
     }
 
-    public void setStartedDate(Date startedDate) {
-        this.startedDate = startedDate;
+    public void setConfigurationJson(String configurationJson) {
+        this.configurationJson = configurationJson;
     }
 
-    public String getResultsEmail() {
-        return resultsEmail;
-    }
-
-    public void setResultsEmail(String resultsEmail) {
-        this.resultsEmail = resultsEmail;
-    }
-
-    public long getExecutingTime() {
-        Date sd = startedDate;
-        Date fd = finishedDate;
-        if (sd == null) {
-            return 0;
-        }
-        if (fd == null) {
-            sd = createdDate;
-            fd = new Date();
-        }
-        return (fd.getTime() - sd.getTime()) / 1000;
-    }
-
-//    public String getUwsJobXml() {
-//        return uwsJobXml;
-//    }
+    
+    
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        int hash = 3;
+        hash = 17 * hash + Objects.hashCode(this.id);
         return hash;
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (!(object instanceof Job)) {
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
         }
-        Job other = (Job) object;
-        return !((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id)));
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Job other = (Job) obj;
+        return Objects.equals(this.id, other.id);
     }
 
     @Override
     public String toString() {
-        return "Job{" + "id=" + id + ", label=" + label + ", notes=" + notes + ", owner=" + owner + ", jobType=" + jobType + ", uws=" + uws + ", createdDate=" + createdDate + ", startedDate=" + startedDate + ", finishedDate=" + finishedDate + ", remoteId=" + remoteId + ", phase=" + phase + ", resultsEmail=" + resultsEmail + '}';
+        return "Job{" + "id=" + id + ", label=" + label + ", notes=" + notes + ", createdDate=" + createdDate + ", startedDate=" + startedDate + ", finishedDate=" + finishedDate + ", remoteId=" + remoteId + ", phase=" + phase + ", resultsEmail=" + resultsEmail + ", owner=" + owner + ", uws=" + uws + ", uwsType=" + uwsType + '}';
     }
-    //</editor-fold>
+
 }

@@ -70,7 +70,7 @@ public abstract class CreateJob implements Serializable {
     public CreateJob() {
         job = new Job();
         tid = UUID.randomUUID();
-        job.setJobType(getJobType());
+//        job.setJobType(getJobType());
         uploadedFiles = new ArrayList<>();
         uploadDir = new File(tempDir, tid.toString());
     }

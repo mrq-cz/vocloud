@@ -6,8 +6,8 @@ package cz.mrq.vocloud.entity;
  */
 public enum Phase {
 
-    PENDING,
     QUEUED,
+    PENDING,
     EXECUTING,
     COMPLETED,
     ERROR,

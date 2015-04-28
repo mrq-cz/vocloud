@@ -4,7 +4,7 @@
               xmlns:p="http://primefaces.org/ui"
               xmlns="http://www.w3.org/1999/xhtml">
 
-    <h:form>
+    <h:form id="navigationForm">
         <p:menubar>
             <p:menuitem value="#{bundle.MenuItemHome}" outcome="/index" />
             <p:menuitem rendered="#{request.remoteUser != null}" ajax="false" action="/jobs/index?faces-redirect=true" value="#{bundle.MenuItemJobs}" icon="ui-icon-document" />

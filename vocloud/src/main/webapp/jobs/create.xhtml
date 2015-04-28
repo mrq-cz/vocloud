@@ -15,36 +15,53 @@
                 <h:outputText value="Create new #{createJobBean.chosenUwsType.shortDescription} job" rendered="#{createJobBean.nonRestrictedUwsTypeFound}" />
             </ui:define>
 
-            <ui:define name="messages">
-                <p:messages id="createMessages" showDetail="true" />
-            </ui:define>
-
             <ui:define name="content">
-                <f:metadata>
-                    <f:viewAction action="#{createJobBean.checkNonRestrictedParamValidity()}" />
-                </f:metadata>
-                <ui:fragment rendered="#{createJobBean.chosenUwsType.description != null}">
-                    <h4><h:outputText value="#{createJobBean.chosenUwsType.shortDescription}"/> description</h4>
-                    <div class="uwsTypeDescription">
-                        <h:outputText value="#{createJobBean.chosenUwsType.description}" />
-                    </div>
-                </ui:fragment>
-                <h:panelGrid columns="2" cellpadding="" cellspacing="2" rendered="#{createJobBean.chosenUwsType.documentationUrl != null}">
-                    <p:outputLabel value="Documentation URL: "/>
-                    <p:link target="_blank" href="#{createJobBean.chosenUwsType.documentationUrl}" value="#{createJobBean.chosenUwsType.documentationUrl}" />  
-                </h:panelGrid>
                 <h:form>
-                    <p:panel header="Job configuration">
+                    <p:messages id="createMessages" showDetail="true" />
+                    <f:metadata>
+                        <f:viewAction action="#{createJobBean.checkNonRestrictedParamValidity()}" />
+                    </f:metadata>
+                    <ui:fragment rendered="#{createJobBean.chosenUwsType.description != null}">
+                        <h4><h:outputText value="#{createJobBean.chosenUwsType.shortDescription}"/> description</h4>
+                        <div class="uwsTypeDescription">
+                            <h:outputText value="#{createJobBean.chosenUwsType.description}" />
+                        </div>
+                    </ui:fragment>
+                    <h:panelGrid columns="2" cellpadding="" cellspacing="2" rendered="#{createJobBean.chosenUwsType.documentationUrl != null}">
+                        <p:outputLabel value="Documentation URL: "/>
+                        <p:link target="_blank" href="#{createJobBean.chosenUwsType.documentationUrl}" value="#{createJobBean.chosenUwsType.documentationUrl}" />  
+                    </h:panelGrid>
+
+                    <p:panel header="Job description">
+                        <h:panelGrid columns="2" style="padding-bottom: 20px">
+                            <p:outputLabel value="Project label:" for="label" />
+                            <p:inputText size="30" label="Job label" id="label" value="#{createJobBean.jobLabel}"
+                                         required="true"  converter="trailingSpacesConverter"
+                                         requiredMessage="Please enter a label for this job"/>
+
+                            <p:outputLabel value="Description:" for="notes" />
+                            <p:inputTextarea id="notes" cols="60" value="#{createJobBean.jobNotes}"  converter="trailingSpacesConverter"/>
+                            <p:selectBooleanCheckbox id="email" value="#{createJobBean.jobEmail}" itemLabel="Email me results" />
+                        </h:panelGrid>
+                    </p:panel>
+                    <p:panel header="Job configuration JSON">
                         <h3>Upload JSON configuration file</h3>
                         <p:fileUpload fileUploadListener="#{createJobBean.handleConfigUpload}" mode="advanced" dragDropSupport="true"
-                                      update="configTextArea" sizeLimit="500000" allowTypes="/(\.|\/)(txt|json)$/" />
+                                      update="configTextArea,createMessages" sizeLimit="500000" allowTypes="/(\.|\/)(txt|json|htm|html)$/" multiple="false" />
                         <h3>JSON configuration preview</h3>
-                        <p:inputTextarea id="configTextArea" rows="20" cols="100" maxlength="500000" value="#{createJobBean.configurationJson}" />
+                        <p:inputTextarea id="configTextArea" converter="trailingSpacesConverter" rows="20" cols="100" maxlength="500000" value="#{createJobBean.configurationJson}" required="true" requiredMessage="Confinguration is mandatory"/>
                     </p:panel>
-                    <p:splitButton ajax="false" value="Save and run">
-                        <p:menuitem ajax="false" value="Save" />
+                    <p:splitButton value="Save and run" action="#{createJobBean.saveNewJob(true)}" update="@form" process="@form" oncomplete="window.scrollTo(0, 0);">
+                        <p:menuitem value="Save" action="#{createJobBean.saveNewJob(false)}" update="@form" process="@form" oncomplete="window.scrollTo(0, 0);"/>
                     </p:splitButton>
                     <p:commandButton ajax="false" value="Cancel" action="index?faces-redirect=true" />
+                    
+                    
+                    <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+
+                    <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage library="images" name="preloader.gif"/>
+                    </p:dialog>
                 </h:form>
                 <!--
                 <h:form enctype="multipart/form-data">

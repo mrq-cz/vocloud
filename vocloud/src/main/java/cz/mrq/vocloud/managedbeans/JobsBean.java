@@ -51,28 +51,28 @@ public class JobsBean implements Serializable {
         logger.info("Creating JobsBean");
     }
 
-    @PostConstruct
-    public void refresh() {
-        user = usb.getUser();
-        jobs = jobFacade.userJobList(user);
-    }
+//    @PostConstruct
+//    public void refresh() {
+//        user = usb.getUser();
+//        jobs = jobFacade.userJobList(user);
+//    }
 
-    public void runAgain() {
-        NavigationHandler myNav = FacesContext.getCurrentInstance().getApplication().getNavigationHandler();
-        FacesContext.getCurrentInstance().getAttributes().put("parent", selected);
-
-        String create = "create";
-        if (selected.getJobType().equals("SOM")) {
-            create = "create-som";
-        } else if (selected.getJobType().equals("RDF")) {
-            create = "create-rdf";
-        } else if(selected.getJobType().equals("Preprocessing"))
-        {
-            create = "create-preprocessing";
-        }
-
-        myNav.handleNavigation(FacesContext.getCurrentInstance(), "details", create);
-    }
+//    public void runAgain() {
+//        NavigationHandler myNav = FacesContext.getCurrentInstance().getApplication().getNavigationHandler();
+//        FacesContext.getCurrentInstance().getAttributes().put("parent", selected);
+//
+//        String create = "create";
+//        if (selected.getJobType().equals("SOM")) {
+//            create = "create-som";
+//        } else if (selected.getJobType().equals("RDF")) {
+//            create = "create-rdf";
+//        } else if(selected.getJobType().equals("Preprocessing"))
+//        {
+//            create = "create-preprocessing";
+//        }
+//
+//        myNav.handleNavigation(FacesContext.getCurrentInstance(), "details", create);
+//    }
 
     public void details(ActionEvent e) {
         selected = (Job) e.getComponent().getAttributes().get("selectedJob");
