@@ -30,7 +30,7 @@ import java.util.logging.Logger;
  *
  * @author voadmin
  */
-@ManagedBean(name = "jobs")
+@ManagedBean(name = "jobsTODODelete")
 @SessionScoped
 public class JobsBean implements Serializable {
 

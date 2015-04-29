@@ -44,6 +44,15 @@ public class CreateJobBean implements Serializable {
 
     @PostConstruct
     private void init() {
+        Job rerun = (Job) FacesContext.getCurrentInstance().getExternalContext().getRequestMap().get("rerunJob");
+        if (rerun != null){
+            chosenUwsType = rerun.getUwsType();
+            configurationJson = rerun.getConfigurationJson();
+            jobLabel = rerun.getLabel() + "(copy)";
+            jobNotes = rerun.getNotes();
+            jobEmail = rerun.getResultsEmail();
+            return;
+        }
         String uwsTypeStrId = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("uwsType");
         if (uwsTypeStrId == null) {
             //undefined param

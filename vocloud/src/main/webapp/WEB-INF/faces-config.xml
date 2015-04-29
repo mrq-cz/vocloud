@@ -21,6 +21,11 @@
             org.primefaces.application.DialogViewHandler
         </view-handler>
     </application>
+    <factory>
+        <exception-handler-factory>
+            cz.rk.vocloud.view.exceptionhandler.ViewExpiredExceptionExceptionHandlerFactory
+        </exception-handler-factory>
+    </factory>
     <navigation-rule>
         <from-view-id>*</from-view-id>
         <navigation-case>

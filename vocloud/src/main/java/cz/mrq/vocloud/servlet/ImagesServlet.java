@@ -2,6 +2,7 @@ package cz.mrq.vocloud.servlet;
 
 import cz.mrq.vocloud.ejb.JobFacade;
 import cz.mrq.vocloud.entity.Job;
+import cz.mrq.vocloud.entity.UserGroupName;
 import cz.mrq.vocloud.tools.Config;
 
 import javax.ejb.EJB;
@@ -48,12 +49,14 @@ public class ImagesServlet extends HttpServlet {
         //TODO fix bugs
         Job job = jf.find(Long.parseLong(jobId));
         String user = request.getRemoteUser();
-        if (!job.getOwner().getUsername().equals(user)) {
+        if (!job.getOwner().getUsername().equals(user) && !(job.getOwner().getGroupName() == UserGroupName.ADMIN)) {
             response.sendError(403);
             return;
         }
 
-        if (!fileName.endsWith("png")) {
+        if (!fileName.endsWith("png") && !fileName.endsWith("jpg")
+                && !fileName.endsWith("jpeg") && !fileName.endsWith("gif")) {
+            response.sendError(400);
             return;
         }
 
@@ -65,7 +68,13 @@ public class ImagesServlet extends HttpServlet {
         }
 
         response.reset();
-        response.setContentType("image/png");
+        if (fileName.endsWith("png")){
+            response.setContentType("image/png");
+        } else if (fileName.endsWith("jpg") || fileName.endsWith("jpeg")){
+            response.setContentType("image/jpeg");
+        } else if (fileName.endsWith("gif")){
+            response.setContentType("image/gif");
+        }
         response.setHeader("Content-disposition", "inline; filename=\"" + file.getName() + "\"");
 
         try (BufferedInputStream input = new BufferedInputStream(new FileInputStream(file));

@@ -50,7 +50,7 @@
                                       update="configTextArea,createMessages" sizeLimit="500000" allowTypes="/(\.|\/)(txt|json|htm|html)$/" multiple="false" />
                         <h3>JSON configuration preview</h3>
                         <p:inputTextarea id="configTextArea" converter="trailingSpacesConverter" rows="20" cols="100" maxlength="500000" value="#{createJobBean.configurationJson}" required="true" requiredMessage="Confinguration is mandatory"/>
-                    </p:panel>
+                    </p:panel>                   
                     <p:splitButton value="Save and run" action="#{createJobBean.saveNewJob(true)}" update="@form" process="@form" oncomplete="window.scrollTo(0, 0);">
                         <p:menuitem value="Save" action="#{createJobBean.saveNewJob(false)}" update="@form" process="@form" oncomplete="window.scrollTo(0, 0);"/>
                     </p:splitButton>
@@ -63,63 +63,6 @@
                         <p:graphicImage library="images" name="preloader.gif"/>
                     </p:dialog>
                 </h:form>
-                <!--
-                <h:form enctype="multipart/form-data">
-                    <h:panelGrid columns="2" style="padding-bottom: 20px">
-                        <h:outputLabel style="font-weight: bold" value="Project label:" for="label" />
-                        <p:inputText size="30" label="Job label" id="label" value="#{createKorelJob.job.label}"
-                                     required="true"
-                                     requiredMessage="Please enter a label for this job"/>
-
-                        <h:outputLabel value="Description:" for="notes" />
-                        <p:inputTextarea id="notes" cols="60" value="#{createKorelJob.job.notes}" />
-                        <h:panelGrid columns="2">
-                            <p:selectBooleanCheckbox id="email" value="#{createKorelJob.email}" />
-                            <h:outputText value="Email me results" for="email" />
-                        </h:panelGrid>
-                    </h:panelGrid>
-                    <p:panel id="korelpar"  binding="#{createKorelJob.editParPanel}" toggleable="true" header="Edit korel.par" >
-                        <p:inputTextarea id="partext" value="#{createKorelJob.parFileContents}"
-                                         cols="90" rows="10"  autoResize="false" style="font-family: courier"/>
-                        <p:resizable for="partext" minHeight="170" minWidth="750" />
-                    </p:panel>
-                    <p> </p>
-                    <p:panel id="korel" toggleable="true" header="Upload parameters">
-                        <h:panelGrid columns="1">
-                            <p>
-                                Please attach parameter file <em>korel.par</em> and data file <em>korel.dat</em>, 
-                                you can also upload template <em>korel.tmp</em> if needed.
-                            </p>
-                            <p>
-                                All those files can be uploaded in zip archive.
-                            </p>
-                            <h:panelGrid columns="2">
-                                <h:outputText value="korel.par"/>
-                                <p:selectBooleanCheckbox disabled="true" value="#{createKorelJob.par}"/>
-
-                                <h:outputText value="korel.dat"/>
-                                <p:selectBooleanCheckbox disabled="true" value="#{createKorelJob.dat}"/>
-
-                                <h:outputText value="korel.tmp"/>
-                                <p:selectBooleanCheckbox disabled="true" value="#{createKorelJob.tmp}"/>
-                            </h:panelGrid>
-                            <p:fileUpload  id="upload" 
-                                           mode="advanced"
-                                           auto="true"
-                                           multiple="true"
-                                           update="korel korelpar"
-                                           allowTypes="/(\.|\/)(par|dat|tmp|zip)$/"
-                                           fileUploadListener="#{createKorelJob.handleFileUpload}"/>
-
-                        </h:panelGrid>
-                    </p:panel>
-
-                    <p> </p>
-                    <p:splitButton update=":createMessages"  value="Save and run" action="#{createKorelJob.saveRun}">
-                        <p:menuitem update=":createMessages"  value="Save" action="#{createKorelJob.save}" />
-                    </p:splitButton>
-                    <p:commandButton ajax="false" value="Cancel" action="index.xhtml" />
-                </h:form>-->
             </ui:define>
 
         </ui:composition>

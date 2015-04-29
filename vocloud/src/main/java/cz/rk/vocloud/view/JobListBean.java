@@ -5,12 +5,13 @@ import cz.mrq.vocloud.ejb.JobFacade;
 import cz.mrq.vocloud.ejb.UserSessionBean;
 import cz.mrq.vocloud.entity.Job;
 import cz.mrq.vocloud.entity.UserAccount;
-import cz.rk.vocloud.entity.DownloadJob;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import org.primefaces.model.LazyDataModel;
@@ -63,19 +64,20 @@ public class JobListBean implements Serializable {
     }
     
     public void startJob(Job job){
-        //TODO
+        jobFacade.startJob(job);
     }
     
     public void abortJob(Job job){
-        //TODO
+        jobFacade.abortJob(job);
     }
     
     public void deleteJob(Job job){
-        //TODO
+        //destroy remote job - idc about results - and delete job dir
+        jobFacade.deleteJob(job);
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Job with id " + job.getId() + " was deleted"));
     }
     
     public String showDetail(Job job){
-        //TODO
-        return null;
+        return "details?faces-redirect=true&jobId=" + job.getId();
     }
 }

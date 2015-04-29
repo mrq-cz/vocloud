@@ -41,10 +41,10 @@ public class UWSParser {
         Unmarshaller unmarshaller = jc.createUnmarshaller();
         UWSJob uwsJob = (UWSJob) unmarshaller.unmarshal(new ByteArrayInputStream(xml.getBytes()));
 
-        //debugging reasons only
-        Marshaller marshaller = jc.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.marshal(uwsJob, System.out);
+//        //debugging reasons only
+//        Marshaller marshaller = jc.createMarshaller();
+//        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+//        marshaller.marshal(uwsJob, System.out);
         return uwsJob;
     }
 

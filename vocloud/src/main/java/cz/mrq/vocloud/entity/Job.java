@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.logging.Logger;
 import javax.enterprise.inject.Vetoed;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -67,7 +68,7 @@ public class Job implements Serializable {
     @Basic(fetch = FetchType.LAZY)
     @Column(nullable = false)
     private String configurationJson;
-    
+
 //    @Transient
 //    private UWSJob uwsJob;
 //    @Transient
@@ -78,6 +79,7 @@ public class Job implements Serializable {
     /**
      * updates attributes from local UWS job object (only if uwsjob isn't null
      * obviously)
+     *
      * @param uwsJob
      */
     public void updateFromUWSJob(UWSJob uwsJob) {
@@ -90,67 +92,13 @@ public class Job implements Serializable {
             Logger.getLogger(Job.class.getName()).warning("trying to update from non-existent uwsJob");
         }
     }
-////
-////    /**
-////     * updates attributes according to data online on UWS server
-////     */
-////    public void updateFromUWS() {
-////        if (uws == null || remoteId == null) {
-////            return; // cant update without uws
-////        }
-////        String xml;
-////        try {
-////            xml = getUws().getJob(remoteId);
-////        } catch (IOException ex) {
-////            Logger.getLogger(Job.class.getName()).log(Level.SEVERE, "cannot update job", ex);
-////            return;
-////        }
-////        uwsJobXml = xml;
-////        uwsJob = getParser().parseJob(xml);
-////        if (uwsJob == null) {
-////            try {
-////                Phase uwsPhase = getUws().getJobPhase(remoteId);
-////                if (uwsPhase != null) {
-////                    this.phase = uwsPhase;
-////                }
-////            } catch (IOException e) {
-////                Logger.getLogger(Job.class.getName()).log(Level.SEVERE, "failed retrieving job phase", e);
-////            }
-////            return;
-////        }
-////        updateFromUWSJob();
-////    }
-////
-////    public void start() throws IOException {
-////        String output = getUws().startJob(remoteId);
-////        uwsJob = getParser().parseJob(output);
-////        updateFromUWSJob();
-////    }
-////
-////    public void abort() throws IOException {
-////        uwsJob = getParser().parseJob(getUws().abortJob(remoteId));
-////        updateFromUWSJob();
-////    }
-////
-////    public void destroyOnUWS() {
-////        if (uws == null) {
-////            return;
-////        }
-////        try {
-////            getUws().destroyJob(remoteId);
-////        } catch (IOException ex) {
-////            Logger.getLogger(Job.class.getName()).log(Level.WARNING, "cant destroy job on UWS", ex.toString());
-////        }
-////    }
-////
-////    private UWSParserManager getParser() {
-////        if (parser == null) {
-////            parser = UWSParserManager.getInstance();
-////        }
-////        return parser;
-////    }
+
     public boolean isCompleted() {
         return (this.phase == Phase.COMPLETED);
+    }
+
+    public boolean hasEndState() {
+        return this.phase == Phase.ABORTED || this.phase == Phase.COMPLETED || this.phase == Phase.ERROR;
     }
 
     /**
@@ -274,9 +222,12 @@ public class Job implements Serializable {
     public void setConfigurationJson(String configurationJson) {
         this.configurationJson = configurationJson;
     }
+    
+    @Transient
+    public String getStringId(){
+        return id.toString();
+    }
 
-    
-    
     @Override
     public int hashCode() {
         int hash = 3;

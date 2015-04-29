@@ -13,8 +13,8 @@
         </ui:define>
         <ui:define name="content">
             <h:form>
-                <p:poll interval="10" listener="#{jobListBean.pollRefresh}" update="@form" />
-                <p:dataTable value="#{jobListBean.model}" var="job" paginator="true" rows="20" lazy="true" resizableColumns="true">
+                <p:poll interval="10" listener="#{jobListBean.pollRefresh}" update="@form" widgetVar="poll"/>
+                <p:dataTable value="#{jobListBean.model}" var="job" paginator="true" rows="20" lazy="true" resizableColumns="true" rowStyleClass="#{job.phase eq 'COMPLETED' ? 'greenRow' : (job.phase eq 'ERROR' ? 'redRow' : null)}">
                     <p:column headerText="Type">
                         <h:outputText value="#{job.uwsType.shortDescription}" />
                     </p:column>
@@ -26,7 +26,7 @@
                     </p:column>
                     <p:column  headerText="Created">
                         <h:outputText value="#{job.createdDate}">
-                            <f:convertDateTime type="date"  dateStyle="short" timeZone="CET" />
+                            <f:convertDateTime type="both"  dateStyle="short" timeZone="CET" />
                         </h:outputText>
                     </p:column>
                     <p:column headerText="Duration">
@@ -45,10 +45,16 @@
                         </p:commandButton>
                     </p:column>
                     <p:column headerText="Details" width="40" style="text-align: center">
-                        <p:commandButton id="details" actionListener="#{jobListBean.showDetail(job)}" ajax="false" icon="ui-icon-document" title="Details of job" />
+                        <p:commandButton id="details" action="#{jobListBean.showDetail(job)}" ajax="false" icon="ui-icon-document" title="Details of job" />
                     </p:column>
                 </p:dataTable>
-                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+
+                <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" onerror="PF('statusDialog').hide()"/>
+
+                <p:dialog  widgetVar="statusDialog" modal="false" draggable="false" closable="false" resizable="false" showHeader="false">
+                    <p:graphicImage library="images" name="preloader.gif"/>
+                </p:dialog>
+                <p:confirmDialog appendTo="@(body)" id="confirmDialog" widgetVar="confirmDialog" global="true" showEffect="fade" hideEffect="fade">
                     <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
                     <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
                 </p:confirmDialog>

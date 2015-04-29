@@ -46,6 +46,7 @@ public class Job extends AbstractJob {
 
     public Job(Map<String, String> lstParam) throws UWSException {
         super(lstParam);
+        System.out.println("New instance");
     }
 
     @Override
@@ -56,10 +57,12 @@ public class Job extends AbstractJob {
             configFile = additionalParameters.get("config");//could be big file - remove from map
             additionalParameters.remove("config");
         } else {
-            for (Map.Entry<String, String> i: additionalParameters.entrySet()){
-                System.out.println("key: |" + i.getKey() + "|");
+//            for (Map.Entry<String, String> i: additionalParameters.entrySet()){
+//                System.out.println("key: |" + i.getKey() + "|");
+//            }
+            if (configFile == null){
+                throw new UWSException(UWSException.BAD_REQUEST, "Config file has to be specified.");
             }
-            throw new UWSException(UWSException.BAD_REQUEST, "Config file has to be specified.");
         }
         return true;
     }
@@ -136,7 +139,8 @@ public class Job extends AbstractJob {
         } catch (InterruptedException ie) {
             //kill process if job is aborted
             if (process != null) {
-                process.destroy();
+                LOG.log(Level.INFO, "Calling kill signal to process");
+                process.destroyForcibly();
             }
             aborted = true;
         } catch (IOException e) {

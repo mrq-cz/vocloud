@@ -63,7 +63,7 @@ public class SchedulerBean {
                 if (uwsJob != null){
                     jf.downloadResults(job, uwsJob);
                 }
-                jf.destroyJob(job);
+                jf.destroyRemoteJob(job);
                 watchedJobs.remove(job);
             }
         }

@@ -28,8 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ejb.Asynchronous;
 import javax.ejb.EJBException;
 import javax.persistence.TypedQuery;
+import org.apache.commons.io.FileUtils;
 import org.zeroturnaround.zip.ZipUtil;
 
 /**
@@ -85,7 +87,7 @@ public class JobFacade extends AbstractFacade<Job> {
         //set user account
         job.setOwner(usb.getUser());
         //set phase
-        job.setPhase(Phase.QUEUED);
+        job.setPhase(Phase.CREATED);
         //find best uws for this job's uws type
         UWS bestUWS = findBestUwsJob(job.getUwsType());
         if (bestUWS == null) {
@@ -161,6 +163,7 @@ public class JobFacade extends AbstractFacade<Job> {
         result.mkdirs();
         return result;
     }
+
     /**
      * downloads results of the job to the local storage
      *
@@ -169,53 +172,66 @@ public class JobFacade extends AbstractFacade<Job> {
      * @return success
      */
     public boolean downloadResults(Job job, UWSJob uwsJob) {
-        if (job == null){
+        if (job == null) {
             throw new IllegalArgumentException("Null job passed as argument");
         }
-        if (uwsJob == null){
+        if (uwsJob == null) {
             throw new IllegalArgumentException("Null uwsJob passed as argument");
         }
         //check that there are some results
-        if (uwsJob.getResults() == null || uwsJob.getResults().isEmpty()){
+        if (uwsJob.getResults() == null || uwsJob.getResults().isEmpty()) {
             return false;//no results
         }
         File results;
         boolean resFlag = true;
         try {
-            for (Result r: uwsJob.getResults()){
-                if (r.getHrefTrimmed() == null){
+            for (Result r : uwsJob.getResults()) {
+                if (r.getHrefTrimmed() == null) {
                     continue;
                 }
                 //else download
                 String[] split = r.getHrefTrimmed().split("/");
                 results = new File(getFileDir(job), split[split.length - 1]);
-                if (!Toolbox.downloadFile(r.getHrefTrimmed(), results)){
+                if (!Toolbox.downloadFile(r.getHrefTrimmed(), results)) {
                     resFlag = false;
                 }
-                if (results.getName().endsWith("zip")){
+                if (results.getName().endsWith("zip")) {
                     ZipUtil.unpack(results, results.getParentFile());
                 }
                 LOG.log(Level.INFO, "Result {0} for job {1} downloaded", new Object[]{results.getName(), job.getId()});
-            }            
+            }
         } catch (Exception ex) {
             resFlag = false;
             LOG.log(Level.SEVERE, "Download failed", ex);
         }
         return resFlag;
     }
-    
-    public List<Job> findUserJobsPaginated(UserAccount userAcc, int first, int count){
+
+    public List<Job> findUserJobsPaginated(UserAccount userAcc, int first, int count) {
         TypedQuery<Job> query = em.createNamedQuery("Job.userJobList", Job.class);
         query.setParameter("owner", userAcc);
         query.setFirstResult(first);
         query.setMaxResults(count);
         return query.getResultList();
     }
-    
-    public Long countUserJobs(UserAccount userAcc){
+
+    public Long countUserJobs(UserAccount userAcc) {
         TypedQuery<Long> query = em.createNamedQuery("Job.countUserJobs", Long.class);
         query.setParameter("owner", userAcc);
         return query.getSingleResult();
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public Job findWithConfig(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("id argument is null");
+        }
+        Job res = em.find(Job.class, id);
+        if (res != null) {
+            //fetch lazy configuration file by reading length
+            res.getConfigurationJson().length();
+        }
+        return res;
     }
 //    public void start(Job job) throws IOException {
 //        job.start();
@@ -487,6 +503,7 @@ public class JobFacade extends AbstractFacade<Job> {
     //==========================Remote job manipulation methods=================
 
     public void createJob(Job job, String configuration, boolean startImmediately) {
+        //not necessary to put to watched jobs - asynchronous method in scheduler bean does it itself
         String request = job.getUws().getUwsUrl();
         if (startImmediately) {
             request += "?PHASE=RUN";
@@ -517,8 +534,10 @@ public class JobFacade extends AbstractFacade<Job> {
             UWSJob response = UWSParserManager.getInstance().parseJob(Toolbox.httpPost(job.getUws().getUwsUrl() + "/" + job.getRemoteId() + "/phase?PHASE=RUN"));
             job.updateFromUWSJob(response);
             edit(job);
+            //add to watched jobs
+            sb.addWatchedJob(job);
         } catch (IOException ex) {
-            LOG.log(Level.SEVERE, "Exception during starting job");
+            LOG.log(Level.SEVERE, "Exception during starting job", ex);
             job.setPhase(Phase.ERROR);
             edit(job);
         }
@@ -532,32 +551,36 @@ public class JobFacade extends AbstractFacade<Job> {
             LOG.log(Level.WARNING, "Job passed as argument has not defined remoteId");
             return;
         }
+        LOG.log(Level.INFO, "Aborting job {0}", job.getId());
         try {
             UWSJob response = UWSParserManager.getInstance().parseJob(Toolbox.httpPost(job.getUws().getUwsUrl() + "/" + job.getRemoteId() + "/phase?PHASE=ABORT"));
             job.updateFromUWSJob(response);
             edit(job);
         } catch (IOException ex) {
-            LOG.log(Level.SEVERE, "Exception during aborting job");
+            LOG.log(Level.SEVERE, "Exception during aborting job", ex);
             job.setPhase(Phase.ERROR);
             edit(job);
         }
     }
 
-    public void destroyJob(Job job) {
+    //not async
+    public void destroyRemoteJob(Job job) {
         if (job == null) {
             throw new IllegalArgumentException("Argument job is null");
         }
-        if (job.getRemoteId() == null) {
-            LOG.log(Level.WARNING, "Job passed as argument has not defined remoteId");
-            return;
+        LOG.log(Level.INFO, "Destroying job with id {0}", job.getId());
+        sb.removeWatchedJob(job);
+        if (job.getRemoteId() != null) {
+            try {
+                Toolbox.httpPost(job.getUws().getUwsUrl() + "/" + job.getRemoteId() + "/?ACTION=DELETE");
+            } catch (IOException ex) {
+                LOG.log(Level.SEVERE, "Exception during destroying job - job will probably have to be deleted manually", ex);
+            }
         }
-        try {
-            Toolbox.httpPost(job.getUws().getUwsUrl() + "/" + job.getRemoteId() + "/?ACTION=DELETE");
-        } catch (IOException ex) {
-            LOG.log(Level.SEVERE, "Exception during destroying job - job will probably have to be deleted manually");
-        }
+
     }
 
+    //not async
     public UWSJob refreshJob(Job job) {
         if (job == null) {
             throw new IllegalArgumentException("Argument job is null");
@@ -579,4 +602,30 @@ public class JobFacade extends AbstractFacade<Job> {
         }
     }
 
+    /**
+     * Method invoked from the presentation tier to delete specified job.
+     *
+     * @param job Job to be deleted from the database with folders and possibly
+     * on worker if still running
+     */
+    public void deleteJob(Job job) {
+        if (job.getPhase() != Phase.COMPLETED && job.getPhase() != Phase.ABORTED && job.getPhase() != Phase.ERROR) {
+            destroyRemoteJob(job);
+        }
+        deleteJobDir(job);//if any
+        remove(job);//remove job from database
+    }
+
+    private void deleteJobDir(Job job) {
+        File jobDir = getFileDir(job);
+        if (!jobDir.exists()) {
+            return;//nothing to do
+        }
+        try {
+            FileUtils.deleteDirectory(jobDir);//recursively delete
+        } catch (IOException ex) {
+            //just log the exception
+            LOG.log(Level.WARNING, "Job directory " + jobDir.getName() + " was NOT successfully deleted", ex);
+        }
+    }
 }

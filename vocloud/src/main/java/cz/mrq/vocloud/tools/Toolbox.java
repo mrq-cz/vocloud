@@ -60,7 +60,7 @@ public class Toolbox {
         conn.connect();
 
         if (conn.getResponseCode() != 200) {
-            throw new IOException(conn.getResponseMessage());
+            throw new IOException(urlStr + " " + conn.getResponseMessage());
         }
 
         // Buffer the result into a string

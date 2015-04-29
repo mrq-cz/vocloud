@@ -2,6 +2,7 @@ package cz.mrq.vocloud.servlet;
 
 import cz.mrq.vocloud.ejb.JobFacade;
 import cz.mrq.vocloud.entity.Job;
+import cz.mrq.vocloud.entity.UserGroupName;
 import cz.mrq.vocloud.tools.Config;
 
 import javax.ejb.EJB;
@@ -51,7 +52,7 @@ public class FileServlet extends HttpServlet {
 
         Job job = jf.find(Long.parseLong(jobId));
         String user = request.getRemoteUser();
-        if (!job.getOwner().getUsername().equals(user)) {
+        if (!job.getOwner().getUsername().equals(user) && !job.getOwner().getGroupName().equals(UserGroupName.ADMIN)) {
             response.sendError(403);
             return;
         }
