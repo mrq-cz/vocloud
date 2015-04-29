@@ -45,7 +45,11 @@ public class CreateJobBean implements Serializable {
     @PostConstruct
     private void init() {
         Job rerun = (Job) FacesContext.getCurrentInstance().getExternalContext().getRequestMap().get("rerunJob");
-        if (rerun != null){
+        if (rerun != null) {
+            //fetch with lazy config file
+            rerun = jobFacade.findWithConfig(rerun.getId());
+        }//next null check is necessary too
+        if (rerun != null) {
             chosenUwsType = rerun.getUwsType();
             configurationJson = rerun.getConfigurationJson();
             jobLabel = rerun.getLabel() + "(copy)";

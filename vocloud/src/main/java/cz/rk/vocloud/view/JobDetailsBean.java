@@ -43,7 +43,6 @@ public class JobDetailsBean implements Serializable {
     private UserSessionBean usb;
     @EJB
     private JobFacade jobFacade;
-    private String configurationJson;
     private Job selectedJob;
 
     
@@ -82,7 +81,6 @@ public class JobDetailsBean implements Serializable {
                     handleNavigation(FacesContext.getCurrentInstance(), null, "index?faces-redirect=true");
         }
         //futher initialization
-        configurationJson = selectedJob.getConfigurationJson();
         initializePages();
         initializeImages();
         initializeFileTree();
@@ -165,7 +163,6 @@ public class JobDetailsBean implements Serializable {
     }
 
     public String runAgain() {
-        selectedJob.setConfigurationJson(configurationJson);
         FacesContext.getCurrentInstance().getExternalContext().getRequestMap().put("rerunJob", selectedJob);
         return "create";
     }
